@@ -135,6 +135,7 @@ fun LoginScreen(
 
                 // Verifikasi login dengan data yang tersimpan
                 if (healthDataManager.verifyLogin(email, password)) {
+                    healthDataManager.setLoggedIn(true) // Simpan status login ke storage
                     Toast.makeText(context, "Login berhasil! Selamat datang kembali", Toast.LENGTH_SHORT).show()
                     onLoginSuccess()
                 } else {
@@ -209,6 +210,7 @@ fun LoginScreen(
                                 onRegisterClick() // Navigate to register screen
                             } else if (existingUser.email == googleEmail) {
                                 // User sudah terdaftar dengan email Google yang sama - LOGIN SUCCESS
+                                healthDataManager.setLoggedIn(true) // Simpan status login ke storage
                                 Toast.makeText(context, "✅ Login dengan Google berhasil!\nSelamat datang kembali", Toast.LENGTH_SHORT).show()
                                 onLoginSuccess()
                             } else {

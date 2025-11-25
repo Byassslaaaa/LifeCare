@@ -32,6 +32,7 @@ class HealthDataManager(context: Context) {
         private const val KEY_FOOD_INTAKE = "food_intake"
         private const val KEY_USER_PIN = "user_pin"
         private const val KEY_USER_DATA = "user_data"
+        private const val KEY_IS_LOGGED_IN = "is_logged_in" // Menyimpan status login persistent
     }
 
     // ============ User Management ============
@@ -78,6 +79,15 @@ class HealthDataManager(context: Context) {
 
     fun isPINSet(): Boolean {
         return getUserPIN() != null
+    }
+
+    // ============ Login State Management ============
+    fun setLoggedIn(isLoggedIn: Boolean) {
+        sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, isLoggedIn).apply()
+    }
+
+    fun isLoggedIn(): Boolean {
+        return sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false)
     }
 
     // ============ Body Metrics ============

@@ -326,6 +326,7 @@ fun RegisterScreen(
 
                 // Simpan data user
                 healthDataManager.saveUserData(fullName, email, password, age, gender)
+                healthDataManager.setLoggedIn(true) // Simpan status login ke storage setelah register
                 Toast.makeText(context, "✅ Registrasi Berhasil! Silakan buat PIN 6 digit untuk keamanan data Anda", Toast.LENGTH_LONG).show()
                 onRegisterSuccess()
             },
@@ -395,6 +396,7 @@ fun RegisterScreen(
                                     age = "",
                                     gender = ""
                                 )
+                                healthDataManager.setLoggedIn(true) // Simpan status login ke storage
                                 Toast.makeText(context, "✅ Registrasi dengan Google berhasil!\nSilakan buat PIN 6 digit untuk keamanan", Toast.LENGTH_LONG).show()
                                 onRegisterSuccess() // This will trigger PIN creation
                             } else if (existingUser.email == googleEmail) {

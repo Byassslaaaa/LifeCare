@@ -16,8 +16,8 @@ class MainActivity : ComponentActivity() {
                 // Initialize HealthDataManager
                 val healthDataManager = remember { HealthDataManager(this) }
 
-                // LOGIN STATE
-                var isLoggedIn by remember { mutableStateOf(false) }
+                // LOGIN STATE - Cek dari storage (persistent)
+                var isLoggedIn by remember { mutableStateOf(healthDataManager.isLoggedIn()) }
 
                 // PIN VERIFIED STATE (untuk sesi saat ini)
                 var isPinVerified by remember { mutableStateOf(false) }
@@ -46,6 +46,7 @@ class MainActivity : ComponentActivity() {
                     isLoggedIn && isPinVerified -> {
                         HomeScreen(
                             onLogoutClick = {
+                                healthDataManager.setLoggedIn(false) // Clear login state dari storage
                                 isLoggedIn = false
                                 isPinVerified = false
                             }
