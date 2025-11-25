@@ -238,8 +238,8 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .height(50.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFFFF6B6B)),
-                shape = RoundedCornerShape(12.dp)
+                colors = ButtonDefaults.buttonColors(Color(0xFF33A1E0)),
+                shape = RoundedCornerShape(50.dp)
             ) {
                 Icon(Icons.Default.ExitToApp, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -284,10 +284,10 @@ fun ProfileScreen(
                     .padding(horizontal = 16.dp)
                     .height(50.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color(0xFFFF6B6B)
+                    contentColor = Color(0xFF98CD00)
                 ),
-                border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFFFF6B6B)),
-                shape = RoundedCornerShape(12.dp)
+                border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF98CD00)),
+                shape = RoundedCornerShape(50.dp)
             ) {
                 Icon(Icons.Default.Delete, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))

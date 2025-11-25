@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lifecare.data.HealthDataManager
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun PINScreen(
@@ -44,7 +45,7 @@ fun PINScreen(
             imageVector = Icons.Default.VisibilityOff,
             contentDescription = "Security",
             modifier = Modifier.size(80.dp),
-            tint = Color(0xFF5DCCB4)
+            tint = Color(0xFF33A1E0)
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -53,7 +54,7 @@ fun PINScreen(
             text = if (isSettingPIN) "Buat PIN" else "Masukkan PIN",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF2D3748)
+            color = Color(0xFF33A1E0)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -65,6 +66,7 @@ fun PINScreen(
                 "Masukkan PIN untuk mengakses data kesehatan",
             fontSize = 14.sp,
             color = Color.Gray,
+            textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
@@ -77,7 +79,7 @@ fun PINScreen(
             },
             label = { Text("PIN 6 Digit") },
             placeholder = { Text("Masukkan PIN") },
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(50.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
@@ -87,16 +89,16 @@ fun PINScreen(
                     Icon(
                         imageVector = if (pinVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                         contentDescription = null,
-                        tint = Color(0xFF5DCCB4)
+                        tint = Color(0xFF33A1E0)
                     )
                 }
             },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color(0xFF2D3748),
                 unfocusedTextColor = Color(0xFF2D3748),
-                focusedBorderColor = Color(0xFF5DCCB4),
+                focusedBorderColor = Color(0xFF33A1E0),
                 unfocusedBorderColor = Color.LightGray,
-                focusedLabelColor = Color(0xFF5DCCB4)
+                focusedLabelColor = Color(0xFF33A1E0)
             )
         )
 
@@ -124,8 +126,8 @@ fun PINScreen(
                     }
                 }
             },
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(Color(0xFF5DCCB4)),
+            shape = RoundedCornerShape(50.dp),
+            colors = ButtonDefaults.buttonColors(Color(0xFF33A1E0)),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)

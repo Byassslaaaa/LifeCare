@@ -29,6 +29,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.foundation.border
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import com.example.lifecare.auth.GoogleSignInHelper
 import kotlinx.coroutines.launch
 
@@ -64,7 +66,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            "Sign In",
+            "Sign Up",
             color = Color(0xFF2196F3),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold
@@ -76,14 +78,18 @@ fun LoginScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            placeholder = { Text("Email") },
-            shape = RoundedCornerShape(50),
+            label = { Text("Email") },
+            placeholder = { Text("Masukkan Email") },
+            shape = RoundedCornerShape(50.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
+                focusedTextColor = Color(0xFF2D3748),
+                unfocusedTextColor = Color(0xFF2D3748),
+                focusedBorderColor = Color(0xFF33A1E0),
                 unfocusedBorderColor = Color.LightGray,
+                focusedLabelColor = Color(0xFF33A1E0)
             )
         )
 
@@ -93,24 +99,29 @@ fun LoginScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            placeholder = { Text("Password") },
-            shape = RoundedCornerShape(50),
+            label = { Text("Password") },
+            placeholder = { Text("Masukkan Password") },
+            shape = RoundedCornerShape(50.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF2D3748),
+                unfocusedTextColor = Color(0xFF2D3748),
+                focusedBorderColor = Color(0xFF33A1E0),
+                unfocusedBorderColor = Color.LightGray,
+                focusedLabelColor = Color(0xFF33A1E0)
+            ),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
                         imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = Color(0xFF33A1E0)
                     )
                 }
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                unfocusedBorderColor = Color.LightGray,
-            )
+            }
         )
 
         Spacer(modifier = Modifier.height(25.dp))
@@ -280,7 +291,7 @@ fun LoginScreen(
                 withStyle(style = SpanStyle(color = Color.Gray.copy(alpha = 0.6f))) {
                     append("Don't have an account? ")
                 }
-                withStyle(style = SpanStyle(color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold)) {
+                withStyle(style = SpanStyle(color = Color(0xFF98CD00), fontWeight = FontWeight.Bold)) {
                     append("Sign up")
                 }
             },

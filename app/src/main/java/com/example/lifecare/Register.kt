@@ -64,7 +64,7 @@ fun RegisterScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
+            .background(Color(0xFFffffff))
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -75,40 +75,40 @@ fun RegisterScreen(
         Image(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = "Logo",
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier.size(180.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            "Buat Akun Baru",
-            color = Color(0xFF2D3748),
-            fontSize = 24.sp,
+            "Sign Up",
+            color = Color(0xFF98CD00),
+            fontSize = 16.sp,
             fontWeight = FontWeight.Bold
         )
 
         Text(
             "Daftar untuk mulai tracking kesehatan",
             color = Color.Gray,
-            fontSize = 14.sp
+            fontSize = 12.sp
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = fullName,
             onValueChange = { fullName = it },
             label = { Text("Nama Lengkap") },
             placeholder = { Text("Masukkan nama lengkap") },
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(50.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color(0xFF2D3748),
                 unfocusedTextColor = Color(0xFF2D3748),
-                focusedBorderColor = Color(0xFF5DCCB4),
+                focusedBorderColor = Color(0xFF98CD00),
                 unfocusedBorderColor = Color.LightGray,
-                focusedLabelColor = Color(0xFF5DCCB4)
+                focusedLabelColor = Color(0xFF98CD00)
             )
         )
 
@@ -119,16 +119,16 @@ fun RegisterScreen(
             onValueChange = { email = it },
             label = { Text("Email") },
             placeholder = { Text("contoh@email.com") },
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(50.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color(0xFF2D3748),
                 unfocusedTextColor = Color(0xFF2D3748),
-                focusedBorderColor = Color(0xFF5DCCB4),
+                focusedBorderColor = Color(0xFF98CD00),
                 unfocusedBorderColor = Color.LightGray,
-                focusedLabelColor = Color(0xFF5DCCB4)
+                focusedLabelColor = Color(0xFF98CD00)
             )
         )
 
@@ -139,16 +139,16 @@ fun RegisterScreen(
             onValueChange = { password = it },
             label = { Text("Password") },
             placeholder = { Text("Minimal 6 karakter") },
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(50.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color(0xFF2D3748),
                 unfocusedTextColor = Color(0xFF2D3748),
-                focusedBorderColor = Color(0xFF5DCCB4),
+                focusedBorderColor = Color(0xFF98CD00),
                 unfocusedBorderColor = Color.LightGray,
-                focusedLabelColor = Color(0xFF5DCCB4)
+                focusedLabelColor = Color(0xFF98CD00)
             ),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
@@ -156,7 +156,7 @@ fun RegisterScreen(
                     Icon(
                         imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                         contentDescription = null,
-                        tint = Color(0xFF5DCCB4)
+                        tint = Color(0xFF98CD00)
                     )
                 }
             }
@@ -169,16 +169,16 @@ fun RegisterScreen(
             onValueChange = { verifPassword = it },
             label = { Text("Konfirmasi Password") },
             placeholder = { Text("Masukkan password lagi") },
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(50.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color(0xFF2D3748),
                 unfocusedTextColor = Color(0xFF2D3748),
-                focusedBorderColor = Color(0xFF5DCCB4),
+                focusedBorderColor = Color(0xFF98CD00),
                 unfocusedBorderColor = Color.LightGray,
-                focusedLabelColor = Color(0xFF5DCCB4)
+                focusedLabelColor = Color(0xFF98CD00)
             ),
             visualTransformation = if (verifPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
@@ -186,7 +186,7 @@ fun RegisterScreen(
                     Icon(
                         imageVector = if (verifPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                         contentDescription = null,
-                        tint = Color(0xFF5DCCB4)
+                        tint = Color(0xFF98CD00)
                     )
                 }
             }
@@ -199,16 +199,16 @@ fun RegisterScreen(
             onValueChange = { if (it.isEmpty() || it.all { char -> char.isDigit() }) age = it },
             label = { Text("Umur") },
             placeholder = { Text("Masukkan umur") },
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(50.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color(0xFF2D3748),
                 unfocusedTextColor = Color(0xFF2D3748),
-                focusedBorderColor = Color(0xFF5DCCB4),
+                focusedBorderColor = Color(0xFF98CD00),
                 unfocusedBorderColor = Color.LightGray,
-                focusedLabelColor = Color(0xFF5DCCB4)
+                focusedLabelColor = Color(0xFF98CD00)
             )
         )
 
@@ -223,7 +223,7 @@ fun RegisterScreen(
                 onValueChange = {},
                 label = { Text("Jenis Kelamin") },
                 placeholder = { Text("Pilih jenis kelamin") },
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth(),
@@ -232,9 +232,9 @@ fun RegisterScreen(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color(0xFF2D3748),
                     unfocusedTextColor = Color(0xFF2D3748),
-                    focusedBorderColor = Color(0xFF5DCCB4),
+                    focusedBorderColor = Color(0xFF98CD00),
                     unfocusedBorderColor = Color.LightGray,
-                    focusedLabelColor = Color(0xFF5DCCB4)
+                    focusedLabelColor = Color(0xFF98CD00)
                 ),
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded)
@@ -330,14 +330,14 @@ fun RegisterScreen(
                 Toast.makeText(context, "✅ Registrasi Berhasil! Silakan buat PIN 6 digit untuk keamanan data Anda", Toast.LENGTH_LONG).show()
                 onRegisterSuccess()
             },
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(Color(0xFF5DCCB4)),
+            shape = RoundedCornerShape(50.dp),
+            colors = ButtonDefaults.buttonColors(Color(0xFF98CD00)),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
         ) {
             Text(
-                "Buat Akun",
+                "Create Account",
                 color = Color.White,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
@@ -427,7 +427,7 @@ fun RegisterScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.outlinedButtonColors(
                 containerColor = Color.White,
                 contentColor = Color(0xFF757575)
@@ -470,13 +470,13 @@ fun RegisterScreen(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Sudah punya akun? ",
-                color = Color.Gray,
+                text = "Have an account? ",
+                color = Color.Gray.copy(alpha = 0.6f),
                 fontSize = 14.sp
             )
             Text(
-                text = "Masuk",
-                color = Color(0xFF5DCCB4),
+                text = "Sign In",
+                color = Color(0xFF33A1E0),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
