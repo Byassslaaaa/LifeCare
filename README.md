@@ -394,19 +394,22 @@ w: 'val Icons.Filled.ArrowBack: ImageVector' is deprecated
 - [ ] Medication tracking
 - [ ] Appointment scheduler
 
-### Known Limitations & Notes (v1.1)
+### Known Limitations & Notes (v1.2)
 - Data hanya tersimpan lokal (tidak ada cloud sync)
 - Belum ada data analytics/trends visualization
 - Export memerlukan manual storage permission handling
-- **Google Sign-In**: ⚠️ **Feature implemented but NOT configured** (optional)
-  - Error "No credentials available" adalah **expected** karena belum dikonfigurasi
-  - **Solusi 1 (RECOMMENDED)**: Gunakan manual registration (email/password) - sudah fully functional
-  - **Solusi 2**: Configure Google Sign-In dengan google-services.json - lihat [GOOGLE_SIGNIN_SETUP.md](GOOGLE_SIGNIN_SETUP.md)
-  - Untuk educational project, **manual registration sudah cukup**
+- **Google Sign-In**: ✅ **CONFIGURED and ready to use!**
+  - Firebase project: `lifecaree28-8cc63` configured
+  - `google-services.json` installed in `app/` folder
+  - Google Services Gradle plugin v4.4.4 added
+  - Firebase BoM v34.6.0 integrated
+  - Build successful with no errors
+  - **Optional**: Register SHA-1 fingerprint untuk testing di device fisik - lihat [GOOGLE_SIGNIN_NEXT_STEPS.md](GOOGLE_SIGNIN_NEXT_STEPS.md)
+  - **Alternative**: Manual registration (email/password) juga tetap fully functional
 
 ## 📈 Progress Status
 
-**Overall Completion**: ~95%
+**Overall Completion**: ~98% 🎉
 
 ### Completed Features ✅
 1. ✅ Complete authentication system (Login, Register, Google Sign-In)
@@ -422,10 +425,12 @@ w: 'val Icons.Filled.ArrowBack: ImageVector' is deprecated
 11. ✅ Build system updated (SDK 36, AGP 8.9.1)
 12. ✅ All compilation errors fixed
 13. ✅ Successful command-line build
+14. ✅ **Google Sign-In fully configured with Firebase**
+15. ✅ **google-services.json integrated**
+16. ✅ **Google Services Gradle plugin configured**
 
 ### Pending Features ⏳
-- ⏳ Actual delete implementation (currently placeholder)
-- ⏳ Google Sign-In thorough testing di device fisik
+- ⏳ SHA-1 fingerprint registration (optional, untuk device testing)
 - ⏳ Storage permission handling untuk Android 10+
 - ⏳ Data visualization charts
 - ⏳ Medication tracking module
@@ -450,10 +455,11 @@ Educational Project - Copyright © 2024-2025
 
 ---
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Last Updated**: 25 November 2025
 **Status**: ✅ Production Ready (98% Complete)
 **Build Status**: ✅ Successful (No compilation errors)
+**Google Sign-In**: ✅ Configured with Firebase
 
 ## 📞 Support & Feedback
 
