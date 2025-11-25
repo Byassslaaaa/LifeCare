@@ -261,41 +261,72 @@ fun RegisterScreen(
 
         Button(
             onClick = {
-                // Validasi input kosong
-                if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() ||
-                    verifPassword.isEmpty() || age.isEmpty() || gender.isEmpty()) {
-                    Toast.makeText(context, "Harap isi semua data", Toast.LENGTH_SHORT).show()
-                    return@Button
+                // Validasi input kosong - dengan pesan spesifik
+                when {
+                    fullName.isEmpty() -> {
+                        Toast.makeText(context, "Nama lengkap tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    email.isEmpty() -> {
+                        Toast.makeText(context, "Email tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    password.isEmpty() -> {
+                        Toast.makeText(context, "Password tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    verifPassword.isEmpty() -> {
+                        Toast.makeText(context, "Konfirmasi password tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    age.isEmpty() -> {
+                        Toast.makeText(context, "Umur tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    gender.isEmpty() -> {
+                        Toast.makeText(context, "Jenis kelamin harus dipilih", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
                 }
 
                 // Validasi format email
                 if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    Toast.makeText(context, "Format email tidak valid", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Format email tidak valid. Contoh: nama@email.com", Toast.LENGTH_LONG).show()
                     return@Button
                 }
 
                 // Validasi panjang password
                 if (password.length < 6) {
-                    Toast.makeText(context, "Password minimal 6 karakter", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Password terlalu pendek. Minimal 6 karakter", Toast.LENGTH_LONG).show()
                     return@Button
                 }
 
                 // Validasi kecocokan password
                 if (password != verifPassword) {
-                    Toast.makeText(context, "Password tidak cocok", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Password dan konfirmasi password tidak cocok", Toast.LENGTH_LONG).show()
                     return@Button
                 }
 
                 // Validasi umur
                 val ageValue = age.toIntOrNull()
-                if (ageValue == null || ageValue < 1 || ageValue > 150) {
-                    Toast.makeText(context, "Umur tidak valid", Toast.LENGTH_SHORT).show()
-                    return@Button
+                when {
+                    ageValue == null -> {
+                        Toast.makeText(context, "Umur harus berupa angka", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    ageValue < 13 -> {
+                        Toast.makeText(context, "Umur minimal 13 tahun untuk menggunakan aplikasi", Toast.LENGTH_LONG).show()
+                        return@Button
+                    }
+                    ageValue > 150 -> {
+                        Toast.makeText(context, "Umur tidak valid", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
                 }
 
                 // Simpan data user
                 healthDataManager.saveUserData(fullName, email, password, age, gender)
-                Toast.makeText(context, "Registrasi Berhasil! Silakan buat PIN untuk keamanan data", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "✅ Registrasi Berhasil! Silakan buat PIN 6 digit untuk keamanan data Anda", Toast.LENGTH_LONG).show()
                 onRegisterSuccess()
             },
             shape = RoundedCornerShape(12.dp),
@@ -343,25 +374,42 @@ fun RegisterScreen(
 
                         result.onSuccess { googleResult ->
                             // Simpan data user dari Google
-                            val email = googleResult.email ?: ""
+                            val googleEmail = googleResult.email ?: ""
                             val displayName = googleResult.displayName ?: ""
+
+                            // Validate Google email
+                            if (googleEmail.isEmpty()) {
+                                Toast.makeText(context, "Tidak dapat mengambil email dari akun Google", Toast.LENGTH_LONG).show()
+                                return@onSuccess
+                            }
 
                             // Cek apakah user sudah terdaftar
                             val existingUser = healthDataManager.getUserData()
 
-                            if (existingUser == null || existingUser.email != email) {
+                            if (existingUser == null) {
                                 // User baru dari Google, simpan data
                                 healthDataManager.saveUserData(
-                                    fullName = displayName,
-                                    email = email,
+                                    fullName = displayName.ifEmpty { "User Google" },
+                                    email = googleEmail,
                                     password = "", // Password kosong untuk Google Sign-In
                                     age = "",
                                     gender = ""
                                 )
+                                Toast.makeText(context, "✅ Registrasi dengan Google berhasil!\nSilakan buat PIN 6 digit untuk keamanan", Toast.LENGTH_LONG).show()
+                                onRegisterSuccess() // This will trigger PIN creation
+                            } else if (existingUser.email == googleEmail) {
+                                // User sudah terdaftar dengan email Google yang sama - arahkan ke login
+                                Toast.makeText(context, "Akun sudah terdaftar dengan email ini.\nSilakan gunakan menu Login.", Toast.LENGTH_LONG).show()
+                                onLoginClick() // Navigate to login screen
+                            } else {
+                                // Email Google berbeda dengan user yang sudah terdaftar
+                                Toast.makeText(
+                                    context,
+                                    "⚠️ Sudah ada akun terdaftar dengan email berbeda: ${existingUser.email}\n\n" +
+                                    "Untuk menggunakan akun Google ini, hapus data aplikasi terlebih dahulu di Profile > Hapus Semua Data.",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
-
-                            Toast.makeText(context, "Registrasi dengan Google berhasil! Silakan buat PIN", Toast.LENGTH_LONG).show()
-                            onRegisterSuccess()
                         }
 
                         result.onFailure { error ->

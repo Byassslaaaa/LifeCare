@@ -117,16 +117,33 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                if (email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(context, "Harap isi semua field", Toast.LENGTH_SHORT).show()
-                    return@Button
+                // Validation
+                when {
+                    email.isEmpty() && password.isEmpty() -> {
+                        Toast.makeText(context, "Email dan password tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    email.isEmpty() -> {
+                        Toast.makeText(context, "Email tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    password.isEmpty() -> {
+                        Toast.makeText(context, "Password tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
                 }
 
                 // Verifikasi login dengan data yang tersimpan
                 if (healthDataManager.verifyLogin(email, password)) {
+                    Toast.makeText(context, "Login berhasil! Selamat datang kembali", Toast.LENGTH_SHORT).show()
                     onLoginSuccess()
                 } else {
-                    Toast.makeText(context, "Email atau password salah", Toast.LENGTH_LONG).show()
+                    // Check if user exists
+                    if (!healthDataManager.isUserRegistered()) {
+                        Toast.makeText(context, "Akun belum terdaftar. Silakan daftar terlebih dahulu", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(context, "Email atau password salah. Periksa kembali dan coba lagi", Toast.LENGTH_LONG).show()
+                    }
                 }
 
             },
@@ -147,13 +164,13 @@ fun LoginScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Divider(modifier = Modifier.weight(1f), color = Color.Gray.copy(alpha = 0.3f))
+            HorizontalDivider(modifier = Modifier.weight(1f), color = Color.Gray.copy(alpha = 0.3f))
             Text(
                 text = "  atau  ",
                 color = Color.Gray,
                 fontSize = 14.sp
             )
-            Divider(modifier = Modifier.weight(1f), color = Color.Gray.copy(alpha = 0.3f))
+            HorizontalDivider(modifier = Modifier.weight(1f), color = Color.Gray.copy(alpha = 0.3f))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -170,25 +187,39 @@ fun LoginScreen(
 
                         result.onSuccess { googleResult ->
                             // Simpan data user dari Google
-                            val email = googleResult.email ?: ""
+                            val googleEmail = googleResult.email ?: ""
                             val displayName = googleResult.displayName ?: ""
+
+                            // Validate Google email
+                            if (googleEmail.isEmpty()) {
+                                Toast.makeText(context, "Tidak dapat mengambil email dari akun Google", Toast.LENGTH_LONG).show()
+                                return@onSuccess
+                            }
 
                             // Cek apakah user sudah terdaftar
                             val existingUser = healthDataManager.getUserData()
 
-                            if (existingUser == null || existingUser.email != email) {
-                                // User baru dari Google, simpan data
-                                healthDataManager.saveUserData(
-                                    fullName = displayName,
-                                    email = email,
-                                    password = "", // Password kosong untuk Google Sign-In
-                                    age = "",
-                                    gender = ""
-                                )
+                            if (existingUser == null) {
+                                // User baru dari Google - arahkan ke register
+                                Toast.makeText(
+                                    context,
+                                    "Akun Google belum terdaftar.\nSilakan gunakan menu Register untuk mendaftar terlebih dahulu.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                onRegisterClick() // Navigate to register screen
+                            } else if (existingUser.email == googleEmail) {
+                                // User sudah terdaftar dengan email Google yang sama - LOGIN SUCCESS
+                                Toast.makeText(context, "✅ Login dengan Google berhasil!\nSelamat datang kembali", Toast.LENGTH_SHORT).show()
+                                onLoginSuccess()
+                            } else {
+                                // Email Google berbeda dengan user yang sudah terdaftar
+                                Toast.makeText(
+                                    context,
+                                    "⚠️ Email Google (${googleEmail}) tidak cocok dengan akun terdaftar (${existingUser.email})\n\n" +
+                                    "Gunakan akun Google yang sama atau hapus data aplikasi di Profile.",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
-
-                            Toast.makeText(context, "Login dengan Google berhasil!", Toast.LENGTH_SHORT).show()
-                            onLoginSuccess()
                         }
 
                         result.onFailure { error ->

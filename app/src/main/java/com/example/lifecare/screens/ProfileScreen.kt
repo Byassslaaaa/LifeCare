@@ -252,7 +252,7 @@ fun ProfileScreen(
                     onDismissRequest = { showLogoutDialog = false },
                     icon = { Icon(Icons.Default.ExitToApp, contentDescription = null, tint = Color(0xFFFF6B6B)) },
                     title = { Text("Keluar dari Akun?") },
-                    text = { Text("Anda akan keluar dari aplikasi dan harus login kembali untuk mengakses data kesehatan.") },
+                    text = { Text("Anda akan keluar dari aplikasi dan harus login kembali untuk mengakses data kesehatan. Data Anda akan tetap tersimpan.") },
                     confirmButton = {
                         Button(
                             onClick = {
@@ -267,6 +267,67 @@ fun ProfileScreen(
                     dismissButton = {
                         TextButton(onClick = { showLogoutDialog = false }) {
                             Text("Batal")
+                        }
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Clear All Data Button
+            var showClearDataDialog by remember { mutableStateOf(false) }
+
+            OutlinedButton(
+                onClick = { showClearDataDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .height(50.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = Color(0xFFFF6B6B)
+                ),
+                border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFFFF6B6B)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.Default.Delete, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Hapus Semua Data & Logout", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
+
+            // Clear Data Confirmation Dialog
+            if (showClearDataDialog) {
+                AlertDialog(
+                    onDismissRequest = { showClearDataDialog = false },
+                    icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFFF6B6B), modifier = Modifier.size(48.dp)) },
+                    title = { Text("Hapus Semua Data?", fontWeight = FontWeight.Bold) },
+                    text = {
+                        Column {
+                            Text("⚠️ PERINGATAN: Tindakan ini akan:", fontWeight = FontWeight.Bold, color = Color(0xFFFF6B6B))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("• Menghapus akun Anda")
+                            Text("• Menghapus SEMUA data kesehatan")
+                            Text("• Menghapus PIN keamanan")
+                            Text("• Mengeluarkan Anda dari aplikasi")
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Data yang dihapus TIDAK DAPAT dikembalikan!", fontWeight = FontWeight.Bold, color = Color(0xFFFF6B6B))
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showClearDataDialog = false
+                                healthDataManager.clearAllData()
+                                Toast.makeText(context, "Semua data berhasil dihapus", Toast.LENGTH_LONG).show()
+                                onLogout()
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFFF6B6B))
+                        ) {
+                            Text("Hapus Semua Data")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showClearDataDialog = false }) {
+                            Text("Batal", fontWeight = FontWeight.Bold)
                         }
                     }
                 )
