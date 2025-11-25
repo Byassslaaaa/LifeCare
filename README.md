@@ -394,12 +394,15 @@ w: 'val Icons.Filled.ArrowBack: ImageVector' is deprecated
 - [ ] Medication tracking
 - [ ] Appointment scheduler
 
-### Known Limitations (v1.0)
+### Known Limitations & Notes (v1.1)
 - Data hanya tersimpan lokal (tidak ada cloud sync)
-- Fitur delete actual implementation pending
 - Belum ada data analytics/trends visualization
 - Export memerlukan manual storage permission handling
-- Google Sign-In perlu testing di device fisik
+- **Google Sign-In**: ⚠️ **Feature implemented but NOT configured** (optional)
+  - Error "No credentials available" adalah **expected** karena belum dikonfigurasi
+  - **Solusi 1 (RECOMMENDED)**: Gunakan manual registration (email/password) - sudah fully functional
+  - **Solusi 2**: Configure Google Sign-In dengan google-services.json - lihat [GOOGLE_SIGNIN_SETUP.md](GOOGLE_SIGNIN_SETUP.md)
+  - Untuk educational project, **manual registration sudah cukup**
 
 ## 📈 Progress Status
 
