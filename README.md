@@ -284,10 +284,10 @@ app/
 3. Sync Gradle files (akan download dependencies otomatis)
 
 4. Konfigurasi Google Sign-In (Opsional):
-   - Buat project di [Google Cloud Console](https://console.cloud.google.com)
-   - Enable Google Sign-In API
-   - Download `google-services.json`
+   - **⚠️ Note**: `google-services.json` **NOT included** in repository (for security)
+   - Download dari Firebase Console (see [SETUP_FIREBASE.md](SETUP_FIREBASE.md))
    - Letakkan di folder `app/`
+   - **Alternative**: Use manual registration (no setup needed)
 
 5. Build & Run:
    ```bash
