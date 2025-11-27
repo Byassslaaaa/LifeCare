@@ -55,20 +55,8 @@ fun HomeScreen(onLogoutClick: () -> Unit) {
             .padding(paddingValues)
         ) {
             when (currentScreen) {
-                "body_metrics" -> {
-                    BodyMetricsScreen(
-                        healthDataManager = healthDataManager,
-                        onBackClick = { currentScreen = null }
-                    )
-                }
-                "blood_pressure" -> {
-                    BloodPressureScreen(
-                        healthDataManager = healthDataManager,
-                        onBackClick = { currentScreen = null }
-                    )
-                }
-                "blood_sugar" -> {
-                    BloodSugarScreen(
+                "health_metrics" -> {
+                    UnifiedHealthMetricsScreen(
                         healthDataManager = healthDataManager,
                         onBackClick = { currentScreen = null }
                     )
@@ -213,7 +201,7 @@ fun HomeScreen(onLogoutClick: () -> Unit) {
                                             .fillMaxWidth()
                                             .clip(RoundedCornerShape(12.dp))
                                             .background(Color(0xFFFCE4EC))
-                                            .clickable { currentScreen = "blood_pressure" }
+                                            .clickable { currentScreen = "health_metrics" }
                                             .padding(12.dp),
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.SpaceBetween
@@ -267,7 +255,7 @@ fun HomeScreen(onLogoutClick: () -> Unit) {
                                             .fillMaxWidth()
                                             .clip(RoundedCornerShape(12.dp))
                                             .background(Color(0xFFF3E5F5))
-                                            .clickable { currentScreen = "blood_sugar" }
+                                            .clickable { currentScreen = "health_metrics" }
                                             .padding(12.dp),
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.SpaceBetween
@@ -321,7 +309,7 @@ fun HomeScreen(onLogoutClick: () -> Unit) {
                                             .fillMaxWidth()
                                             .clip(RoundedCornerShape(12.dp))
                                             .background(Color(0xFFE3F2FD))
-                                            .clickable { currentScreen = "body_metrics" }
+                                            .clickable { currentScreen = "health_metrics" }
                                             .padding(12.dp),
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.SpaceBetween
@@ -596,36 +584,13 @@ fun HomeScreen(onLogoutClick: () -> Unit) {
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 HealthCategoryCard(
-                                    title = "Tekanan\nDarah",
-                                    subtitle = "Monitor tekanan darah",
-                                    icon = Icons.Default.Favorite,
+                                    title = "Data\nKesehatan",
+                                    subtitle = "Tekanan darah, gula darah, berat badan",
+                                    icon = Icons.Default.MonitorHeart,
                                     backgroundColor = Color(0xFFE8F5F3),
                                     iconColor = Color(0xFF5DCCB4),
                                     modifier = Modifier.weight(1f),
-                                    onClick = { currentScreen = "blood_pressure" }
-                                )
-                                HealthCategoryCard(
-                                    title = "Gula\nDarah",
-                                    subtitle = "Kontrol gula darah",
-                                    icon = Icons.Default.WaterDrop,
-                                    backgroundColor = Color(0xFFFFE8E8),
-                                    iconColor = Color(0xFFFF6B6B),
-                                    modifier = Modifier.weight(1f),
-                                    onClick = { currentScreen = "blood_sugar" }
-                                )
-                            }
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                HealthCategoryCard(
-                                    title = "Berat &\nTinggi",
-                                    subtitle = "Cek BMI Anda",
-                                    icon = Icons.Default.MonitorWeight,
-                                    backgroundColor = Color(0xFFE3F2FD),
-                                    iconColor = Color(0xFF2196F3),
-                                    modifier = Modifier.weight(1f),
-                                    onClick = { currentScreen = "body_metrics" }
+                                    onClick = { currentScreen = "health_metrics" }
                                 )
                                 HealthCategoryCard(
                                     title = "Aktivitas\nFisik",

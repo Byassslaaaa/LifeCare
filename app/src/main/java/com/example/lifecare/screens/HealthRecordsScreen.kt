@@ -36,12 +36,10 @@ fun HealthRecordsScreen(
     healthDataManager: HealthDataManager,
     onBackClick: () -> Unit
 ) {
-    var selectedTab by remember { mutableStateOf(0) }
     var dateFilter by remember { mutableStateOf(DateFilter.ALL) }
     var sortOrder by remember { mutableStateOf(SortOrder.DATE_DESC) }
     var showFilterDialog by remember { mutableStateOf(false) }
     var showSortDialog by remember { mutableStateOf(false) }
-    val tabs = listOf("Semua", "Berat & Tinggi", "Tekanan Darah", "Gula Darah", "Aktivitas", "Makanan")
 
     Scaffold(
         topBar = {
@@ -85,27 +83,6 @@ fun HealthRecordsScreen(
                 .padding(paddingValues)
                 .background(Color(0xFFF8F9FA))
         ) {
-            // Tabs
-            ScrollableTabRow(
-                selectedTabIndex = selectedTab,
-                containerColor = Color.White,
-                contentColor = Color(0xFF5DCCB4),
-                edgePadding = 16.dp
-            ) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
-                        text = {
-                            Text(
-                                title,
-                                fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal
-                            )
-                        }
-                    )
-                }
-            }
-
             // Filter & Sort Info
             if (dateFilter != DateFilter.ALL || sortOrder != SortOrder.DATE_DESC) {
                 Card(
@@ -138,101 +115,15 @@ fun HealthRecordsScreen(
                 }
             }
 
-            // Content based on selected tab
+            // Unified Timeline - All Records
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                when (selectedTab) {
-                    0 -> { // Semua
-                        item {
-                            AllRecordsSection(healthDataManager)
-                        }
-                    }
-                    1 -> { // Berat & Tinggi
-                        val data = filterAndSortBodyMetrics(
-                            healthDataManager.getBodyMetricsList(),
-                            dateFilter,
-                            sortOrder
-                        )
-                        if (data.isEmpty()) {
-                            item {
-                                EmptyState("Belum ada data berat & tinggi badan")
-                            }
-                        } else {
-                            items(data.size) { index ->
-                                BodyMetricsCard(data[index], healthDataManager) {
-                                    // Trigger recomposition after delete
-                                }
-                            }
-                        }
-                    }
-                    2 -> { // Tekanan Darah
-                        val data = filterAndSortBloodPressure(
-                            healthDataManager.getBloodPressureList(),
-                            dateFilter,
-                            sortOrder
-                        )
-                        if (data.isEmpty()) {
-                            item {
-                                EmptyState("Belum ada data tekanan darah")
-                            }
-                        } else {
-                            items(data.size) { index ->
-                                BloodPressureCard(data[index], healthDataManager) { }
-                            }
-                        }
-                    }
-                    3 -> { // Gula Darah
-                        val data = filterAndSortBloodSugar(
-                            healthDataManager.getBloodSugarList(),
-                            dateFilter,
-                            sortOrder
-                        )
-                        if (data.isEmpty()) {
-                            item {
-                                EmptyState("Belum ada data gula darah")
-                            }
-                        } else {
-                            items(data.size) { index ->
-                                BloodSugarCard(data[index], healthDataManager) { }
-                            }
-                        }
-                    }
-                    4 -> { // Aktivitas
-                        val data = filterAndSortActivity(
-                            healthDataManager.getPhysicalActivityList(),
-                            dateFilter,
-                            sortOrder
-                        )
-                        if (data.isEmpty()) {
-                            item {
-                                EmptyState("Belum ada data aktivitas fisik")
-                            }
-                        } else {
-                            items(data.size) { index ->
-                                ActivityCard(data[index], healthDataManager) { }
-                            }
-                        }
-                    }
-                    5 -> { // Makanan
-                        val data = filterAndSortFood(
-                            healthDataManager.getFoodIntakeList(),
-                            dateFilter,
-                            sortOrder
-                        )
-                        if (data.isEmpty()) {
-                            item {
-                                EmptyState("Belum ada data asupan makanan")
-                            }
-                        } else {
-                            items(data.size) { index ->
-                                FoodCard(data[index], healthDataManager) { }
-                            }
-                        }
-                    }
+                item {
+                    AllRecordsSection(healthDataManager, dateFilter, sortOrder)
                 }
 
                 item {
@@ -268,39 +159,166 @@ fun HealthRecordsScreen(
 }
 
 @Composable
-fun AllRecordsSection(healthDataManager: HealthDataManager) {
+fun AllRecordsSection(
+    healthDataManager: HealthDataManager,
+    dateFilter: DateFilter,
+    sortOrder: SortOrder
+) {
+    // Collect all records with timestamp
+    data class HealthRecord(
+        val timestamp: Long,
+        val type: String,
+        val content: @Composable () -> Unit
+    )
+
+    val allRecords = mutableListOf<HealthRecord>()
+
+    // Add Body Metrics
+    filterAndSortBodyMetrics(healthDataManager.getBodyMetricsList(), dateFilter, sortOrder).forEach { data ->
+        allRecords.add(HealthRecord(
+            timestamp = data.timestamp,
+            type = "body_metrics",
+            content = { BodyMetricsCard(data, healthDataManager) {} }
+        ))
+    }
+
+    // Add Blood Pressure
+    filterAndSortBloodPressure(healthDataManager.getBloodPressureList(), dateFilter, sortOrder).forEach { data ->
+        allRecords.add(HealthRecord(
+            timestamp = data.timestamp,
+            type = "blood_pressure",
+            content = { BloodPressureCard(data, healthDataManager) {} }
+        ))
+    }
+
+    // Add Blood Sugar
+    filterAndSortBloodSugar(healthDataManager.getBloodSugarList(), dateFilter, sortOrder).forEach { data ->
+        allRecords.add(HealthRecord(
+            timestamp = data.timestamp,
+            type = "blood_sugar",
+            content = { BloodSugarCard(data, healthDataManager) {} }
+        ))
+    }
+
+    // Add Physical Activity
+    filterAndSortActivity(healthDataManager.getPhysicalActivityList(), dateFilter, sortOrder).forEach { data ->
+        allRecords.add(HealthRecord(
+            timestamp = data.timestamp,
+            type = "activity",
+            content = { ActivityCard(data, healthDataManager) {} }
+        ))
+    }
+
+    // Add Food Intake
+    filterAndSortFood(healthDataManager.getFoodIntakeList(), dateFilter, sortOrder).forEach { data ->
+        allRecords.add(HealthRecord(
+            timestamp = data.timestamp,
+            type = "food",
+            content = { FoodCard(data, healthDataManager) {} }
+        ))
+    }
+
+    // Sort all records by timestamp (newest first by default)
+    val sortedRecords = when (sortOrder) {
+        SortOrder.DATE_DESC -> allRecords.sortedByDescending { it.timestamp }
+        SortOrder.DATE_ASC -> allRecords.sortedBy { it.timestamp }
+        else -> allRecords.sortedByDescending { it.timestamp }
+    }
+
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // Summary Cards
-        SummaryCard(
-            title = "Total Data Berat & Tinggi",
-            count = healthDataManager.getBodyMetricsList().size,
-            icon = Icons.Default.MonitorWeight,
-            color = Color(0xFF2196F3)
-        )
-        SummaryCard(
-            title = "Total Data Tekanan Darah",
-            count = healthDataManager.getBloodPressureList().size,
-            icon = Icons.Default.Favorite,
-            color = Color(0xFFE91E63)
-        )
-        SummaryCard(
-            title = "Total Data Gula Darah",
-            count = healthDataManager.getBloodSugarList().size,
-            icon = Icons.Default.WaterDrop,
-            color = Color(0xFF9C27B0)
-        )
-        SummaryCard(
-            title = "Total Aktivitas Fisik",
-            count = healthDataManager.getPhysicalActivityList().size,
-            icon = Icons.Default.DirectionsRun,
-            color = Color(0xFF4CAF50)
-        )
-        SummaryCard(
-            title = "Total Asupan Makanan",
-            count = healthDataManager.getFoodIntakeList().size,
-            icon = Icons.Default.Restaurant,
-            color = Color(0xFFFF9800)
-        )
+        // Summary Header
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF5DCCB4)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    "Total Riwayat Kesehatan",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "${healthDataManager.getBodyMetricsList().size + healthDataManager.getBloodPressureList().size + healthDataManager.getBloodSugarList().size}",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            "Data Kesehatan",
+                            fontSize = 11.sp,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "${healthDataManager.getPhysicalActivityList().size}",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            "Aktivitas",
+                            fontSize = 11.sp,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "${healthDataManager.getFoodIntakeList().size}",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            "Makanan",
+                            fontSize = 11.sp,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                    }
+                }
+            }
+        }
+
+        // Timeline Header
+        if (sortedRecords.isNotEmpty()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Timeline Riwayat",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF2D3748)
+                )
+                Text(
+                    "${sortedRecords.size} records",
+                    fontSize = 14.sp,
+                    color = Color(0xFF6C757D)
+                )
+            }
+        }
+
+        // All Records Timeline
+        if (sortedRecords.isEmpty()) {
+            EmptyState("Belum ada riwayat kesehatan")
+        } else {
+            sortedRecords.forEach { record ->
+                record.content()
+            }
+        }
     }
 }
 
