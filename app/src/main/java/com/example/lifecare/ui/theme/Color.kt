@@ -2,10 +2,69 @@ package com.example.lifecare.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+/**
+ * HealthColors - Complete color system for LifeCare application
+ * Based on professional health app design principles with softer, more accessible colors
+ */
+object HealthColors {
+    // Primary Brand Colors
+    val Primary = Color(0xFF4DB8A8)              // Soft Teal - Main brand color
+    val PrimaryVariant = Color(0xFF3A9D8F)       // Darker teal for contrast
+    val Secondary = Color(0xFF60A5FA)            // Soft Blue
+    val SecondaryVariant = Color(0xFF4A90E2)     // Darker blue
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+    // Category Colors (Softer palette for better UX)
+    val BloodPressure = Color(0xFFFF6B9D)        // Soft Pink
+    val BloodPressureLight = Color(0xFFFFF0F5)   // Very light pink background
+    val BloodSugar = Color(0xFFB794F6)           // Soft Purple
+    val BloodSugarLight = Color(0xFFF3EFFF)      // Very light purple background
+    val BodyMetrics = Color(0xFF60A5FA)          // Soft Blue
+    val BodyMetricsLight = Color(0xFFE3F2FD)     // Very light blue background
+    val Activity = Color(0xFF4ADE80)             // Fresh Green
+    val ActivityLight = Color(0xFFE8F5E9)        // Very light green background
+    val Food = Color(0xFFFBBF24)                 // Warm Yellow
+    val FoodLight = Color(0xFFFDE7)            // Very light yellow background
+
+    // Neutral Colors
+    val Background = Color(0xFFF8FAFB)           // Very light gray
+    val Surface = Color(0xFFFFFFFF)              // White
+    val SurfaceVariant = Color(0xFFF1F3F5)       // Light gray
+
+    // Text Colors
+    val TextPrimary = Color(0xFF2D3748)          // Dark gray (excellent readability)
+    val TextSecondary = Color(0xFF6C757D)        // Medium gray
+    val TextTertiary = Color(0xFF9CA3AF)         // Light gray
+    val TextOnPrimary = Color(0xFFFFFFFF)        // White text on primary colors
+
+    // Status Colors
+    val Success = Color(0xFF10B981)              // Green
+    val SuccessLight = Color(0xFFD1FAE5)         // Light green background
+    val Warning = Color(0xFFF59E0B)              // Orange
+    val WarningLight = Color(0xFFFEF3C7)         // Light orange background
+    val Error = Color(0xFFEF4444)                // Red
+    val ErrorLight = Color(0xFFFEE2E2)           // Light red background
+    val Info = Color(0xFF3B82F6)                 // Blue
+    val InfoLight = Color(0xFFDBEAFE)            // Light blue background
+
+    // UI Element Colors
+    val Divider = Color(0xFFE5E7EB)              // Light gray divider
+    val Border = Color(0xFFD1D5DB)               // Medium gray border
+    val Shadow = Color(0x1A000000)               // 10% black for shadows
+    val Overlay = Color(0x80000000)              // 50% black for overlays
+
+    // Gradient Colors (for hero sections and highlights)
+    val GradientStart = Color(0xFF4DB8A8)        // Primary teal
+    val GradientEnd = Color(0xFF60A5FA)          // Secondary blue
+}
+
+/**
+ * Legacy color definitions for compatibility
+ * These map to the old color names used throughout the app
+ */
+val Purple80 = HealthColors.Primary
+val PurpleGrey80 = HealthColors.SurfaceVariant
+val Pink80 = HealthColors.BloodPressure
+
+val Purple40 = HealthColors.PrimaryVariant
+val PurpleGrey40 = HealthColors.TextSecondary
+val Pink40 = HealthColors.BloodPressure

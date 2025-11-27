@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,10 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.lifecare.data.BloodPressure
 import com.example.lifecare.data.HealthDataManager
+import com.example.lifecare.ui.components.*
+import com.example.lifecare.ui.theme.HealthColors
+import com.example.lifecare.ui.theme.HealthSpacing
+import com.example.lifecare.ui.theme.HealthTypography
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,25 +39,31 @@ fun BloodPressureScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Tekanan Darah") },
+                title = {
+                    Text(
+                        "Tekanan Darah",
+                        style = HealthTypography.titleLarge
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFE91E63),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = HealthColors.BloodPressure,
+                    titleContentColor = HealthColors.TextOnPrimary,
+                    navigationIconContentColor = HealthColors.TextOnPrimary
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showDialog = true },
-                containerColor = Color(0xFFE91E63)
+                containerColor = HealthColors.BloodPressure,
+                contentColor = HealthColors.TextOnPrimary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
+                Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
     ) { paddingValues ->
@@ -66,43 +74,42 @@ fun BloodPressureScreen(
         ) {
             // Latest BP Card
             bpList.firstOrNull()?.let { latest ->
-                Card(
+                FeaturedCard(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE4EC))
+                        .padding(HealthSpacing.screenPadding),
+                    backgroundColor = HealthColors.BloodPressure,
+                    contentColor = HealthColors.TextOnPrimary
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             Icons.Default.Favorite,
                             contentDescription = null,
-                            modifier = Modifier.size(48.dp),
-                            tint = Color(0xFFE91E63)
+                            modifier = Modifier.size(HealthSpacing.iconSizeLarge),
+                            tint = HealthColors.TextOnPrimary
                         )
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(HealthSpacing.medium))
                         Column {
                             Text(
                                 "Data Terbaru",
-                                fontSize = 14.sp,
-                                color = Color.Gray
+                                style = HealthTypography.bodySmall,
+                                color = HealthColors.TextOnPrimary.copy(alpha = 0.8f)
                             )
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(HealthSpacing.xxSmall))
                             Text(
                                 "${latest.systolic}/${latest.diastolic} mmHg",
-                                fontSize = 28.sp,
+                                style = HealthTypography.displaySmall,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFFE91E63)
+                                color = HealthColors.TextOnPrimary
                             )
                             if (latest.heartRate != null) {
                                 Text(
                                     "Detak Jantung: ${latest.heartRate} BPM",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
+                                    style = HealthTypography.bodySmall,
+                                    color = HealthColors.TextOnPrimary.copy(alpha = 0.8f)
                                 )
                             }
                         }
@@ -113,18 +120,17 @@ fun BloodPressureScreen(
             // History List
             Text(
                 "Riwayat",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                style = HealthTypography.headlineSmall,
+                modifier = Modifier.padding(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small)
             )
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                contentPadding = PaddingValues(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small)
             ) {
                 items(bpList) { bp ->
                     BloodPressureHistoryItem(bp)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(HealthSpacing.small))
                 }
             }
         }
@@ -152,45 +158,47 @@ fun BloodPressureScreen(
 fun BloodPressureHistoryItem(bp: BloodPressure) {
     val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    HealthCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
                 Text(
                     dateFormat.format(Date(bp.timestamp)),
-                    fontSize = 12.sp,
-                    color = Color.Gray
+                    style = HealthTypography.bodySmall,
+                    color = HealthColors.TextSecondary
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(HealthSpacing.xxSmall))
                 Text(
                     "${bp.systolic}/${bp.diastolic} mmHg",
-                    fontSize = 18.sp,
+                    style = HealthTypography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = getBPColor(bp.systolic, bp.diastolic)
                 )
                 if (bp.heartRate != null) {
                     Text(
                         "Detak: ${bp.heartRate} BPM",
-                        fontSize = 12.sp,
-                        color = Color.Gray
+                        style = HealthTypography.bodySmall,
+                        color = HealthColors.TextSecondary
                     )
                 }
             }
-            Text(
-                getBPCategory(bp.systolic, bp.diastolic),
-                fontSize = 12.sp,
-                color = getBPColor(bp.systolic, bp.diastolic),
-                fontWeight = FontWeight.Medium
-            )
+            Surface(
+                color = getBPColor(bp.systolic, bp.diastolic).copy(alpha = 0.1f),
+                shape = MaterialTheme.shapes.small
+            ) {
+                Text(
+                    getBPCategory(bp.systolic, bp.diastolic),
+                    style = HealthTypography.labelMedium,
+                    color = getBPColor(bp.systolic, bp.diastolic),
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(horizontal = HealthSpacing.small, vertical = HealthSpacing.xxSmall)
+                )
+            }
         }
     }
 }
@@ -210,9 +218,16 @@ fun AddBloodPressureDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Tambah Data Tekanan Darah") },
+        title = {
+            Text(
+                "Tambah Data Tekanan Darah",
+                style = HealthTypography.titleLarge
+            )
+        },
         text = {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(HealthSpacing.small)
+            ) {
                 OutlinedTextField(
                     value = systolic,
                     onValueChange = {
@@ -228,12 +243,16 @@ fun AddBloodPressureDialog(
                     isError = systolicError != null,
                     supportingText = {
                         if (systolicError != null) {
-                            Text(systolicError!!, color = MaterialTheme.colorScheme.error)
+                            Text(systolicError!!, color = HealthColors.Error)
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = HealthColors.BloodPressure,
+                        focusedLabelColor = HealthColors.BloodPressure
+                    )
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+
                 OutlinedTextField(
                     value = diastolic,
                     onValueChange = {
@@ -249,12 +268,16 @@ fun AddBloodPressureDialog(
                     isError = diastolicError != null,
                     supportingText = {
                         if (diastolicError != null) {
-                            Text(diastolicError!!, color = MaterialTheme.colorScheme.error)
+                            Text(diastolicError!!, color = HealthColors.Error)
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = HealthColors.BloodPressure,
+                        focusedLabelColor = HealthColors.BloodPressure
+                    )
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+
                 OutlinedTextField(
                     value = heartRate,
                     onValueChange = {
@@ -270,10 +293,14 @@ fun AddBloodPressureDialog(
                     isError = heartRateError != null,
                     supportingText = {
                         if (heartRateError != null) {
-                            Text(heartRateError!!, color = MaterialTheme.colorScheme.error)
+                            Text(heartRateError!!, color = HealthColors.Error)
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = HealthColors.BloodPressure,
+                        focusedLabelColor = HealthColors.BloodPressure
+                    )
                 )
             }
         },
@@ -335,33 +362,36 @@ fun AddBloodPressureDialog(
                         if (sys >= 180 || dia >= 120) {
                             Toast.makeText(
                                 context,
-                                "⚠️ PERINGATAN: Tekanan darah sangat tinggi! Segera konsultasi dokter!",
+                                "PERINGATAN: Tekanan darah sangat tinggi! Segera konsultasi dokter!",
                                 Toast.LENGTH_LONG
                             ).show()
                         } else if (sys >= 140 || dia >= 90) {
                             Toast.makeText(
                                 context,
-                                "⚠️ Tekanan darah tinggi. Pertimbangkan konsultasi dokter.",
+                                "Tekanan darah tinggi. Pertimbangkan konsultasi dokter.",
                                 Toast.LENGTH_LONG
                             ).show()
                         } else if (sys < 90 || dia < 60) {
                             Toast.makeText(
                                 context,
-                                "⚠️ Tekanan darah rendah. Perhatikan kondisi Anda.",
+                                "Tekanan darah rendah. Perhatikan kondisi Anda.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
 
                         onSave(sys, dia, hr)
                     }
-                }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = HealthColors.BloodPressure
+                )
             ) {
                 Text("Simpan")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Batal")
+                Text("Batal", color = HealthColors.TextSecondary)
             }
         }
     )
@@ -379,10 +409,10 @@ fun getBPCategory(systolic: Int, diastolic: Int): String {
 
 fun getBPColor(systolic: Int, diastolic: Int): Color {
     return when {
-        systolic < 120 && diastolic < 80 -> Color(0xFF4CAF50) // Normal - Green
-        systolic < 130 && diastolic < 80 -> Color(0xFFFFC107) // Elevated - Yellow
-        systolic < 140 || diastolic < 90 -> Color(0xFFFF9800) // Stage 1 - Orange
-        systolic < 180 || diastolic < 120 -> Color(0xFFFF5722) // Stage 2 - Deep Orange
-        else -> Color(0xFFF44336) // Crisis - Red
+        systolic < 120 && diastolic < 80 -> HealthColors.Success
+        systolic < 130 && diastolic < 80 -> HealthColors.Warning
+        systolic < 140 || diastolic < 90 -> Color(0xFFFF9800)
+        systolic < 180 || diastolic < 120 -> Color(0xFFFF5722)
+        else -> HealthColors.Error
     }
 }

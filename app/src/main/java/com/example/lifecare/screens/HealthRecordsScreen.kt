@@ -375,10 +375,13 @@ fun BodyMetricsCard(
 ) {
     val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showDetailDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { showDetailDialog = true },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
@@ -413,6 +416,10 @@ fun BodyMetricsCard(
         }
     }
 
+    if (showDetailDialog) {
+        BodyMetricsDetailDialog(data = data, onDismiss = { showDetailDialog = false })
+    }
+
     if (showDeleteDialog) {
         DeleteConfirmationDialog(
             title = "Hapus Data Berat & Tinggi",
@@ -436,10 +443,13 @@ fun BloodPressureCard(
 ) {
     val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showDetailDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { showDetailDialog = true },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
@@ -468,6 +478,10 @@ fun BloodPressureCard(
         }
     }
 
+    if (showDetailDialog) {
+        BloodPressureDetailDialog(data = data, onDismiss = { showDetailDialog = false })
+    }
+
     if (showDeleteDialog) {
         DeleteConfirmationDialog(
             title = "Hapus Data Tekanan Darah",
@@ -490,10 +504,13 @@ fun BloodSugarCard(
 ) {
     val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showDetailDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { showDetailDialog = true },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
@@ -520,6 +537,10 @@ fun BloodSugarCard(
         }
     }
 
+    if (showDetailDialog) {
+        BloodSugarDetailDialog(data = data, onDismiss = { showDetailDialog = false })
+    }
+
     if (showDeleteDialog) {
         DeleteConfirmationDialog(
             title = "Hapus Data Gula Darah",
@@ -542,10 +563,13 @@ fun ActivityCard(
 ) {
     val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showDetailDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { showDetailDialog = true },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
@@ -576,6 +600,10 @@ fun ActivityCard(
         }
     }
 
+    if (showDetailDialog) {
+        ActivityDetailDialog(data = data, onDismiss = { showDetailDialog = false })
+    }
+
     if (showDeleteDialog) {
         DeleteConfirmationDialog(
             title = "Hapus Data Aktivitas Fisik",
@@ -598,10 +626,13 @@ fun FoodCard(
 ) {
     val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showDetailDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { showDetailDialog = true },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
@@ -630,6 +661,10 @@ fun FoodCard(
                 }
             }
         }
+    }
+
+    if (showDetailDialog) {
+        FoodDetailDialog(data = data, onDismiss = { showDetailDialog = false })
     }
 
     if (showDeleteDialog) {
@@ -1208,4 +1243,802 @@ fun generateTXT(healthDataManager: HealthDataManager, dateFormat: SimpleDateForm
     sb.appendLine("Akhir Laporan")
 
     return sb.toString()
+}
+
+// Detail Dialog Components
+@Composable
+fun BodyMetricsDetailDialog(data: com.example.lifecare.data.BodyMetrics, onDismiss: () -> Unit) {
+    val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy 'pukul' HH:mm", Locale("id", "ID"))
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                Icons.Default.MonitorWeight,
+                contentDescription = null,
+                tint = Color(0xFF60A5FA),
+                modifier = Modifier.size(40.dp)
+            )
+        },
+        title = { Text("Detail Berat & Tinggi Badan", fontWeight = FontWeight.Bold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // Timestamp
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.CalendarToday, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(dateFormat.format(Date(data.timestamp)), fontSize = 13.sp, color = Color(0xFF2D3748))
+                    }
+                }
+
+                // Measurements
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Berat Badan", fontSize = 11.sp, color = Color.Gray)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("${data.weight} kg", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF60A5FA))
+                        }
+                    }
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Tinggi Badan", fontSize = 11.sp, color = Color.Gray)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("${data.height} cm", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF60A5FA))
+                        }
+                    }
+                }
+
+                // BMI Card
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = getBMIColor(data.bmi).copy(alpha = 0.1f)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Body Mass Index (BMI)", fontSize = 12.sp, color = Color.Gray)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(String.format("%.1f", data.bmi), fontSize = 32.sp, fontWeight = FontWeight.Bold, color = getBMIColor(data.bmi))
+                        Text(getBMICategory(data.bmi), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = getBMIColor(data.bmi))
+                    }
+                }
+
+                // Health Info
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFF4CAF50), modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            when {
+                                data.bmi < 18.5 -> "BMI Anda tergolong kurang. Konsultasikan dengan ahli gizi untuk meningkatkan berat badan secara sehat."
+                                data.bmi < 25.0 -> "BMI Anda normal. Pertahankan pola makan sehat dan olahraga teratur."
+                                data.bmi < 30.0 -> "BMI Anda tergolong berlebih. Perhatikan pola makan dan tingkatkan aktivitas fisik."
+                                else -> "BMI Anda tergolong obesitas. Sangat disarankan untuk berkonsultasi dengan dokter."
+                            },
+                            fontSize = 12.sp,
+                            color = Color(0xFF2D3748),
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF60A5FA))
+            ) {
+                Text("Tutup")
+            }
+        }
+    )
+}
+
+@Composable
+fun BloodPressureDetailDialog(data: com.example.lifecare.data.BloodPressure, onDismiss: () -> Unit) {
+    val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy 'pukul' HH:mm", Locale("id", "ID"))
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                Icons.Default.Favorite,
+                contentDescription = null,
+                tint = Color(0xFFFF6B9D),
+                modifier = Modifier.size(40.dp)
+            )
+        },
+        title = { Text("Detail Tekanan Darah", fontWeight = FontWeight.Bold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // Timestamp
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.CalendarToday, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(dateFormat.format(Date(data.timestamp)), fontSize = 13.sp, color = Color(0xFF2D3748))
+                    }
+                }
+
+                // Blood Pressure
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE4EC)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Tekanan Darah", fontSize = 12.sp, color = Color.Gray)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("${data.systolic}/${data.diastolic}", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFF6B9D))
+                        Text("mmHg", fontSize = 14.sp, color = Color.Gray)
+                    }
+                }
+
+                // Detailed values
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Sistolik", fontSize = 11.sp, color = Color.Gray)
+                            Text("${data.systolic}", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2D3748))
+                            Text("(Atas)", fontSize = 10.sp, color = Color.Gray)
+                        }
+                    }
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Diastolik", fontSize = 11.sp, color = Color.Gray)
+                            Text("${data.diastolic}", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2D3748))
+                            Text("(Bawah)", fontSize = 10.sp, color = Color.Gray)
+                        }
+                    }
+                }
+
+                // Heart Rate if available
+                if (data.heartRate != null) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Detak Jantung", fontSize = 14.sp, color = Color(0xFF2D3748))
+                            Text("${data.heartRate} BPM", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFF9800))
+                        }
+                    }
+                }
+
+                // Category
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = getBPColor(data.systolic, data.diastolic).copy(alpha = 0.1f)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Kategori", fontSize = 11.sp, color = Color.Gray)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(getBPCategoryLabel(data.systolic, data.diastolic), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = getBPColor(data.systolic, data.diastolic))
+                    }
+                }
+
+                // Health Info
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFF4CAF50), modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            when {
+                                data.systolic >= 180 || data.diastolic >= 120 -> "KRISIS! Segera hubungi dokter atau layanan darurat!"
+                                data.systolic >= 140 || data.diastolic >= 90 -> "Tekanan darah tinggi. Konsultasikan dengan dokter Anda."
+                                data.systolic >= 130 && data.diastolic < 80 -> "Tekanan darah meningkat. Perhatikan pola makan dan kurangi garam."
+                                data.systolic < 90 || data.diastolic < 60 -> "Tekanan darah rendah. Konsultasikan jika ada gejala seperti pusing."
+                                else -> "Tekanan darah normal. Pertahankan gaya hidup sehat!"
+                            },
+                            fontSize = 12.sp,
+                            color = Color(0xFF2D3748),
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B9D))
+            ) {
+                Text("Tutup")
+            }
+        }
+    )
+}
+
+@Composable
+fun BloodSugarDetailDialog(data: com.example.lifecare.data.BloodSugar, onDismiss: () -> Unit) {
+    val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy 'pukul' HH:mm", Locale("id", "ID"))
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                Icons.Default.Bloodtype,
+                contentDescription = null,
+                tint = Color(0xFFB794F6),
+                modifier = Modifier.size(40.dp)
+            )
+        },
+        title = { Text("Detail Gula Darah", fontWeight = FontWeight.Bold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // Timestamp
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.CalendarToday, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(dateFormat.format(Date(data.timestamp)), fontSize = 13.sp, color = Color(0xFF2D3748))
+                    }
+                }
+
+                // Blood Sugar Level
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF3E5F5)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Kadar Gula Darah", fontSize = 12.sp, color = Color.Gray)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("${data.level}", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB794F6))
+                        Text("mg/dL", fontSize = 14.sp, color = Color.Gray)
+                    }
+                }
+
+                // Measurement Type
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Jenis Pengukuran", fontSize = 14.sp, color = Color.Gray)
+                        Text(data.measurementType, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2D3748))
+                    }
+                }
+
+                // Category
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = getBloodSugarColor(data.level, data.measurementType).copy(alpha = 0.1f)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Kategori", fontSize = 11.sp, color = Color.Gray)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(getBloodSugarCategory(data.level, data.measurementType), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = getBloodSugarColor(data.level, data.measurementType))
+                    }
+                }
+
+                // Normal Range Info
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                    ) {
+                        Text("Rentang Normal", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2D3748))
+                        Spacer(modifier = Modifier.height(8.dp))
+                        when (data.measurementType) {
+                            "Puasa" -> {
+                                Text("• Normal: < 100 mg/dL", fontSize = 11.sp, color = Color.Gray)
+                                Text("• Prediabetes: 100-125 mg/dL", fontSize = 11.sp, color = Color.Gray)
+                                Text("• Diabetes: ≥ 126 mg/dL", fontSize = 11.sp, color = Color.Gray)
+                            }
+                            "Setelah Makan" -> {
+                                Text("• Normal: < 140 mg/dL", fontSize = 11.sp, color = Color.Gray)
+                                Text("• Prediabetes: 140-199 mg/dL", fontSize = 11.sp, color = Color.Gray)
+                                Text("• Diabetes: ≥ 200 mg/dL", fontSize = 11.sp, color = Color.Gray)
+                            }
+                            else -> {
+                                Text("• Normal: 70-140 mg/dL", fontSize = 11.sp, color = Color.Gray)
+                                Text("• Tinggi: 140-200 mg/dL", fontSize = 11.sp, color = Color.Gray)
+                                Text("• Sangat Tinggi: > 200 mg/dL", fontSize = 11.sp, color = Color.Gray)
+                            }
+                        }
+                    }
+                }
+
+                // Health Info
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFF4CAF50), modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            when (data.measurementType) {
+                                "Puasa" -> when {
+                                    data.level >= 126 -> "Kadar gula darah puasa sangat tinggi! Konsultasi dokter segera!"
+                                    data.level >= 100 -> "Prediabetes. Jaga pola makan dan tingkatkan aktivitas fisik."
+                                    data.level < 70 -> "Hipoglikemia (gula darah rendah). Konsumsi makanan/minuman manis."
+                                    else -> "Kadar gula darah puasa normal. Pertahankan gaya hidup sehat!"
+                                }
+                                "Setelah Makan" -> when {
+                                    data.level >= 200 -> "Kadar gula darah sangat tinggi! Konsultasi dokter segera!"
+                                    data.level >= 140 -> "Gula darah tinggi setelah makan. Perhatikan porsi dan jenis makanan."
+                                    else -> "Kadar gula darah setelah makan normal."
+                                }
+                                else -> when {
+                                    data.level >= 200 -> "Kadar gula darah sangat tinggi! Konsultasi dokter!"
+                                    data.level < 70 -> "Gula darah rendah. Konsumsi makanan/minuman manis segera."
+                                    else -> "Kadar gula darah dalam batas normal."
+                                }
+                            },
+                            fontSize = 12.sp,
+                            color = Color(0xFF2D3748),
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB794F6))
+            ) {
+                Text("Tutup")
+            }
+        }
+    )
+}
+
+@Composable
+fun ActivityDetailDialog(data: com.example.lifecare.data.PhysicalActivity, onDismiss: () -> Unit) {
+    val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy 'pukul' HH:mm", Locale("id", "ID"))
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                Icons.Default.DirectionsRun,
+                contentDescription = null,
+                tint = Color(0xFF4ADE80),
+                modifier = Modifier.size(40.dp)
+            )
+        },
+        title = { Text("Detail Aktivitas Fisik", fontWeight = FontWeight.Bold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // Timestamp
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.CalendarToday, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(dateFormat.format(Date(data.timestamp)), fontSize = 13.sp, color = Color(0xFF2D3748))
+                    }
+                }
+
+                // Activity Type
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Jenis Aktivitas", fontSize = 12.sp, color = Color.Gray)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(data.activityType, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4ADE80))
+                    }
+                }
+
+                // Duration
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Durasi", fontSize = 14.sp, color = Color.Gray)
+                        Text("${data.duration} menit", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2D3748))
+                    }
+                }
+
+                // Steps if available
+                if (data.steps != null) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.DirectionsWalk, contentDescription = null, tint = Color(0xFF2196F3), modifier = Modifier.size(20.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Langkah", fontSize = 14.sp, color = Color.Gray)
+                            }
+                            Text("${data.steps}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2196F3))
+                        }
+                    }
+                }
+
+                // Calories if available
+                if (data.caloriesBurned != null) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = Color(0xFFFF9800), modifier = Modifier.size(20.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Kalori Terbakar", fontSize = 14.sp, color = Color.Gray)
+                            }
+                            Text("${data.caloriesBurned} kal", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFF9800))
+                        }
+                    }
+                }
+
+                // Health Info
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFF4CAF50), modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            when {
+                                data.duration >= 60 -> "Luar biasa! Aktivitas ${data.duration} menit sangat baik untuk kesehatan jantung dan metabolisme."
+                                data.duration >= 30 -> "Bagus! WHO merekomendasikan minimal 30 menit aktivitas fisik per hari. Pertahankan!"
+                                else -> "Usahakan minimal 30 menit aktivitas fisik per hari untuk kesehatan optimal."
+                            },
+                            fontSize = 12.sp,
+                            color = Color(0xFF2D3748),
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4ADE80))
+            ) {
+                Text("Tutup")
+            }
+        }
+    )
+}
+
+@Composable
+fun FoodDetailDialog(data: com.example.lifecare.data.FoodIntake, onDismiss: () -> Unit) {
+    val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy 'pukul' HH:mm", Locale("id", "ID"))
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                Icons.Default.Restaurant,
+                contentDescription = null,
+                tint = Color(0xFFFBBF24),
+                modifier = Modifier.size(40.dp)
+            )
+        },
+        title = { Text("Detail Asupan Makanan", fontWeight = FontWeight.Bold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // Timestamp
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.CalendarToday, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(dateFormat.format(Date(data.timestamp)), fontSize = 13.sp, color = Color(0xFF2D3748))
+                    }
+                }
+
+                // Food Name
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9E6)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Nama Makanan", fontSize = 12.sp, color = Color.Gray)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(data.foodName, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2D3748), maxLines = 2)
+                    }
+                }
+
+                // Meal Type and Calories
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Waktu Makan", fontSize = 11.sp, color = Color.Gray)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(data.mealType, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2D3748))
+                        }
+                    }
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Kalori", fontSize = 11.sp, color = Color.Gray)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("${data.calories} kal", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFF9800))
+                        }
+                    }
+                }
+
+                // Nutrients if available
+                if (data.protein != null || data.carbs != null || data.fat != null) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                        ) {
+                            Text("Informasi Nutrisi", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2D3748))
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            if (data.protein != null) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text("Protein", fontSize = 13.sp, color = Color.Gray)
+                                    Text("${data.protein} g", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color(0xFF2D3748))
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+
+                            if (data.carbs != null) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text("Karbohidrat", fontSize = 13.sp, color = Color.Gray)
+                                    Text("${data.carbs} g", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color(0xFF2D3748))
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+
+                            if (data.fat != null) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text("Lemak", fontSize = 13.sp, color = Color.Gray)
+                                    Text("${data.fat} g", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color(0xFF2D3748))
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Health Info
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFF4CAF50), modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            when {
+                                data.calories > 800 -> "Makanan tinggi kalori (${data.calories} kal). Pastikan Anda mengimbanginya dengan aktivitas fisik yang cukup."
+                                data.calories > 500 -> "Asupan ${data.calories} kalori cukup signifikan. Jaga keseimbangan nutrisi harian Anda."
+                                data.calories > 300 -> "Asupan kalori moderat (${data.calories} kal). Bagus untuk menjaga energi."
+                                else -> "Asupan kalori ringan (${data.calories} kal). Cocok untuk snack atau makanan ringan."
+                            },
+                            fontSize = 12.sp,
+                            color = Color(0xFF2D3748),
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFBBF24))
+            ) {
+                Text("Tutup")
+            }
+        }
+    )
+}
+
+// Helper function for BP category label
+fun getBPCategoryLabel(systolic: Int, diastolic: Int): String {
+    return when {
+        systolic < 120 && diastolic < 80 -> "Normal"
+        systolic < 130 && diastolic < 80 -> "Meningkat"
+        systolic < 140 || diastolic < 90 -> "Hipertensi Tahap 1"
+        systolic < 180 || diastolic < 120 -> "Hipertensi Tahap 2"
+        else -> "Krisis Hipertensi"
+    }
 }

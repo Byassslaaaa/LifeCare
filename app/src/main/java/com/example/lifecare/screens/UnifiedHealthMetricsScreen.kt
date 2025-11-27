@@ -4,25 +4,23 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.lifecare.data.*
-import java.text.SimpleDateFormat
-import java.util.*
+import com.example.lifecare.ui.components.*
+import com.example.lifecare.ui.theme.HealthColors
+import com.example.lifecare.ui.theme.HealthSpacing
+import com.example.lifecare.ui.theme.HealthTypography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,16 +48,21 @@ fun UnifiedHealthMetricsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Data Kesehatan") },
+                title = {
+                    Text(
+                        "Data Kesehatan",
+                        style = HealthTypography.titleLarge
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Kembali")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF5DCCB4),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = HealthColors.Primary,
+                    titleContentColor = HealthColors.TextOnPrimary,
+                    navigationIconContentColor = HealthColors.TextOnPrimary
                 )
             )
         }
@@ -67,159 +70,149 @@ fun UnifiedHealthMetricsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF8F9FA))
+                .background(HealthColors.Background)
                 .padding(paddingValues)
                 .verticalScroll(scrollState)
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(HealthSpacing.screenPadding),
+            verticalArrangement = Arrangement.spacedBy(HealthSpacing.cardSpacing)
         ) {
             // Header Info
             Text(
                 "Masukkan data kesehatan Anda hari ini",
-                fontSize = 14.sp,
-                color = Color(0xFF6C757D)
+                style = HealthTypography.bodyMedium,
+                color = HealthColors.TextSecondary
             )
 
             // Latest Values Summary Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp)
+            HealthCard(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                Text(
+                    "Data Terakhir",
+                    style = HealthTypography.titleMedium,
+                    color = HealthColors.TextPrimary
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        "Data Terakhir",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2D3748)
+                    // Berat Badan
+                    LatestMetricItem(
+                        icon = Icons.Default.MonitorWeight,
+                        label = "Berat Badan",
+                        value = latestBodyMetrics?.let { "${it.weight} kg" } ?: "-",
+                        color = HealthColors.BodyMetrics
                     )
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        // Berat Badan
-                        LatestMetricItem(
-                            icon = Icons.Default.MonitorWeight,
-                            label = "Berat Badan",
-                            value = latestBodyMetrics?.let { "${it.weight} kg" } ?: "-",
-                            color = Color(0xFF2196F3)
-                        )
+                    // Tekanan Darah
+                    LatestMetricItem(
+                        icon = Icons.Default.Favorite,
+                        label = "Tekanan Darah",
+                        value = latestBloodPressure?.let { "${it.systolic}/${it.diastolic}" } ?: "-",
+                        color = HealthColors.BloodPressure
+                    )
 
-                        // Tekanan Darah
-                        LatestMetricItem(
-                            icon = Icons.Default.Favorite,
-                            label = "Tekanan Darah",
-                            value = latestBloodPressure?.let { "${it.systolic}/${it.diastolic}" } ?: "-",
-                            color = Color(0xFFE91E63)
-                        )
-
-                        // Gula Darah
-                        LatestMetricItem(
-                            icon = Icons.Default.Bloodtype,
-                            label = "Gula Darah",
-                            value = latestBloodSugar?.let { "${it.level} mg/dL" } ?: "-",
-                            color = Color(0xFFFF9800)
-                        )
-                    }
+                    // Gula Darah
+                    LatestMetricItem(
+                        icon = Icons.Default.Bloodtype,
+                        label = "Gula Darah",
+                        value = latestBloodSugar?.let { "${it.level} mg/dL" } ?: "-",
+                        color = HealthColors.BloodSugar
+                    )
                 }
             }
 
-            Divider(color = Color(0xFFE0E0E0))
+            Divider(color = HealthColors.Divider)
 
-            // Input Section
+            // Input Section Header
             Text(
                 "Input Data Baru",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF2D3748)
+                style = HealthTypography.headlineSmall,
+                color = HealthColors.TextPrimary
             )
 
             // Berat & Tinggi Badan Section
-            Card(
+            HealthDataCard(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp)
+                dataType = HealthDataType.BODY_METRICS
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(HealthSpacing.xSmall)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.MonitorWeight,
-                            contentDescription = null,
-                            tint = Color(0xFF2196F3),
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            "Berat & Tinggi Badan",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF2D3748)
-                        )
-                    }
-
-                    OutlinedTextField(
-                        value = weight,
-                        onValueChange = { weight = it },
-                        label = { Text("Berat Badan (kg)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
+                    Icon(
+                        Icons.Default.MonitorWeight,
+                        contentDescription = null,
+                        tint = HealthColors.BodyMetrics,
+                        modifier = Modifier.size(HealthSpacing.iconSize)
                     )
-
-                    OutlinedTextField(
-                        value = height,
-                        onValueChange = { height = it },
-                        label = { Text("Tinggi Badan (cm)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
+                    Text(
+                        "Berat & Tinggi Badan",
+                        style = HealthTypography.titleMedium,
+                        color = HealthColors.TextPrimary
                     )
+                }
 
-                    // BMI Display
-                    if (weight.isNotBlank() && height.isNotBlank()) {
-                        val w = weight.toDoubleOrNull()
-                        val h = height.toDoubleOrNull()
-                        if (w != null && h != null && h > 0) {
-                            val bmi = w / ((h / 100) * (h / 100))
-                            val bmiCategory = when {
-                                bmi < 18.5 -> "Kurang"
-                                bmi < 25 -> "Normal"
-                                bmi < 30 -> "Berlebih"
-                                else -> "Obesitas"
-                            }
-                            Surface(
-                                modifier = Modifier.fillMaxWidth(),
-                                color = Color(0xFFE3F2FD),
-                                shape = RoundedCornerShape(8.dp)
+                OutlinedTextField(
+                    value = weight,
+                    onValueChange = { weight = it },
+                    label = { Text("Berat Badan (kg)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = HealthColors.BodyMetrics,
+                        focusedLabelColor = HealthColors.BodyMetrics
+                    )
+                )
+
+                OutlinedTextField(
+                    value = height,
+                    onValueChange = { height = it },
+                    label = { Text("Tinggi Badan (cm)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = HealthColors.BodyMetrics,
+                        focusedLabelColor = HealthColors.BodyMetrics
+                    )
+                )
+
+                // BMI Display
+                if (weight.isNotBlank() && height.isNotBlank()) {
+                    val w = weight.toDoubleOrNull()
+                    val h = height.toDoubleOrNull()
+                    if (w != null && h != null && h > 0) {
+                        val bmi = w / ((h / 100) * (h / 100))
+                        val bmiCategory = when {
+                            bmi < 18.5 -> "Kurang"
+                            bmi < 25 -> "Normal"
+                            bmi < 30 -> "Berlebih"
+                            else -> "Obesitas"
+                        }
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = HealthColors.InfoLight,
+                            shape = MaterialTheme.shapes.small
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(HealthSpacing.small),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(
-                                    modifier = Modifier.padding(12.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        "BMI: ${"%.1f".format(bmi)}",
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF2196F3)
-                                    )
-                                    Text(
-                                        bmiCategory,
-                                        fontSize = 12.sp,
-                                        color = Color(0xFF2196F3)
-                                    )
-                                }
+                                Text(
+                                    "BMI: ${"%.1f".format(bmi)}",
+                                    style = HealthTypography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = HealthColors.Info
+                                )
+                                Text(
+                                    bmiCategory,
+                                    style = HealthTypography.bodySmall,
+                                    color = HealthColors.Info
+                                )
                             }
                         }
                     }
@@ -227,149 +220,149 @@ fun UnifiedHealthMetricsScreen(
             }
 
             // Tekanan Darah Section
-            Card(
+            HealthDataCard(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp)
+                dataType = HealthDataType.BLOOD_PRESSURE
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(HealthSpacing.xSmall)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.Favorite,
-                            contentDescription = null,
-                            tint = Color(0xFFE91E63),
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            "Tekanan Darah",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF2D3748)
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        OutlinedTextField(
-                            value = systolic,
-                            onValueChange = { systolic = it },
-                            label = { Text("Sistolik") },
-                            placeholder = { Text("120") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.weight(1f),
-                            singleLine = true
-                        )
-
-                        OutlinedTextField(
-                            value = diastolic,
-                            onValueChange = { diastolic = it },
-                            label = { Text("Diastolik") },
-                            placeholder = { Text("80") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.weight(1f),
-                            singleLine = true
-                        )
-                    }
-
+                    Icon(
+                        Icons.Default.Favorite,
+                        contentDescription = null,
+                        tint = HealthColors.BloodPressure,
+                        modifier = Modifier.size(HealthSpacing.iconSize)
+                    )
                     Text(
-                        "Normal: 120/80 mmHg",
-                        fontSize = 12.sp,
-                        color = Color(0xFF6C757D)
+                        "Tekanan Darah",
+                        style = HealthTypography.titleMedium,
+                        color = HealthColors.TextPrimary
                     )
                 }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(HealthSpacing.xSmall)
+                ) {
+                    OutlinedTextField(
+                        value = systolic,
+                        onValueChange = { systolic = it },
+                        label = { Text("Sistolik") },
+                        placeholder = { Text("120") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = HealthColors.BloodPressure,
+                            focusedLabelColor = HealthColors.BloodPressure
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = diastolic,
+                        onValueChange = { diastolic = it },
+                        label = { Text("Diastolik") },
+                        placeholder = { Text("80") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = HealthColors.BloodPressure,
+                            focusedLabelColor = HealthColors.BloodPressure
+                        )
+                    )
+                }
+
+                Text(
+                    "Normal: 120/80 mmHg",
+                    style = HealthTypography.bodySmall,
+                    color = HealthColors.TextSecondary
+                )
             }
 
             // Gula Darah Section
-            Card(
+            HealthDataCard(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp)
+                dataType = HealthDataType.BLOOD_SUGAR
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(HealthSpacing.xSmall)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.Bloodtype,
-                            contentDescription = null,
-                            tint = Color(0xFFFF9800),
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            "Gula Darah",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF2D3748)
-                        )
-                    }
-
-                    OutlinedTextField(
-                        value = bloodSugar,
-                        onValueChange = { bloodSugar = it },
-                        label = { Text("Kadar Gula Darah (mg/dL)") },
-                        placeholder = { Text("100") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
+                    Icon(
+                        Icons.Default.Bloodtype,
+                        contentDescription = null,
+                        tint = HealthColors.BloodSugar,
+                        modifier = Modifier.size(HealthSpacing.iconSize)
                     )
-
-                    // Dropdown for Blood Sugar Type
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = !expanded }
-                    ) {
-                        OutlinedTextField(
-                            value = bloodSugarType,
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text("Jenis Pengukuran") },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(),
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            listOf("Puasa", "Setelah Makan", "Random").forEach { type ->
-                                DropdownMenuItem(
-                                    text = { Text(type) },
-                                    onClick = {
-                                        bloodSugarType = type
-                                        expanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-
                     Text(
-                        "Normal (Puasa): 70-100 mg/dL",
-                        fontSize = 12.sp,
-                        color = Color(0xFF6C757D)
+                        "Gula Darah",
+                        style = HealthTypography.titleMedium,
+                        color = HealthColors.TextPrimary
                     )
                 }
+
+                OutlinedTextField(
+                    value = bloodSugar,
+                    onValueChange = { bloodSugar = it },
+                    label = { Text("Kadar Gula Darah (mg/dL)") },
+                    placeholder = { Text("100") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = HealthColors.BloodSugar,
+                        focusedLabelColor = HealthColors.BloodSugar
+                    )
+                )
+
+                // Dropdown for Blood Sugar Type
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = bloodSugarType,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Jenis Pengukuran") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = HealthColors.BloodSugar,
+                            focusedLabelColor = HealthColors.BloodSugar
+                        )
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        listOf("Puasa", "Setelah Makan", "Random").forEach { type ->
+                            DropdownMenuItem(
+                                text = { Text(type) },
+                                onClick = {
+                                    bloodSugarType = type
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Text(
+                    "Normal (Puasa): 70-100 mg/dL",
+                    style = HealthTypography.bodySmall,
+                    color = HealthColors.TextSecondary
+                )
             }
 
-            // Save Button
-            Button(
+            // Save Button using new PrimaryButton component
+            PrimaryButton(
+                text = "Simpan Data",
                 onClick = {
                     var saved = false
 
@@ -419,7 +412,7 @@ fun UnifiedHealthMetricsScreen(
                     }
 
                     if (saved) {
-                        Toast.makeText(context, "✅ Data kesehatan berhasil disimpan!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Data kesehatan berhasil disimpan!", Toast.LENGTH_SHORT).show()
                         // Reset form
                         weight = ""
                         height = ""
@@ -428,36 +421,19 @@ fun UnifiedHealthMetricsScreen(
                         bloodSugar = ""
                         bloodSugarType = "Puasa"
                     } else {
-                        Toast.makeText(context, "⚠️ Isi minimal satu data untuk disimpan", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Isi minimal satu data untuk disimpan", Toast.LENGTH_SHORT).show()
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF5DCCB4)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(
-                    Icons.Default.Save,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    "Simpan Data",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
+                icon = Icons.Default.Save,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             // Info Text
             Text(
-                "💡 Anda dapat mengisi satu, dua, atau semua data sekaligus",
-                fontSize = 12.sp,
-                color = Color(0xFF6C757D),
-                modifier = Modifier.padding(vertical = 8.dp)
+                "Anda dapat mengisi satu, dua, atau semua data sekaligus",
+                style = HealthTypography.bodySmall,
+                color = HealthColors.TextSecondary,
+                modifier = Modifier.padding(vertical = HealthSpacing.xSmall)
             )
         }
     }
@@ -468,26 +444,26 @@ private fun LatestMetricItem(
     icon: ImageVector,
     label: String,
     value: String,
-    color: Color
+    color: androidx.compose.ui.graphics.Color
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(HealthSpacing.xxSmall)
     ) {
         Icon(
             icon,
             contentDescription = null,
             tint = color,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(HealthSpacing.iconSize)
         )
         Text(
             label,
-            fontSize = 10.sp,
-            color = Color(0xFF6C757D)
+            style = HealthTypography.labelSmall,
+            color = HealthColors.TextSecondary
         )
         Text(
             value,
-            fontSize = 12.sp,
+            style = HealthTypography.bodySmall,
             fontWeight = FontWeight.Bold,
             color = color
         )
