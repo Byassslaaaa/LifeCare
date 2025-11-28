@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DirectionsRun
+import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,7 +30,8 @@ import java.util.*
 @Composable
 fun PhysicalActivityScreen(
     healthDataManager: HealthDataManager,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onStartGPSTracking: () -> Unit = {}
 ) {
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
@@ -85,6 +87,26 @@ fun PhysicalActivityScreen(
                         Text("${healthDataManager.getTodayTotalExerciseMinutes()} menit olahraga", style = HealthTypography.bodySmall, color = HealthColors.TextOnPrimary.copy(alpha = 0.8f))
                     }
                 }
+            }
+
+            // GPS Tracking Button
+            Button(
+                onClick = onStartGPSTracking,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = HealthSpacing.screenPadding)
+                    .padding(top = HealthSpacing.medium),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = HealthColors.Activity
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.GpsFixed,
+                    contentDescription = null,
+                    modifier = Modifier.size(HealthSpacing.iconSizeMedium)
+                )
+                Spacer(modifier = Modifier.width(HealthSpacing.small))
+                Text("Track dengan GPS", style = HealthTypography.titleMedium)
             }
 
             Text("Riwayat", style = HealthTypography.headlineSmall, modifier = Modifier.padding(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small))

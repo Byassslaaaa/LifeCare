@@ -11,11 +11,13 @@ object HealthSpacing {
     // Base spacing units (8dp grid)
     val xxxSmall: Dp = 2.dp     // For very tight spacing (dividers, borders)
     val xxSmall: Dp = 4.dp      // For minimal spacing
+    val extraSmall: Dp = 6.dp   // Extra small spacing
     val xSmall: Dp = 8.dp       // Base unit (1x)
     val small: Dp = 12.dp       // 1.5x base
     val medium: Dp = 16.dp      // 2x base (most commonly used)
     val large: Dp = 24.dp       // 3x base
     val xLarge: Dp = 32.dp      // 4x base
+    val extraLarge: Dp = 40.dp  // 5x base
     val xxLarge: Dp = 48.dp     // 6x base (section spacing)
     val xxxLarge: Dp = 64.dp    // 8x base (large gaps)
 
@@ -27,6 +29,7 @@ object HealthSpacing {
     val buttonHeight: Dp = 50.dp            // Standard button height
     val iconSize: Dp = 24.dp                // Standard icon size
     val iconSizeSmall: Dp = 20.dp           // Small icon size
+    val iconSizeMedium: Dp = 28.dp          // Medium icon size
     val iconSizeLarge: Dp = 32.dp           // Large icon size
 
     // Layout spacing

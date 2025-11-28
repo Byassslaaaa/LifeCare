@@ -81,6 +81,13 @@ class HealthDataManager(context: Context) {
         return getUserPIN() != null
     }
 
+    /**
+     * Clear/delete PIN (untuk forgot PIN flow)
+     */
+    fun clearPIN() {
+        sharedPreferences.edit().remove(KEY_USER_PIN).apply()
+    }
+
     // ============ Login State Management ============
     fun setLoggedIn(isLoggedIn: Boolean) {
         sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, isLoggedIn).apply()
@@ -195,6 +202,15 @@ class HealthDataManager(context: Context) {
         return getPhysicalActivityList()
             .filter { it.timestamp >= startOfDay }
             .sumOf { it.duration }
+    }
+
+    // ============ Generic Data Access (for GPS Tracking) ============
+    fun getData(key: String): String? {
+        return sharedPreferences.getString(key, null)
+    }
+
+    fun saveData(key: String, value: String) {
+        sharedPreferences.edit().putString(key, value).apply()
     }
 
     // ============ Clear All Data ============

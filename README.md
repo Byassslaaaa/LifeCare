@@ -16,6 +16,11 @@ LifeCare adalah aplikasi mobile Android untuk tracking kesehatan pribadi yang me
 - **PIN Security**: Proteksi tambahan dengan 6-digit PIN
 - **Change PIN**: Fitur ubah PIN dengan validasi
 - **Data Encryption**: Semua data disimpan dengan EncryptedSharedPreferences (AES256_GCM)
+- **🌓 Dark Mode / Light Mode** (NEW!):
+  - Toggle tema terang dan gelap
+  - Preference tersimpan persistent
+  - Material Design 3 color schemes
+  - Accessible di Profile → Pengaturan
 
 ### 2. 📊 Tracking Kesehatan
 
@@ -44,6 +49,15 @@ LifeCare adalah aplikasi mobile Android untuk tracking kesehatan pribadi yang me
 - **Auto-calculated calorie estimates** berdasarkan jenis aktivitas
 - Tracking langkah dan kalori terbakar (opsional)
 - Pesan motivasi berdasarkan durasi
+- **🏃 GPS Run Tracking** (NEW!):
+  - Real-time GPS tracking untuk Lari, Jalan Kaki, dan Bersepeda
+  - Live statistics: Distance, Pace, Speed, Calories, Elevation
+  - Route recording dengan GPS coordinates
+  - Background tracking dengan foreground service
+  - Target setting untuk jarak dan durasi
+  - Professional UX mirip Strava
+  - Haversine formula untuk accurate distance calculation
+  - MET-based calorie estimation
 
 #### Asupan Makanan
 - Input nama makanan (2-50 karakter) dan kalori (1-10000 kal)

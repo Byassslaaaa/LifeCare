@@ -3,89 +3,152 @@ package com.example.lifecare
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
+import com.example.lifecare.auth.AuthViewModel
 import com.example.lifecare.data.HealthDataManager
+import com.example.lifecare.data.PINSessionManager
+import com.example.lifecare.data.ThemeManager
 import com.example.lifecare.ui.theme.LifeCareTheme
 
+/**
+ * MainActivity - Entry point aplikasi dengan Firebase Authentication
+ *
+ * IMPROVED FLOW (No Activity Restart!):
+ * 1. Check Firebase currentUser
+ * 2. Check PIN session (valid 30 menit)
+ * 3. Navigate dengan state management (smooth transitions)
+ *
+ * Authentication States:
+ * - NOT_LOGGED_IN → LoginScreen / RegisterScreen
+ * - LOGGED_IN_PIN_NOT_SET → PINScreen (Create Mode)
+ * - LOGGED_IN_PIN_EXPIRED → PINScreen (Verify Mode)
+ * - LOGGED_IN_PIN_VALID → HomeScreen
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            LifeCareTheme {
-                // Initialize HealthDataManager
-                val healthDataManager = remember { HealthDataManager(this) }
+            // Initialize Managers
+            val themeManager = remember { ThemeManager(this) }
+            val healthDataManager = remember { HealthDataManager(this) }
+            val authViewModel = remember { AuthViewModel(this) }
+            val pinSessionManager = remember { PINSessionManager(this) }
 
-                // LOGIN STATE - Cek dari storage (persistent)
-                var isLoggedIn by remember { mutableStateOf(healthDataManager.isLoggedIn()) }
+            // THEME STATE - reactive dark mode state
+            val isSystemInDarkMode = isSystemInDarkTheme()
+            val isDarkMode = remember(isSystemInDarkMode) {
+                derivedStateOf {
+                    themeManager.isDarkModeEnabled(isSystemInDarkMode)
+                }
+            }.value
 
-                // PIN VERIFIED STATE (untuk sesi saat ini)
-                var isPinVerified by remember { mutableStateOf(false) }
+            var themeMode by remember { mutableStateOf(themeManager.getThemeMode()) }
 
-                // REGISTER SCREEN STATE
-                var showRegister by remember { mutableStateOf(false) }
+            LifeCareTheme(darkTheme = isDarkMode) {
 
-                // JUST REGISTERED STATE (untuk langsung setup PIN setelah register)
-                var justRegistered by remember { mutableStateOf(false) }
+                // ============ AUTHENTICATION STATE ============
+                val isUserLoggedIn = authViewModel.isUserLoggedIn()
+                val isPINSet = healthDataManager.isPINSet()
+                val isPINSessionValid = pinSessionManager.isSessionValid()
 
-                when {
-                    // === SETELAH REGISTER, SETUP PIN TERLEBIH DAHULU ===
-                    justRegistered -> {
+                // ============ NAVIGATION STATE ============
+                // Determine initial screen based on auth + PIN state
+                val initialScreen = remember(isUserLoggedIn, isPINSet, isPINSessionValid) {
+                    when {
+                        !isUserLoggedIn -> AppScreen.LOGIN
+                        !isPINSet -> AppScreen.PIN_CREATE
+                        !isPINSessionValid -> AppScreen.PIN_VERIFY
+                        else -> AppScreen.HOME
+                    }
+                }
+
+                var currentScreen by remember { mutableStateOf(initialScreen) }
+
+                // ============ SCREEN NAVIGATION ============
+                when (currentScreen) {
+                    // === HOME SCREEN ===
+                    AppScreen.HOME -> {
+                        HomeScreen(
+                            onLogoutClick = {
+                                // Logout flow
+                                authViewModel.logout()
+                                pinSessionManager.clearSession()
+                                currentScreen = AppScreen.LOGIN
+                            },
+                            onThemeToggle = {
+                                themeMode = themeManager.cycleThemeMode()
+                            }
+                        )
+                    }
+
+                    // === PIN CREATE (Setelah register pertama kali) ===
+                    AppScreen.PIN_CREATE -> {
                         PINScreen(
                             healthDataManager = healthDataManager,
+                            authViewModel = authViewModel,
                             onPINVerified = {
-                                justRegistered = false
-                                isLoggedIn = true
-                                isPinVerified = true
+                                // PIN created, mark session as valid
+                                pinSessionManager.markPINVerified()
+                                currentScreen = AppScreen.HOME
                             },
                             forceCreateMode = true
                         )
                     }
 
-                    // === USER SUDAH LOGIN DAN PIN VERIFIED ===
-                    isLoggedIn && isPinVerified -> {
-                        HomeScreen(
-                            onLogoutClick = {
-                                healthDataManager.setLoggedIn(false) // Clear login state dari storage
-                                isLoggedIn = false
-                                isPinVerified = false
-                            }
-                        )
-                    }
+                    // === PIN VERIFY (Session expired atau baru buka app) ===
+                    AppScreen.PIN_VERIFY -> {
+                        // Check if PIN still exists (bisa saja di-clear via forgot PIN)
+                        val isPINStillSet = healthDataManager.isPINSet()
 
-                    // === USER SUDAH LOGIN TAPI BELUM VERIFY PIN ===
-                    isLoggedIn && !isPinVerified -> {
-                        PINScreen(
-                            healthDataManager = healthDataManager,
-                            onPINVerified = {
-                                isPinVerified = true
-                            }
-                        )
+                        if (!isPINStillSet) {
+                            // PIN was cleared, navigate to create mode
+                            currentScreen = AppScreen.PIN_CREATE
+                        } else {
+                            PINScreen(
+                                healthDataManager = healthDataManager,
+                                authViewModel = authViewModel,
+                                onPINVerified = {
+                                    // PIN verified, renew session
+                                    pinSessionManager.markPINVerified()
+                                    currentScreen = AppScreen.HOME
+                                },
+                                forceCreateMode = false
+                            )
+                        }
                     }
 
                     // === REGISTER SCREEN ===
-                    showRegister -> {
+                    AppScreen.REGISTER -> {
                         RegisterScreen(
-                            healthDataManager = healthDataManager,
+                            authViewModel = authViewModel,
                             onLoginClick = {
-                                showRegister = false
+                                currentScreen = AppScreen.LOGIN
                             },
                             onRegisterSuccess = {
-                                showRegister = false
-                                justRegistered = true
+                                // After register, need to create PIN
+                                currentScreen = AppScreen.PIN_CREATE
                             }
                         )
                     }
 
                     // === LOGIN SCREEN ===
-                    else -> {
+                    AppScreen.LOGIN -> {
                         LoginScreen(
-                            healthDataManager = healthDataManager,
+                            authViewModel = authViewModel,
                             onRegisterClick = {
-                                showRegister = true
+                                currentScreen = AppScreen.REGISTER
                             },
                             onLoginSuccess = {
-                                isLoggedIn = true
+                                // After login, check PIN status
+                                currentScreen = if (healthDataManager.isPINSet()) {
+                                    // PIN already set, need to verify
+                                    AppScreen.PIN_VERIFY
+                                } else {
+                                    // First time login, need to create PIN
+                                    AppScreen.PIN_CREATE
+                                }
                             }
                         )
                     }
@@ -93,4 +156,16 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+/**
+ * AppScreen - Sealed class untuk type-safe navigation
+ * Lebih baik dari String-based navigation
+ */
+sealed class AppScreen {
+    object LOGIN : AppScreen()
+    object REGISTER : AppScreen()
+    object PIN_CREATE : AppScreen()
+    object PIN_VERIFY : AppScreen()
+    object HOME : AppScreen()
 }

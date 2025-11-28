@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">LifeCare</string>
+    <string name="notification_channel_location_tracking">GPS Tracking</string>
+    <string name="notification_channel_location_tracking_desc">Menampilkan notifikasi saat sedang tracking aktivitas dengan GPS</string>
 </resources>

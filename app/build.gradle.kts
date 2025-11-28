@@ -56,7 +56,13 @@ android {
 
 dependencies {
     // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+
+    // Firebase Authentication
+    implementation("com.google.firebase:firebase-auth")
+
+    // Firebase Firestore (for storing additional user data)
+    implementation("com.google.firebase:firebase-firestore")
 
     implementation(platform(libs.androidx.compose.bom))
 
@@ -86,6 +92,9 @@ dependencies {
     implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     implementation("com.google.android.gms:play-services-auth:21.4.0")
+
+    // Google Play Services Location for GPS tracking
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 
     // Test dependencies
     testImplementation(libs.junit)

@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lifecare.data.HealthDataManager
+import com.example.lifecare.data.ThemeManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,9 +34,13 @@ fun ProfileScreen(
     healthDataManager: HealthDataManager,
     onBackClick: () -> Unit,
     onLogout: () -> Unit,
-    onChangePIN: () -> Unit = {}
+    onChangePIN: () -> Unit = {},
+    onThemeToggle: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val themeManager = remember { ThemeManager(context) }
+    var currentThemeMode by remember { mutableStateOf(themeManager.getThemeMode()) }
+
     var showChangePINDialog by remember { mutableStateOf(false) }
     var showClearDataDialog by remember { mutableStateOf(false) }
     var showEditProfileDialog by remember { mutableStateOf(false) }
@@ -210,6 +215,21 @@ fun ProfileScreen(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
+                    SettingItem(
+                        icon = Icons.Default.DarkMode,
+                        title = "Tema Aplikasi",
+                        subtitle = "Saat ini: ${themeManager.getThemeDisplayName()}",
+                        onClick = {
+                            onThemeToggle()
+                            currentThemeMode = themeManager.getThemeMode()
+                            Toast.makeText(
+                                context,
+                                "Tema diubah ke: ${themeManager.getThemeDisplayName()}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
+                    Divider(modifier = Modifier.padding(vertical = 8.dp))
                     SettingItem(
                         icon = Icons.Default.Lock,
                         title = "Ubah PIN",

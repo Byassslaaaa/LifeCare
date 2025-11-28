@@ -21,15 +21,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lifecare.data.HealthDataManager
+import com.example.lifecare.repository.RunRepository
 import com.example.lifecare.screens.*
+import com.example.lifecare.ui.screens.*
+import com.example.lifecare.utils.PermissionHelper
+import com.example.lifecare.viewmodel.RunTrackingViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onLogoutClick: () -> Unit) {
+fun HomeScreen(
+    onLogoutClick: () -> Unit,
+    onThemeToggle: () -> Unit = {}
+) {
     val context = LocalContext.current
     val healthDataManager = remember { HealthDataManager(context) }
+
+    // GPS Tracking ViewModel
+    val runRepository = remember { RunRepository(healthDataManager) }
+    val runTrackingViewModel = remember { RunTrackingViewModel(context.applicationContext as android.app.Application, runRepository) }
 
     var currentScreen by remember { mutableStateOf<String?>(null) }
     var selectedBottomNav by remember { mutableStateOf("home") }
@@ -64,7 +75,58 @@ fun HomeScreen(onLogoutClick: () -> Unit) {
                 "physical_activity" -> {
                     PhysicalActivityScreen(
                         healthDataManager = healthDataManager,
-                        onBackClick = { currentScreen = null }
+                        onBackClick = { currentScreen = null },
+                        onStartGPSTracking = {
+                            // Check permission first
+                            if (PermissionHelper.hasLocationPermission(context)) {
+                                currentScreen = "run_tracking_setup"
+                            } else {
+                                currentScreen = "run_tracking_permission"
+                            }
+                        }
+                    )
+                }
+                "run_tracking_permission" -> {
+                    RunTrackingPermissionScreen(
+                        onPermissionGranted = {
+                            currentScreen = "run_tracking_setup"
+                        },
+                        onNavigateBack = {
+                            currentScreen = "physical_activity"
+                        }
+                    )
+                }
+                "run_tracking_setup" -> {
+                    RunTrackingSetupScreen(
+                        viewModel = runTrackingViewModel,
+                        onStartRun = {
+                            currentScreen = "live_run"
+                        },
+                        onNavigateBack = {
+                            currentScreen = "physical_activity"
+                        }
+                    )
+                }
+                "live_run" -> {
+                    LiveRunScreen(
+                        viewModel = runTrackingViewModel,
+                        onFinishRun = {
+                            currentScreen = "run_summary"
+                        },
+                        onDiscardRun = {
+                            currentScreen = "physical_activity"
+                        }
+                    )
+                }
+                "run_summary" -> {
+                    RunSummaryScreen(
+                        viewModel = runTrackingViewModel,
+                        onSaveAndExit = {
+                            currentScreen = "physical_activity"
+                        },
+                        onDiscardAndExit = {
+                            currentScreen = "physical_activity"
+                        }
                     )
                 }
                 "food_intake" -> {
@@ -84,7 +146,8 @@ fun HomeScreen(onLogoutClick: () -> Unit) {
                         healthDataManager = healthDataManager,
                         onBackClick = { currentScreen = null },
                         onLogout = onLogoutClick,
-                        onChangePIN = { currentScreen = "change_pin" }
+                        onChangePIN = { currentScreen = "change_pin" },
+                        onThemeToggle = onThemeToggle
                     )
                 }
                 "change_pin" -> {
