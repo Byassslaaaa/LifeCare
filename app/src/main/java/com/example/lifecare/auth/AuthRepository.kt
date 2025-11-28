@@ -199,7 +199,35 @@ class AuthRepository(private val context: Context) {
             )
         } catch (e: Exception) {
             Log.e(TAG, "Google Sign-In exception", e)
-            AuthResult.Error("Google Sign-In gagal: ${e.message}")
+
+            // Handle specific Firebase errors
+            val errorMessage = when {
+                e.message?.contains("this operation is not allowed", ignoreCase = true) == true ||
+                e.message?.contains("operation_not_allowed", ignoreCase = true) == true ->
+                    """
+                    ⚠️ Google Sign-In belum diaktifkan di Firebase.
+
+                    Cara mengaktifkan:
+                    1. Buka Firebase Console (console.firebase.google.com)
+                    2. Pilih project LifeCare
+                    3. Klik Authentication → Sign-in method
+                    4. Klik Google → Enable → Save
+
+                    Atau gunakan Email/Password untuk login/register.
+
+                    Detail error: ${e.message}
+                    """.trimIndent()
+
+                e.message?.contains("network", ignoreCase = true) == true ->
+                    "Tidak ada koneksi internet. Periksa koneksi Anda"
+
+                e.message?.contains("user-disabled", ignoreCase = true) == true ->
+                    "Akun Google ini telah dinonaktifkan"
+
+                else -> "Google Sign-In gagal: ${e.message ?: "Error tidak diketahui"}"
+            }
+
+            AuthResult.Error(errorMessage)
         }
     }
 

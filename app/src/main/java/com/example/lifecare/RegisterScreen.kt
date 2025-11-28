@@ -56,7 +56,7 @@ fun RegisterScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var genderExpanded by remember { mutableStateOf(false) }
-    val genderOptions = listOf("Male", "Female")
+    val genderOptions = listOf("Laki-laki", "Perempuan")
 
     // Real-time validation states
     var fullNameError by remember { mutableStateOf<String?>(null) }

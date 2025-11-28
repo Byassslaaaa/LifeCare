@@ -26,6 +26,8 @@ import com.example.lifecare.screens.*
 import com.example.lifecare.ui.screens.*
 import com.example.lifecare.utils.PermissionHelper
 import com.example.lifecare.viewmodel.RunTrackingViewModel
+import com.example.lifecare.charts.HealthChartsScreen
+import com.example.lifecare.reminder.ReminderSettingsScreen
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -155,6 +157,17 @@ fun HomeScreen(
                         healthDataManager = healthDataManager,
                         onBackClick = { currentScreen = "profile" },
                         onPINChanged = { currentScreen = "profile" }
+                    )
+                }
+                "charts" -> {
+                    HealthChartsScreen(
+                        healthDataManager = healthDataManager,
+                        onBackClick = { currentScreen = null }
+                    )
+                }
+                "reminders" -> {
+                    ReminderSettingsScreen(
+                        onBackClick = { currentScreen = null }
                     )
                 }
                 else -> {
@@ -663,6 +676,29 @@ fun HomeScreen(
                                     iconColor = Color(0xFF4CAF50),
                                     modifier = Modifier.weight(1f),
                                     onClick = { currentScreen = "physical_activity" }
+                                )
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                HealthCategoryCard(
+                                    title = "Grafik\nKesehatan",
+                                    subtitle = "Visualisasi data kesehatan",
+                                    icon = Icons.Default.ShowChart,
+                                    backgroundColor = Color(0xFFFFF3E0),
+                                    iconColor = Color(0xFFFF9800),
+                                    modifier = Modifier.weight(1f),
+                                    onClick = { currentScreen = "charts" }
+                                )
+                                HealthCategoryCard(
+                                    title = "Pengingat\nKesehatan",
+                                    subtitle = "Atur reminder harian",
+                                    icon = Icons.Default.Notifications,
+                                    backgroundColor = Color(0xFFF3E5F5),
+                                    iconColor = Color(0xFF9C27B0),
+                                    modifier = Modifier.weight(1f),
+                                    onClick = { currentScreen = "reminders" }
                                 )
                             }
                         }
