@@ -161,6 +161,8 @@ class MainActivity : ComponentActivity() {
 /**
  * AppScreen - Sealed class untuk type-safe navigation
  * Lebih baik dari String-based navigation
+ *
+ * Note: CHARTS & REMINDERS navigation handled internally by HomeScreen
  */
 sealed class AppScreen {
     object LOGIN : AppScreen()
@@ -168,6 +170,4 @@ sealed class AppScreen {
     object PIN_CREATE : AppScreen()
     object PIN_VERIFY : AppScreen()
     object HOME : AppScreen()
-    object CHARTS : AppScreen()
-    object REMINDERS : AppScreen()
 }
