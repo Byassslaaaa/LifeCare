@@ -149,7 +149,23 @@ fun HomeScreen(
                         onBackClick = { currentScreen = null },
                         onLogout = onLogoutClick,
                         onChangePIN = { currentScreen = "change_pin" },
-                        onThemeToggle = onThemeToggle
+                        onThemeToggle = onThemeToggle,
+                        onShowStatistic = { currentScreen = "profile_statistic" },
+                        onEditProfile = { currentScreen = "edit_profile" },
+                        onShowAccount = { currentScreen = "account" }
+                    )
+                }
+                "edit_profile" -> {
+                    EditProfileScreen(
+                        healthDataManager = healthDataManager,
+                        onBackClick = { currentScreen = "profile" },
+                        onProfileSaved = { currentScreen = "profile" }
+                    )
+                }
+                "profile_statistic" -> {
+                    ProfileStatisticScreen(
+                        healthDataManager = healthDataManager,
+                        onBackClick = { currentScreen = "profile" }
                     )
                 }
                 "change_pin" -> {
@@ -157,6 +173,14 @@ fun HomeScreen(
                         healthDataManager = healthDataManager,
                         onBackClick = { currentScreen = "profile" },
                         onPINChanged = { currentScreen = "profile" }
+                    )
+                }
+                "account" -> {
+                    AccountScreen(
+                        healthDataManager = healthDataManager,
+                        onBackClick = { currentScreen = "profile" },
+                        onLogout = onLogoutClick,
+                        onThemeToggle = onThemeToggle
                     )
                 }
                 "charts" -> {
