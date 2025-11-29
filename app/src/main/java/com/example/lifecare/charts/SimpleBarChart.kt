@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -21,13 +22,28 @@ fun SimpleBarChart(
     modifier: Modifier = Modifier,
     barColor: Color = MaterialTheme.colorScheme.primary
 ) {
-    if (data.isEmpty()) return
+    if (data.isEmpty()) {
+        // Show empty state instead of nothing
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "Belum ada data untuk ditampilkan",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray
+            )
+        }
+        return
+    }
 
     Column(modifier = modifier) {
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(250.dp)  // Increased height for better visibility
                 .padding(16.dp)
         ) {
             val canvasWidth = size.width
@@ -46,6 +62,18 @@ fun SimpleBarChart(
             val valueRange = maxValue - minValue
 
             if (valueRange == 0f) return@Canvas
+
+            // Draw background grid for better visibility
+            val gridColor = Color.LightGray.copy(alpha = 0.3f)
+            for (i in 0..4) {
+                val y = padding + (canvasHeight - 2 * padding) * i / 4
+                drawLine(
+                    color = gridColor,
+                    start = Offset(padding, y),
+                    end = Offset(canvasWidth - padding, y),
+                    strokeWidth = 1f
+                )
+            }
 
             // Draw bars
             data.forEachIndexed { index, point ->

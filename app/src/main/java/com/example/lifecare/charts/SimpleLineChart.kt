@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -21,13 +22,28 @@ fun SimpleLineChart(
     modifier: Modifier = Modifier,
     lineColor: Color = MaterialTheme.colorScheme.primary
 ) {
-    if (data.isEmpty()) return
+    if (data.isEmpty()) {
+        // Show empty state instead of nothing
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "Belum ada data untuk ditampilkan",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray
+            )
+        }
+        return
+    }
 
     Column(modifier = modifier) {
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(250.dp)  // Increased height for better visibility
                 .padding(16.dp)
         ) {
             val canvasWidth = size.width
@@ -49,6 +65,20 @@ fun SimpleLineChart(
                 Offset(x, y)
             }
 
+            // Draw background grid (optional, for better visibility)
+            val gridColor = Color.LightGray.copy(alpha = 0.3f)
+
+            // Horizontal grid lines
+            for (i in 0..4) {
+                val y = padding + (canvasHeight - 2 * padding) * i / 4
+                drawLine(
+                    color = gridColor,
+                    start = Offset(padding, y),
+                    end = Offset(canvasWidth - padding, y),
+                    strokeWidth = 1f
+                )
+            }
+
             // Draw line
             val path = Path().apply {
                 moveTo(points[0].x, points[0].y)
@@ -56,13 +86,20 @@ fun SimpleLineChart(
                     lineTo(points[i].x, points[i].y)
                 }
             }
-            drawPath(path, lineColor, style = Stroke(width = 3f))
+            drawPath(path, lineColor, style = Stroke(width = 4f))
 
-            // Draw points
+            // Draw points with white border for better visibility
             points.forEach { point ->
+                // White border
+                drawCircle(
+                    color = Color.White,
+                    radius = 6f,
+                    center = point
+                )
+                // Colored center
                 drawCircle(
                     color = lineColor,
-                    radius = 4f,
+                    radius = 5f,
                     center = point
                 )
             }

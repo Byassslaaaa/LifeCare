@@ -52,20 +52,15 @@ fun RegisterScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf("") }
 
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
-    var genderExpanded by remember { mutableStateOf(false) }
-    val genderOptions = listOf("Laki-laki", "Perempuan")
 
     // Real-time validation states
     var fullNameError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
     var confirmPasswordError by remember { mutableStateOf<String?>(null) }
-    var ageError by remember { mutableStateOf<String?>(null) }
 
     // Password strength - using utility
     val passwordStrength = remember(password) {
@@ -91,10 +86,6 @@ fun RegisterScreen(
         confirmPasswordError = ValidationHelper.validateConfirmPassword(password, confirmPassword)
     }
 
-    fun validateAge() {
-        ageError = ValidationHelper.validateAge(age)
-    }
-
     // Observe auth state
     val authState by authViewModel.authState.collectAsState()
 
@@ -107,8 +98,8 @@ fun RegisterScreen(
                     fullName = fullName,
                     email = email,
                     password = password, // Will be hashed by HealthDataManager
-                    age = age,
-                    gender = gender
+                    age = "",
+                    gender = ""
                 )
                 healthDataManager.setLoggedIn(true)
 
@@ -326,87 +317,6 @@ fun RegisterScreen(
             }
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // AGE
-        OutlinedTextField(
-            value = age,
-            onValueChange = {
-                if (it.isEmpty() || it.all { char -> char.isDigit() }) {
-                    age = it
-                    validateAge()
-                }
-            },
-            label = { Text("Umur") },
-            placeholder = { Text("Masukkan umur") },
-            shape = RoundedCornerShape(50.dp),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            enabled = !isLoading,
-            isError = ageError != null,
-            supportingText = ageError?.let { { Text(it, color = Color.Red, fontSize = 12.sp) } },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color(0xFF2D3748),
-                unfocusedTextColor = Color(0xFF2D3748),
-                focusedBorderColor = Color(0xFF98CD00),
-                unfocusedBorderColor = Color.LightGray,
-                focusedLabelColor = Color(0xFF98CD00),
-                errorBorderColor = Color.Red,
-                disabledBorderColor = Color.LightGray,
-                disabledTextColor = Color.Gray
-            )
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // GENDER DROPDOWN
-        ExposedDropdownMenuBox(
-            expanded = genderExpanded,
-            onExpandedChange = { if (!isLoading) genderExpanded = !genderExpanded }
-        ) {
-            OutlinedTextField(
-                value = gender,
-                onValueChange = {},
-                label = { Text("Jenis Kelamin") },
-                placeholder = { Text("Pilih jenis kelamin") },
-                shape = RoundedCornerShape(50.dp),
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth(),
-                readOnly = true,
-                singleLine = true,
-                enabled = !isLoading,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color(0xFF2D3748),
-                    unfocusedTextColor = Color(0xFF2D3748),
-                    focusedBorderColor = Color(0xFF98CD00),
-                    unfocusedBorderColor = Color.LightGray,
-                    focusedLabelColor = Color(0xFF98CD00),
-                    disabledBorderColor = Color.LightGray,
-                    disabledTextColor = Color.Gray
-                ),
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(genderExpanded)
-                }
-            )
-
-            DropdownMenu(
-                expanded = genderExpanded,
-                onDismissRequest = { genderExpanded = false }
-            ) {
-                genderOptions.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option) },
-                        onClick = {
-                            gender = option
-                            genderExpanded = false
-                        }
-                    )
-                }
-            }
-        }
-
         Spacer(modifier = Modifier.height(24.dp))
 
         // REGISTER BUTTON
@@ -417,8 +327,8 @@ fun RegisterScreen(
                     password = password,
                     confirmPassword = confirmPassword,
                     fullName = fullName,
-                    age = age,
-                    gender = gender
+                    age = "",
+                    gender = ""
                 )
             },
             shape = RoundedCornerShape(50.dp),
