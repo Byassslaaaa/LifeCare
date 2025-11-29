@@ -36,6 +36,7 @@ class HealthDataManager(context: Context) {
         private const val KEY_USER_PIN = "user_pin"
         private const val KEY_USER_DATA = "user_data"
         private const val KEY_IS_LOGGED_IN = "is_logged_in" // Menyimpan status login persistent
+        private const val KEY_PROFILE_PHOTO_URI = "profile_photo_uri" // URI foto profil
     }
 
     // ============ User Management ============
@@ -98,6 +99,19 @@ class HealthDataManager(context: Context) {
 
     fun isLoggedIn(): Boolean {
         return sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false)
+    }
+
+    // ============ Profile Photo Management ============
+    fun saveProfilePhotoUri(uri: String) {
+        sharedPreferences.edit().putString(KEY_PROFILE_PHOTO_URI, uri).apply()
+    }
+
+    fun getProfilePhotoUri(): String? {
+        return sharedPreferences.getString(KEY_PROFILE_PHOTO_URI, null)
+    }
+
+    fun clearProfilePhoto() {
+        sharedPreferences.edit().remove(KEY_PROFILE_PHOTO_URI).apply()
     }
 
     // ============ Body Metrics ============

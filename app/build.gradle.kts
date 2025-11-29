@@ -96,6 +96,9 @@ dependencies {
     // Google Play Services Location for GPS tracking
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
+    // Coil for image loading (profile photo)
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
     // Test dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

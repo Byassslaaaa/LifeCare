@@ -1,6 +1,9 @@
 package com.example.lifecare.screens
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,6 +32,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.lifecare.R
 import com.example.lifecare.data.HealthDataManager
 import com.example.lifecare.data.ThemeManager
@@ -72,6 +76,24 @@ fun ProfileScreen(
     var userAge by remember { mutableStateOf(userData?.age ?: "") }
     var userGender by remember { mutableStateOf(userData?.gender ?: "") }
 
+    // Profile photo state
+    var profilePhotoUri by remember {
+        mutableStateOf<Uri?>(
+            healthDataManager.getProfilePhotoUri()?.let { Uri.parse(it) }
+        )
+    }
+
+    // Photo picker launcher
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            profilePhotoUri = it
+            healthDataManager.saveProfilePhotoUri(it.toString())
+            Toast.makeText(context, "Foto profil berhasil diubah", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     Scaffold(
         topBar = {
             // top bar: back di kiri, logo di kanan (kecil, tidak mengubah tinggi app bar)
@@ -109,19 +131,63 @@ fun ProfileScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            // ====== AVATAR + NAMA (seperti gambar) ======
+            // ====== AVATAR + NAMA (dengan foto profil) ======
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Profile photo with edit button
                 Box(
-                    modifier = Modifier
-                        .size(140.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFE5E5E5))
-                )
+                    modifier = Modifier.size(140.dp),
+                    contentAlignment = Alignment.BottomEnd
+                ) {
+                    // Profile photo or default avatar
+                    if (profilePhotoUri != null) {
+                        AsyncImage(
+                            model = profilePhotoUri,
+                            contentDescription = "Foto Profil",
+                            modifier = Modifier
+                                .size(140.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFE5E5E5))
+                                .clickable { photoPickerLauncher.launch("image/*") },
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(140.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFE5E5E5))
+                                .clickable { photoPickerLauncher.launch("image/*") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Default Avatar",
+                                modifier = Modifier.size(70.dp),
+                                tint = Color.Gray
+                            )
+                        }
+                    }
+
+                    // Camera icon button
+                    FloatingActionButton(
+                        onClick = { photoPickerLauncher.launch("image/*") },
+                        modifier = Modifier.size(40.dp),
+                        containerColor = LifeGreen,
+                        contentColor = Color.White
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CameraAlt,
+                            contentDescription = "Ubah Foto",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = userFullName,
