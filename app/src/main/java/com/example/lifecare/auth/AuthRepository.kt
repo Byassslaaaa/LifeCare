@@ -69,13 +69,20 @@ class AuthRepository(private val context: Context) {
                     "updatedAt" to System.currentTimeMillis()
                 )
 
+                // PERFORMANCE FIX: Save to Firestore in background (non-blocking)
+                // User can proceed immediately, data saves asynchronously
                 firestore.collection(USERS_COLLECTION)
                     .document(firebaseUser.uid)
                     .set(userData)
-                    .await()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "User data saved to Firestore successfully")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Failed to save user data to Firestore", e)
+                        // Still okay - user is authenticated, data can be synced later
+                    }
 
-                Log.d(TAG, "User data saved to Firestore")
-
+                // Return immediately - don't wait for Firestore
                 AuthResult.Success(firebaseUser, "✅ Registrasi berhasil! Selamat datang di LifeCare")
             } else {
                 AuthResult.Error("Gagal membuat akun. Silakan coba lagi")
@@ -108,12 +115,19 @@ class AuthRepository(private val context: Context) {
             if (firebaseUser != null) {
                 Log.d(TAG, "Login successful for user: ${firebaseUser.uid}")
 
-                // Update last login time
+                // PERFORMANCE FIX: Update last login time in background (non-blocking)
                 firestore.collection(USERS_COLLECTION)
                     .document(firebaseUser.uid)
                     .update("lastLoginAt", System.currentTimeMillis())
-                    .await()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Last login time updated")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Failed to update last login time", e)
+                        // Non-critical, user is already authenticated
+                    }
 
+                // Return immediately - don't wait for Firestore
                 AuthResult.Success(firebaseUser, "✅ Login berhasil! Selamat datang kembali")
             } else {
                 AuthResult.Error("Login gagal. Silakan coba lagi")
@@ -157,6 +171,7 @@ class AuthRepository(private val context: Context) {
                         // Check if this is first time login (new user)
                         val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
 
+                        // PERFORMANCE FIX: Save to Firestore in background (non-blocking)
                         if (isNewUser) {
                             // Simpan data user baru ke Firestore
                             val userData = hashMapOf(
@@ -174,18 +189,26 @@ class AuthRepository(private val context: Context) {
                             firestore.collection(USERS_COLLECTION)
                                 .document(firebaseUser.uid)
                                 .set(userData)
-                                .await()
+                                .addOnSuccessListener {
+                                    Log.d(TAG, "New Google user data saved to Firestore")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e(TAG, "Failed to save Google user data", e)
+                                }
 
-                            Log.d(TAG, "New Google user data saved to Firestore")
                             AuthResult.Success(firebaseUser, "✅ Registrasi dengan Google berhasil! Selamat datang di LifeCare")
                         } else {
-                            // Update last login time untuk existing user
+                            // Update last login time untuk existing user (background)
                             firestore.collection(USERS_COLLECTION)
                                 .document(firebaseUser.uid)
                                 .update("lastLoginAt", System.currentTimeMillis())
-                                .await()
+                                .addOnSuccessListener {
+                                    Log.d(TAG, "Google user last login time updated")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e(TAG, "Failed to update last login time", e)
+                                }
 
-                            Log.d(TAG, "Existing Google user logged in")
                             AuthResult.Success(firebaseUser, "✅ Login dengan Google berhasil! Selamat datang kembali")
                         }
                     } else {

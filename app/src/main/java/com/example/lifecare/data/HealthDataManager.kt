@@ -2,9 +2,11 @@ package com.example.lifecare.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 
 class HealthDataManager(context: Context) {
@@ -25,6 +27,7 @@ class HealthDataManager(context: Context) {
 
     // Keys untuk SharedPreferences
     companion object {
+        private const val TAG = "HealthDataManager"
         private const val KEY_BODY_METRICS = "body_metrics"
         private const val KEY_BLOOD_PRESSURE = "blood_pressure"
         private const val KEY_BLOOD_SUGAR = "blood_sugar"
@@ -106,9 +109,23 @@ class HealthDataManager(context: Context) {
     }
 
     fun getBodyMetricsList(): List<BodyMetrics> {
-        val json = sharedPreferences.getString(KEY_BODY_METRICS, null) ?: return emptyList()
-        val type = object : TypeToken<List<BodyMetrics>>() {}.type
-        return gson.fromJson(json, type)
+        return try {
+            val json = sharedPreferences.getString(KEY_BODY_METRICS, null) ?: return emptyList()
+            val type = object : TypeToken<List<BodyMetrics>>() {}.type
+            val data: List<BodyMetrics>? = gson.fromJson(json, type)
+            data ?: emptyList()
+        } catch (e: JsonSyntaxException) {
+            Log.e(TAG, "JSON syntax error in body metrics data. Clearing corrupt data.", e)
+            clearBodyMetricsData()
+            emptyList()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reading body metrics data", e)
+            emptyList()
+        }
+    }
+
+    private fun clearBodyMetricsData() {
+        sharedPreferences.edit().remove(KEY_BODY_METRICS).apply()
     }
 
     fun getLatestBodyMetrics(): BodyMetrics? {
@@ -124,9 +141,23 @@ class HealthDataManager(context: Context) {
     }
 
     fun getBloodPressureList(): List<BloodPressure> {
-        val json = sharedPreferences.getString(KEY_BLOOD_PRESSURE, null) ?: return emptyList()
-        val type = object : TypeToken<List<BloodPressure>>() {}.type
-        return gson.fromJson(json, type)
+        return try {
+            val json = sharedPreferences.getString(KEY_BLOOD_PRESSURE, null) ?: return emptyList()
+            val type = object : TypeToken<List<BloodPressure>>() {}.type
+            val data: List<BloodPressure>? = gson.fromJson(json, type)
+            data ?: emptyList()
+        } catch (e: JsonSyntaxException) {
+            Log.e(TAG, "JSON syntax error in blood pressure data. Clearing corrupt data.", e)
+            clearBloodPressureData()
+            emptyList()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reading blood pressure data", e)
+            emptyList()
+        }
+    }
+
+    private fun clearBloodPressureData() {
+        sharedPreferences.edit().remove(KEY_BLOOD_PRESSURE).apply()
     }
 
     fun getLatestBloodPressure(): BloodPressure? {
@@ -142,9 +173,23 @@ class HealthDataManager(context: Context) {
     }
 
     fun getBloodSugarList(): List<BloodSugar> {
-        val json = sharedPreferences.getString(KEY_BLOOD_SUGAR, null) ?: return emptyList()
-        val type = object : TypeToken<List<BloodSugar>>() {}.type
-        return gson.fromJson(json, type)
+        return try {
+            val json = sharedPreferences.getString(KEY_BLOOD_SUGAR, null) ?: return emptyList()
+            val type = object : TypeToken<List<BloodSugar>>() {}.type
+            val data: List<BloodSugar>? = gson.fromJson(json, type)
+            data ?: emptyList()
+        } catch (e: JsonSyntaxException) {
+            Log.e(TAG, "JSON syntax error in blood sugar data. Clearing corrupt data.", e)
+            clearBloodSugarData()
+            emptyList()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reading blood sugar data", e)
+            emptyList()
+        }
+    }
+
+    private fun clearBloodSugarData() {
+        sharedPreferences.edit().remove(KEY_BLOOD_SUGAR).apply()
     }
 
     fun getLatestBloodSugar(): BloodSugar? {
@@ -160,9 +205,23 @@ class HealthDataManager(context: Context) {
     }
 
     fun getPhysicalActivityList(): List<PhysicalActivity> {
-        val json = sharedPreferences.getString(KEY_PHYSICAL_ACTIVITY, null) ?: return emptyList()
-        val type = object : TypeToken<List<PhysicalActivity>>() {}.type
-        return gson.fromJson(json, type)
+        return try {
+            val json = sharedPreferences.getString(KEY_PHYSICAL_ACTIVITY, null) ?: return emptyList()
+            val type = object : TypeToken<List<PhysicalActivity>>() {}.type
+            val data: List<PhysicalActivity>? = gson.fromJson(json, type)
+            data ?: emptyList()
+        } catch (e: JsonSyntaxException) {
+            Log.e(TAG, "JSON syntax error in physical activity data. Clearing corrupt data.", e)
+            clearPhysicalActivityData()
+            emptyList()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reading physical activity data", e)
+            emptyList()
+        }
+    }
+
+    private fun clearPhysicalActivityData() {
+        sharedPreferences.edit().remove(KEY_PHYSICAL_ACTIVITY).apply()
     }
 
     // ============ Food Intake ============
@@ -174,9 +233,23 @@ class HealthDataManager(context: Context) {
     }
 
     fun getFoodIntakeList(): List<FoodIntake> {
-        val json = sharedPreferences.getString(KEY_FOOD_INTAKE, null) ?: return emptyList()
-        val type = object : TypeToken<List<FoodIntake>>() {}.type
-        return gson.fromJson(json, type)
+        return try {
+            val json = sharedPreferences.getString(KEY_FOOD_INTAKE, null) ?: return emptyList()
+            val type = object : TypeToken<List<FoodIntake>>() {}.type
+            val data: List<FoodIntake>? = gson.fromJson(json, type)
+            data ?: emptyList()
+        } catch (e: JsonSyntaxException) {
+            Log.e(TAG, "JSON syntax error in food intake data. Clearing corrupt data.", e)
+            clearFoodIntakeData()
+            emptyList()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reading food intake data", e)
+            emptyList()
+        }
+    }
+
+    private fun clearFoodIntakeData() {
+        sharedPreferences.edit().remove(KEY_FOOD_INTAKE).apply()
     }
 
     // ============ Statistics ============

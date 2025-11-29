@@ -103,9 +103,12 @@ fun HealthChartsScreen(
 
 @Composable
 private fun BloodPressureChart(healthDataManager: HealthDataManager, dateRange: DateRange) {
-    val data = remember(dateRange) {
-        val allData = healthDataManager.getBloodPressureList()
-        filterByDateRange(allData, dateRange) { it.timestamp }
+    // FIX: Use derivedStateOf to reactively update when data changes
+    val data by remember {
+        derivedStateOf {
+            val allData = healthDataManager.getBloodPressureList()
+            filterByDateRange(allData, dateRange) { it.timestamp }
+        }
     }
 
     if (data.isEmpty()) {
@@ -156,9 +159,12 @@ private fun BloodPressureChart(healthDataManager: HealthDataManager, dateRange: 
 
 @Composable
 private fun BloodSugarChart(healthDataManager: HealthDataManager, dateRange: DateRange) {
-    val data = remember(dateRange) {
-        val allData = healthDataManager.getBloodSugarList()
-        filterByDateRange(allData, dateRange) { it.timestamp }
+    // FIX: Use derivedStateOf to reactively update when data changes
+    val data by remember {
+        derivedStateOf {
+            val allData = healthDataManager.getBloodSugarList()
+            filterByDateRange(allData, dateRange) { it.timestamp }
+        }
     }
 
     if (data.isEmpty()) {
@@ -188,9 +194,12 @@ private fun BloodSugarChart(healthDataManager: HealthDataManager, dateRange: Dat
 
 @Composable
 private fun BMIChart(healthDataManager: HealthDataManager, dateRange: DateRange) {
-    val data = remember(dateRange) {
-        val allData = healthDataManager.getBodyMetricsList()
-        filterByDateRange(allData, dateRange) { it.timestamp }
+    // FIX: Use derivedStateOf to reactively update when data changes
+    val data by remember {
+        derivedStateOf {
+            val allData = healthDataManager.getBodyMetricsList()
+            filterByDateRange(allData, dateRange) { it.timestamp }
+        }
     }
 
     if (data.isEmpty()) {
@@ -220,9 +229,12 @@ private fun BMIChart(healthDataManager: HealthDataManager, dateRange: DateRange)
 
 @Composable
 private fun ActivityChart(healthDataManager: HealthDataManager, dateRange: DateRange) {
-    val data = remember(dateRange) {
-        val allData = healthDataManager.getPhysicalActivityList()
-        filterByDateRange(allData, dateRange) { it.timestamp }
+    // FIX: Use derivedStateOf to reactively update when data changes
+    val data by remember {
+        derivedStateOf {
+            val allData = healthDataManager.getPhysicalActivityList()
+            filterByDateRange(allData, dateRange) { it.timestamp }
+        }
     }
 
     if (data.isEmpty()) {
@@ -256,9 +268,12 @@ private fun ActivityChart(healthDataManager: HealthDataManager, dateRange: DateR
 
 @Composable
 private fun FoodChart(healthDataManager: HealthDataManager, dateRange: DateRange) {
-    val data = remember(dateRange) {
-        val allData = healthDataManager.getFoodIntakeList()
-        filterByDateRange(allData, dateRange) { it.timestamp }
+    // FIX: Use derivedStateOf to reactively update when data changes
+    val data by remember {
+        derivedStateOf {
+            val allData = healthDataManager.getFoodIntakeList()
+            filterByDateRange(allData, dateRange) { it.timestamp }
+        }
     }
 
     if (data.isEmpty()) {

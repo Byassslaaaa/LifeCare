@@ -36,8 +36,13 @@ class LocationTrackingService : Service() {
     companion object {
         private const val NOTIFICATION_ID = 1001
         private const val CHANNEL_ID = "location_tracking_channel"
-        private const val UPDATE_INTERVAL = 2000L // 2 seconds
-        private const val FASTEST_INTERVAL = 1000L // 1 second
+
+        // BATTERY OPTIMIZATION: Dynamic intervals based on activity type
+        private const val RUNNING_UPDATE_INTERVAL = 3000L // 3s untuk lari (was 2s)
+        private const val WALKING_UPDATE_INTERVAL = 5000L // 5s untuk jalan (battery friendly)
+        private const val CYCLING_UPDATE_INTERVAL = 2000L // 2s untuk sepeda (faster movement)
+
+        private const val FASTEST_INTERVAL = 1000L // 1 second minimum
         private const val MAX_WAIT_TIME = 5000L // 5 seconds
         private const val ACCURACY_THRESHOLD = 25f // meters
     }
@@ -75,9 +80,17 @@ class LocationTrackingService : Service() {
             startTime = startTime
         )
 
+        // BATTERY OPTIMIZATION: Select update interval based on activity type
+        val updateInterval = when (activityType.lowercase()) {
+            "lari", "jogging" -> RUNNING_UPDATE_INTERVAL // 3s
+            "jalan", "jalan kaki" -> WALKING_UPDATE_INTERVAL // 5s (save battery)
+            "sepeda", "bersepeda", "cycling" -> CYCLING_UPDATE_INTERVAL // 2s (faster)
+            else -> RUNNING_UPDATE_INTERVAL // Default to running
+        }
+
         val locationRequest = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
-            UPDATE_INTERVAL
+            updateInterval // Use dynamic interval instead of fixed
         ).apply {
             setMinUpdateIntervalMillis(FASTEST_INTERVAL)
             setMaxUpdateDelayMillis(MAX_WAIT_TIME)
@@ -269,6 +282,19 @@ class LocationTrackingService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        fusedLocationClient.removeLocationUpdates(locationCallback)
+
+        // CRITICAL FIX: Proper cleanup to prevent memory leak
+        try {
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+        } catch (e: Exception) {
+            // Handle case where location updates were never started
+            e.printStackTrace()
+        }
+
+        // Reset state to prevent stale data
+        _runState.value = LiveRunState()
+
+        // Stop foreground service notification
+        stopForeground(STOP_FOREGROUND_REMOVE)
     }
 }
