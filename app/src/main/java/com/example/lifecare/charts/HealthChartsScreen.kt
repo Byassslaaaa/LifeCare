@@ -1,16 +1,15 @@
 package com.example.lifecare.charts
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.lifecare.data.*
 import java.text.SimpleDateFormat
@@ -25,7 +24,6 @@ fun HealthChartsScreen(
     healthDataManager: HealthDataManager,
     onBackClick: () -> Unit
 ) {
-    val context = LocalContext.current
     var selectedCategory by remember { mutableStateOf(HealthChartCategory.BLOOD_PRESSURE) }
     var selectedDateRange by remember { mutableStateOf(DateRange.WEEK) }
 
@@ -104,274 +102,222 @@ fun HealthChartsScreen(
 }
 
 @Composable
-private fun BloodPressureChart(
-    healthDataManager: HealthDataManager,
-    dateRange: DateRange
-) {
+private fun BloodPressureChart(healthDataManager: HealthDataManager, dateRange: DateRange) {
     val data = remember(dateRange) {
-        val allData = healthDataManager.getAllBloodPressure()
-        filterByDateRange(allData, dateRange)
+        val allData = healthDataManager.getBloodPressureList()
+        filterByDateRange(allData, dateRange) { it.timestamp }
     }
 
     if (data.isEmpty()) {
-        EmptyChartMessage("tekanan darah")
+        EmptyStateCard("Belum ada data tekanan darah")
         return
     }
 
-    val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
-
-    // Systolic chart
     val systolicData = data.map { bp ->
         ChartDataPoint(
             timestamp = bp.timestamp,
             value = bp.systolic.toFloat(),
-            label = dateFormat.format(Date(bp.timestamp))
+            label = SimpleDateFormat("dd/MM", Locale.getDefault()).format(Date(bp.timestamp))
         )
     }
 
-    LineChart(
-        data = systolicData,
-        config = ChartConfig(
-            title = "Tekanan Darah Sistolik",
-            yAxisLabel = "mmHg",
-            minValue = 70f,
-            maxValue = 200f
-        ),
-        lineColor = Color(0xFFE91E63)
-    )
-
-    Spacer(modifier = Modifier.height(32.dp))
-
-    // Diastolic chart
     val diastolicData = data.map { bp ->
         ChartDataPoint(
             timestamp = bp.timestamp,
             value = bp.diastolic.toFloat(),
-            label = dateFormat.format(Date(bp.timestamp))
+            label = SimpleDateFormat("dd/MM", Locale.getDefault()).format(Date(bp.timestamp))
         )
     }
 
-    LineChart(
-        data = diastolicData,
-        config = ChartConfig(
-            title = "Tekanan Darah Diastolik",
-            yAxisLabel = "mmHg",
-            minValue = 40f,
-            maxValue = 150f
-        ),
-        lineColor = Color(0xFF9C27B0)
-    )
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Tekanan Darah Sistolik", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            SimpleLineChart(data = systolicData, lineColor = Color(0xFFE91E63))
+        }
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Tekanan Darah Diastolik", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            SimpleLineChart(data = diastolicData, lineColor = Color(0xFF2196F3))
+        }
+    }
 }
 
 @Composable
-private fun BloodSugarChart(
-    healthDataManager: HealthDataManager,
-    dateRange: DateRange
-) {
+private fun BloodSugarChart(healthDataManager: HealthDataManager, dateRange: DateRange) {
     val data = remember(dateRange) {
-        val allData = healthDataManager.getAllBloodSugar()
-        filterByDateRange(allData, dateRange)
+        val allData = healthDataManager.getBloodSugarList()
+        filterByDateRange(allData, dateRange) { it.timestamp }
     }
 
     if (data.isEmpty()) {
-        EmptyChartMessage("gula darah")
+        EmptyStateCard("Belum ada data gula darah")
         return
     }
-
-    val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
 
     val chartData = data.map { bs ->
         ChartDataPoint(
             timestamp = bs.timestamp,
             value = bs.level.toFloat(),
-            label = dateFormat.format(Date(bs.timestamp))
+            label = SimpleDateFormat("dd/MM", Locale.getDefault()).format(Date(bs.timestamp))
         )
     }
 
-    LineChart(
-        data = chartData,
-        config = ChartConfig(
-            title = "Level Gula Darah",
-            yAxisLabel = "mg/dL",
-            minValue = 50f,
-            maxValue = 300f
-        ),
-        lineColor = Color(0xFF9C27B0)
-    )
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Gula Darah", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            SimpleLineChart(data = chartData, lineColor = Color(0xFF9C27B0))
+        }
+    }
 }
 
 @Composable
-private fun BMIChart(
-    healthDataManager: HealthDataManager,
-    dateRange: DateRange
-) {
+private fun BMIChart(healthDataManager: HealthDataManager, dateRange: DateRange) {
     val data = remember(dateRange) {
-        val allData = healthDataManager.getAllBodyMetrics()
-        filterByDateRange(allData, dateRange)
+        val allData = healthDataManager.getBodyMetricsList()
+        filterByDateRange(allData, dateRange) { it.timestamp }
     }
 
     if (data.isEmpty()) {
-        EmptyChartMessage("berat & tinggi badan")
+        EmptyStateCard("Belum ada data berat & tinggi badan")
         return
     }
-
-    val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
 
     val chartData = data.map { bm ->
-        val bmi = bm.weight / ((bm.height / 100) * (bm.height / 100))
         ChartDataPoint(
             timestamp = bm.timestamp,
-            value = bmi.toFloat(),
-            label = dateFormat.format(Date(bm.timestamp))
+            value = bm.bmi.toFloat(),
+            label = SimpleDateFormat("dd/MM", Locale.getDefault()).format(Date(bm.timestamp))
         )
     }
 
-    LineChart(
-        data = chartData,
-        config = ChartConfig(
-            title = "Indeks Massa Tubuh (BMI)",
-            yAxisLabel = "BMI",
-            minValue = 15f,
-            maxValue = 35f
-        ),
-        lineColor = Color(0xFF2196F3)
-    )
-}
-
-@Composable
-private fun ActivityChart(
-    healthDataManager: HealthDataManager,
-    dateRange: DateRange
-) {
-    val data = remember(dateRange) {
-        val allData = healthDataManager.getAllPhysicalActivities()
-        filterByDateRange(allData, dateRange)
-    }
-
-    if (data.isEmpty()) {
-        EmptyChartMessage("aktivitas fisik")
-        return
-    }
-
-    val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
-
-    // Group by date and sum calories
-    val caloriesByDate = data.groupBy {
-        dateFormat.format(Date(it.timestamp))
-    }.mapValues { entry ->
-        entry.value.sumOf { it.caloriesBurned }
-    }
-
-    val chartData = caloriesByDate.entries.mapIndexed { index, entry ->
-        ChartDataPoint(
-            timestamp = index.toLong(),
-            value = entry.value.toFloat(),
-            label = entry.key
-        )
-    }
-
-    BarChart(
-        data = chartData,
-        config = ChartConfig(
-            title = "Kalori Terbakar per Hari",
-            yAxisLabel = "Kalori",
-            minValue = 0f
-        ),
-        barColor = Color(0xFF4CAF50)
-    )
-}
-
-@Composable
-private fun FoodChart(
-    healthDataManager: HealthDataManager,
-    dateRange: DateRange
-) {
-    val data = remember(dateRange) {
-        val allData = healthDataManager.getAllFoodIntakes()
-        filterByDateRange(allData, dateRange)
-    }
-
-    if (data.isEmpty()) {
-        EmptyChartMessage("asupan makanan")
-        return
-    }
-
-    val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
-
-    // Group by date and sum calories
-    val caloriesByDate = data.groupBy {
-        dateFormat.format(Date(it.timestamp))
-    }.mapValues { entry ->
-        entry.value.sumOf { it.calories }
-    }
-
-    val chartData = caloriesByDate.entries.mapIndexed { index, entry ->
-        ChartDataPoint(
-            timestamp = index.toLong(),
-            value = entry.value.toFloat(),
-            label = entry.key
-        )
-    }
-
-    BarChart(
-        data = chartData,
-        config = ChartConfig(
-            title = "Asupan Kalori per Hari",
-            yAxisLabel = "Kalori",
-            minValue = 0f
-        ),
-        barColor = Color(0xFFFF9800)
-    )
-}
-
-@Composable
-private fun EmptyChartMessage(category: String) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(
-            modifier = Modifier.padding(32.dp),
-            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Body Mass Index (BMI)", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            SimpleLineChart(data = chartData, lineColor = Color(0xFF2196F3))
+        }
+    }
+}
+
+@Composable
+private fun ActivityChart(healthDataManager: HealthDataManager, dateRange: DateRange) {
+    val data = remember(dateRange) {
+        val allData = healthDataManager.getPhysicalActivityList()
+        filterByDateRange(allData, dateRange) { it.timestamp }
+    }
+
+    if (data.isEmpty()) {
+        EmptyStateCard("Belum ada data aktivitas fisik")
+        return
+    }
+
+    val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
+    val dailyData = data
+        .groupBy { dateFormat.format(Date(it.timestamp)) }
+        .map { (date, activities) ->
+            ChartDataPoint(
+                timestamp = activities.first().timestamp,
+                value = activities.sumOf { it.caloriesBurned ?: 0 }.toFloat(),
+                label = date
+            )
+        }
+        .sortedBy { it.timestamp }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Kalori Terbakar per Hari", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            SimpleBarChart(data = dailyData, barColor = Color(0xFF4CAF50))
+        }
+    }
+}
+
+@Composable
+private fun FoodChart(healthDataManager: HealthDataManager, dateRange: DateRange) {
+    val data = remember(dateRange) {
+        val allData = healthDataManager.getFoodIntakeList()
+        filterByDateRange(allData, dateRange) { it.timestamp }
+    }
+
+    if (data.isEmpty()) {
+        EmptyStateCard("Belum ada data asupan makanan")
+        return
+    }
+
+    val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
+    val dailyData = data
+        .groupBy { dateFormat.format(Date(it.timestamp)) }
+        .map { (date, foods) ->
+            ChartDataPoint(
+                timestamp = foods.first().timestamp,
+                value = foods.sumOf { it.calories }.toFloat(),
+                label = date
+            )
+        }
+        .sortedBy { it.timestamp }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Kalori Asupan per Hari", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            SimpleBarChart(data = dailyData, barColor = Color(0xFFFF9800))
+        }
+    }
+}
+
+@Composable
+private fun EmptyStateCard(message: String) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center
         ) {
             Text(
-                "Tidak ada data $category",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                "Mulai catat data $category untuk melihat grafik",
+                message,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
 }
 
-// Helper function to filter data by date range
-private fun <T : Any> filterByDateRange(data: List<T>, dateRange: DateRange): List<T> {
+private fun <T> filterByDateRange(
+    data: List<T>,
+    dateRange: DateRange,
+    timestampExtractor: (T) -> Long
+): List<T> {
     val cutoffTime = System.currentTimeMillis() - (dateRange.days * 24 * 60 * 60 * 1000L)
-
-    return data.filter { item ->
-        val timestamp = when (item) {
-            is BloodPressure -> item.timestamp
-            is BloodSugar -> item.timestamp
-            is BodyMetrics -> item.timestamp
-            is PhysicalActivity -> item.timestamp
-            is FoodIntake -> item.timestamp
-            else -> 0L
-        }
-        timestamp >= cutoffTime
-    }.sortedBy { item ->
-        when (item) {
-            is BloodPressure -> item.timestamp
-            is BloodSugar -> item.timestamp
-            is BodyMetrics -> item.timestamp
-            is PhysicalActivity -> item.timestamp
-            is FoodIntake -> item.timestamp
-            else -> 0L
-        }
-    }
+    return data
+        .filter { timestampExtractor(it) >= cutoffTime }
+        .sortedBy { timestampExtractor(it) }
 }
