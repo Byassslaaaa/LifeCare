@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.ui.text.font.FontWeight
 import com.example.lifecare.auth.AuthViewModel
 import com.example.lifecare.auth.AuthUiState
+import com.example.lifecare.data.HealthDataManager
 import com.example.lifecare.utils.ValidationHelper
 import com.example.lifecare.utils.PasswordStrengthCalculator
 import com.example.lifecare.utils.PasswordStrength
@@ -41,6 +42,7 @@ import com.example.lifecare.utils.Dimensions
 @Composable
 fun RegisterScreen(
     authViewModel: AuthViewModel,
+    healthDataManager: HealthDataManager,
     onLoginClick: () -> Unit,
     onRegisterSuccess: () -> Unit
 ) {
@@ -100,6 +102,16 @@ fun RegisterScreen(
     LaunchedEffect(authState) {
         when (val state = authState) {
             is AuthUiState.Success -> {
+                // FIX: Save user data to local storage for profile display
+                healthDataManager.saveUserData(
+                    fullName = fullName,
+                    email = email,
+                    password = password, // Will be hashed by HealthDataManager
+                    age = age,
+                    gender = gender
+                )
+                healthDataManager.setLoggedIn(true)
+
                 Toast.makeText(context, state.message + "\n\nSilakan buat PIN 6 digit untuk keamanan data Anda", Toast.LENGTH_LONG).show()
                 authViewModel.resetAuthState()
                 onRegisterSuccess()

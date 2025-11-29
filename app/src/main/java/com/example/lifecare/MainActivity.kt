@@ -123,6 +123,7 @@ class MainActivity : ComponentActivity() {
                     AppScreen.REGISTER -> {
                         RegisterScreen(
                             authViewModel = authViewModel,
+                            healthDataManager = healthDataManager,
                             onLoginClick = {
                                 currentScreen = AppScreen.LOGIN
                             },
@@ -137,6 +138,7 @@ class MainActivity : ComponentActivity() {
                     AppScreen.LOGIN -> {
                         LoginScreen(
                             authViewModel = authViewModel,
+                            healthDataManager = healthDataManager,
                             onRegisterClick = {
                                 currentScreen = AppScreen.REGISTER
                             },

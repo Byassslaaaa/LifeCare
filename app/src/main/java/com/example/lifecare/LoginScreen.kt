@@ -30,8 +30,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.lifecare.auth.AuthViewModel
 import com.example.lifecare.auth.AuthUiState
+import com.example.lifecare.data.HealthDataManager
 import com.example.lifecare.utils.ValidationHelper
 import com.example.lifecare.utils.Dimensions
+import com.google.firebase.auth.FirebaseAuth
 
 /**
  * LoginScreen - Halaman Login dengan Firebase Authentication
@@ -40,6 +42,7 @@ import com.example.lifecare.utils.Dimensions
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel,
+    healthDataManager: HealthDataManager,
     onRegisterClick: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
@@ -69,6 +72,25 @@ fun LoginScreen(
     LaunchedEffect(authState) {
         when (val state = authState) {
             is AuthUiState.Success -> {
+                // FIX: Save user data to local storage (especially for Google Sign-In)
+                val firebaseUser = state.user
+                if (firebaseUser != null) {
+                    // Check if user data already exists in local storage
+                    val existingUser = healthDataManager.getUserData()
+
+                    if (existingUser == null) {
+                        // New user (Google Sign-In first time) - save to local
+                        healthDataManager.saveUserData(
+                            fullName = firebaseUser.displayName ?: "Pengguna LifeCare",
+                            email = firebaseUser.email ?: "",
+                            password = "", // No password for Google/existing users
+                            age = "",
+                            gender = ""
+                        )
+                    }
+                    healthDataManager.setLoggedIn(true)
+                }
+
                 Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
                 authViewModel.resetAuthState()
                 onLoginSuccess()
