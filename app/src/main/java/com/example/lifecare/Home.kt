@@ -30,6 +30,12 @@ import com.example.lifecare.charts.HealthChartsScreen
 import com.example.lifecare.reminder.ReminderSettingsScreen
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+
+private val LifeCareBlue = Color(0xFF33A1E0)
+private val LifeCareGreen = Color(0xFF98CD00)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -199,56 +205,62 @@ fun HomeScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color(0xFFF8F9FA))
+                            .background(Color.White)
                     ) {
                     // Top Header
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFF5DCCB4))
-                            .padding(horizontal = 20.dp, vertical = 20.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(70.dp),
+                            color = Color.White,
+                            shadowElevation = 4.dp
                         ) {
-                            Box(
+                            Row(
                                 modifier = Modifier
-                                    .size(50.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.White),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxSize()
+                                    .padding(horizontal = 20.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Icon(
-                                    Icons.Default.LocalHospital,
-                                    contentDescription = "LifeCare Logo",
-                                    tint = Color(0xFF5DCCB4),
-                                    modifier = Modifier.size(30.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    "LifeCare",
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                                Text(
-                                    "Tracking Kesehatan Pribadi",
-                                    fontSize = 12.sp,
-                                    color = Color.White.copy(alpha = 0.8f)
-                                )
+
+                                // KIRI: LOGO
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.logo),
+                                        contentDescription = "LifeCare Logo",
+                                        modifier = Modifier
+                                            .height(40.dp)
+                                            .width(80.dp),
+                                        contentScale = ContentScale.FillHeight
+                                    )
+                                }
+
+                                // KANAN: AVATAR
+                                Surface(
+                                    modifier = Modifier.size(40.dp),
+                                    shape = CircleShape,
+                                    color = Color(0xFF33A1E0).copy(alpha = 0.08f)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            Icons.Default.Person,
+                                            contentDescription = "Profile",
+                                            tint = Color(0xFF33A1E0)
+                                        )
+                                    }
+                                }
                             }
                         }
-                    }
 
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                            .padding(20.dp)
-                    ) {
+
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState())
+                                .padding(20.dp)
+                       ) {
                         // Greeting
                         val dateFormat = SimpleDateFormat("EEEE, d MMM", Locale("id", "ID"))
                         Text(
