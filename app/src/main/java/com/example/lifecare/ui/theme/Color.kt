@@ -55,6 +55,15 @@ object HealthColors {
     // Gradient Colors (for hero sections and highlights)
     val GradientStart = Color(0xFF4DB8A8)        // Primary teal
     val GradientEnd = Color(0xFF60A5FA)          // Secondary blue
+
+    // Dark Mode Colors
+    val DarkBackground = Color(0xFF000000)       // Pure Black
+    val DarkSurface = Color(0xFF121212)          // Very dark gray
+    val DarkSurfaceVariant = Color(0xFF1E1E1E)   // Dark gray
+    val DarkTextPrimary = Color(0xFFE5E5E5)      // Light gray text
+    val DarkTextSecondary = Color(0xFFB0B0B0)    // Medium gray text
+    val DarkDivider = Color(0xFF2C2C2E)          // Dark divider
+    val DarkBorder = Color(0xFF3A3A3C)           // Dark border
 }
 
 /**

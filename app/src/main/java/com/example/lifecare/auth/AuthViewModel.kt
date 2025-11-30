@@ -174,11 +174,6 @@ class AuthViewModel(context: Context) : ViewModel() {
             password.length < 6 -> "Password minimal 6 karakter"
             confirmPassword.isBlank() -> "Konfirmasi password tidak boleh kosong"
             password != confirmPassword -> "Password dan konfirmasi password tidak cocok"
-            age.isBlank() -> "Umur tidak boleh kosong"
-            age.toIntOrNull() == null -> "Umur harus berupa angka"
-            age.toInt() < 13 -> "Umur minimal 13 tahun untuk menggunakan aplikasi"
-            age.toInt() > 150 -> "Umur tidak valid"
-            gender.isBlank() -> "Jenis kelamin harus dipilih"
             else -> null
         }
     }

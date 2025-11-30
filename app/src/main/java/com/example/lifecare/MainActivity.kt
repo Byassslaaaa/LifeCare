@@ -2,6 +2,7 @@ package com.example.lifecare
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
@@ -65,6 +66,25 @@ class MainActivity : ComponentActivity() {
                 }
 
                 var currentScreen by remember { mutableStateOf(initialScreen) }
+
+                // ============ BACK BUTTON HANDLER ============
+                BackHandler(enabled = true) {
+                    when (currentScreen) {
+                        AppScreen.LOGIN, AppScreen.REGISTER -> {
+                            // Exit app from login/register screen
+                            finish()
+                        }
+                        AppScreen.PIN_CREATE, AppScreen.PIN_VERIFY -> {
+                            // Cannot go back from PIN screens (security)
+                            // Just exit app
+                            finish()
+                        }
+                        AppScreen.HOME -> {
+                            // Exit app from home screen
+                            finish()
+                        }
+                    }
+                }
 
                 // ============ SCREEN NAVIGATION ============
                 when (currentScreen) {

@@ -1,6 +1,9 @@
 package com.example.lifecare.screens
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,10 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.lifecare.data.HealthDataManager
 import androidx.compose.ui.platform.LocalContext
 
@@ -53,6 +58,24 @@ fun EditProfileScreen(
     var genderExpanded by remember { mutableStateOf(false) }
 
     var isLoading by remember { mutableStateOf(false) }
+
+    // Profile photo state
+    var profilePhotoUri by remember {
+        mutableStateOf<Uri?>(
+            healthDataManager.getProfilePhotoUri()?.let { Uri.parse(it) }
+        )
+    }
+
+    // Photo picker launcher
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            profilePhotoUri = it
+            healthDataManager.saveProfilePhotoUri(it.toString())
+            Toast.makeText(context, "Foto profil berhasil diubah", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -94,24 +117,38 @@ fun EditProfileScreen(
 
             // ===== AVATAR + CHANGE PHOTO =====
             Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFE5E5E5))
-                    .clickable {
-                        // di sini nanti bisa dihubungkan ke image picker
-                        Toast
-                            .makeText(context, "Fitur ganti foto belum diimplementasikan", Toast.LENGTH_SHORT)
-                            .show()
-                    },
-                contentAlignment = Alignment.Center
+                modifier = Modifier.size(120.dp),
+                contentAlignment = Alignment.BottomEnd
             ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Foto Profil",
-                    tint = Color(0xFF9E9E9E),
-                    modifier = Modifier.size(60.dp)
-                )
+                // Profile photo or default avatar
+                if (profilePhotoUri != null) {
+                    AsyncImage(
+                        model = profilePhotoUri,
+                        contentDescription = "Foto Profil",
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFE5E5E5))
+                            .clickable { photoPickerLauncher.launch("image/*") },
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFE5E5E5))
+                            .clickable { photoPickerLauncher.launch("image/*") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Foto Profil",
+                            tint = Color(0xFF9E9E9E),
+                            modifier = Modifier.size(60.dp)
+                        )
+                    }
+                }
 
                 // badge kamera kecil di pojok bawah
                 Box(
@@ -119,7 +156,8 @@ fun EditProfileScreen(
                         .align(Alignment.BottomEnd)
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(EditPrimary),
+                        .background(EditPrimary)
+                        .clickable { photoPickerLauncher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(

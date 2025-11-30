@@ -13,20 +13,44 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 /**
- * Dark color scheme using HealthColors
- * Currently using the same colors as light mode with some adjustments
- * Can be customized for true dark mode in the future
+ * Dark color scheme using HealthColors with pure black background
+ * Optimized for AMOLED screens with true black (#000000)
+ * Category colors remain vibrant for better contrast
  */
 private val DarkColorScheme = darkColorScheme(
+    // Primary colors - keep vibrant for contrast
     primary = HealthColors.Primary,
-    secondary = HealthColors.Secondary,
-    tertiary = HealthColors.BloodPressure,
-    background = Color(0xFF1C1C1E),
-    surface = Color(0xFF2C2C2E),
     onPrimary = HealthColors.TextOnPrimary,
+    primaryContainer = HealthColors.PrimaryVariant,
+    onPrimaryContainer = HealthColors.DarkTextPrimary,
+
+    // Secondary colors
+    secondary = HealthColors.Secondary,
     onSecondary = HealthColors.TextOnPrimary,
-    onBackground = Color(0xFFE5E5EA),
-    onSurface = Color(0xFFE5E5EA)
+    secondaryContainer = HealthColors.SecondaryVariant,
+    onSecondaryContainer = HealthColors.DarkTextPrimary,
+
+    // Tertiary colors
+    tertiary = HealthColors.BloodPressure,
+    onTertiary = HealthColors.TextOnPrimary,
+
+    // Background & Surface - Pure black theme
+    background = HealthColors.DarkBackground,        // Pure Black #000000
+    onBackground = HealthColors.DarkTextPrimary,     // Light gray text
+    surface = HealthColors.DarkSurface,              // Very dark gray #121212
+    onSurface = HealthColors.DarkTextPrimary,        // Light gray text
+    surfaceVariant = HealthColors.DarkSurfaceVariant,// Dark gray #1E1E1E
+    onSurfaceVariant = HealthColors.DarkTextSecondary,
+
+    // Outline & Border
+    outline = HealthColors.DarkBorder,
+    outlineVariant = HealthColors.DarkDivider,
+
+    // Error
+    error = HealthColors.Error,
+    onError = Color.White,
+    errorContainer = Color(0xFF5C1919),
+    onErrorContainer = Color(0xFFFFDADA)
 )
 
 /**

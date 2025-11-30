@@ -47,6 +47,8 @@ fun RegisterScreen(
     onRegisterSuccess: () -> Unit
 ) {
     val context = LocalContext.current
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val surfaceColor = MaterialTheme.colorScheme.surface
 
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
