@@ -33,6 +33,7 @@ import java.util.*
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.layout.ContentScale
+import androidx.activity.compose.BackHandler
 
 private val LifeCareBlue = Color(0xFF33A1E0)
 private val LifeCareGreen = Color(0xFF98CD00)
@@ -52,6 +53,39 @@ fun HomeScreen(
 
     var currentScreen by remember { mutableStateOf<String?>(null) }
     var selectedBottomNav by remember { mutableStateOf("home") }
+
+    // Back button handler
+    BackHandler(enabled = currentScreen != null) {
+        when (currentScreen) {
+            // Profile sub-screens go back to profile
+            "edit_profile", "profile_statistic", "change_pin", "account" -> {
+                currentScreen = "profile"
+            }
+            // Run tracking flow
+            "run_tracking_permission" -> {
+                currentScreen = "physical_activity"
+            }
+            "run_tracking_setup" -> {
+                currentScreen = "physical_activity"
+            }
+            "live_run" -> {
+                // Don't allow back during live run - user must use discard button
+            }
+            "run_summary" -> {
+                currentScreen = "physical_activity"
+            }
+            // Bottom nav items - go back to home dashboard
+            "profile", "health_records" -> {
+                currentScreen = null
+                selectedBottomNav = "home"
+            }
+            // All other screens go back to home dashboard
+            else -> {
+                currentScreen = null
+                selectedBottomNav = "home"
+            }
+        }
+    }
 
     // Persistent Scaffold with bottom navigation
     Scaffold(
