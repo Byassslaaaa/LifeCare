@@ -1,6 +1,9 @@
 package com.example.lifecare
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -14,26 +17,30 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lifecare.charts.HealthChartsScreen
 import com.example.lifecare.data.HealthDataManager
+import com.example.lifecare.reminder.ReminderSettingsScreen
 import com.example.lifecare.repository.RunRepository
 import com.example.lifecare.screens.*
 import com.example.lifecare.ui.screens.*
 import com.example.lifecare.utils.PermissionHelper
 import com.example.lifecare.viewmodel.RunTrackingViewModel
-import com.example.lifecare.charts.HealthChartsScreen
-import com.example.lifecare.reminder.ReminderSettingsScreen
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.layout.ContentScale
-import androidx.activity.compose.BackHandler
 
 private val LifeCareBlue = Color(0xFF33A1E0)
 private val LifeCareGreen = Color(0xFF98CD00)
@@ -57,29 +64,16 @@ fun HomeScreen(
     // Back button handler
     BackHandler(enabled = currentScreen != null) {
         when (currentScreen) {
-            // Profile sub-screens go back to profile
             "edit_profile", "profile_statistic", "change_pin", "account" -> {
                 currentScreen = "profile"
             }
-            // Run tracking flow
-            "run_tracking_permission" -> {
+            "run_tracking_permission", "run_tracking_setup", "live_run", "run_summary" -> {
                 currentScreen = "physical_activity"
             }
-            "run_tracking_setup" -> {
-                currentScreen = "physical_activity"
-            }
-            "live_run" -> {
-                // Don't allow back during live run - user must use discard button
-            }
-            "run_summary" -> {
-                currentScreen = "physical_activity"
-            }
-            // Bottom nav items - go back to home dashboard
-            "profile", "health_records" -> {
+            "profile", "health_records", "physical_activity" -> {
                 currentScreen = null
                 selectedBottomNav = "home"
             }
-            // All other screens go back to home dashboard
             else -> {
                 currentScreen = null
                 selectedBottomNav = "home"
@@ -87,8 +81,20 @@ fun HomeScreen(
         }
     }
 
-    // Persistent Scaffold with bottom navigation
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { currentScreen = "health_metrics" },
+                modifier = Modifier.offset(y = 48.dp),
+                shape = CircleShape,
+                containerColor = LifeCareGreen,
+                contentColor = Color.White,
+                elevation = FloatingActionButtonDefaults.elevation(8.dp)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Tambah Data")
+            }
+        },
+        floatingActionButtonPosition = FabPosition.Center,
         bottomBar = {
             BottomNavigationBar(
                 selectedItem = selectedBottomNav,
@@ -96,6 +102,7 @@ fun HomeScreen(
                     selectedBottomNav = item
                     when (item) {
                         "home" -> currentScreen = null
+                        "activity" -> currentScreen = "physical_activity"
                         "calendar" -> currentScreen = "health_records"
                         "profile" -> currentScreen = "profile"
                     }
@@ -103,9 +110,10 @@ fun HomeScreen(
             )
         }
     ) { paddingValues ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
             when (currentScreen) {
                 "health_metrics" -> {
@@ -119,7 +127,6 @@ fun HomeScreen(
                         healthDataManager = healthDataManager,
                         onBackClick = { currentScreen = null },
                         onStartGPSTracking = {
-                            // Check permission first
                             if (PermissionHelper.hasLocationPermission(context)) {
                                 currentScreen = "run_tracking_setup"
                             } else {
@@ -130,45 +137,29 @@ fun HomeScreen(
                 }
                 "run_tracking_permission" -> {
                     RunTrackingPermissionScreen(
-                        onPermissionGranted = {
-                            currentScreen = "run_tracking_setup"
-                        },
-                        onNavigateBack = {
-                            currentScreen = "physical_activity"
-                        }
+                        onPermissionGranted = { currentScreen = "run_tracking_setup" },
+                        onNavigateBack = { currentScreen = "physical_activity" }
                     )
                 }
                 "run_tracking_setup" -> {
                     RunTrackingSetupScreen(
                         viewModel = runTrackingViewModel,
-                        onStartRun = {
-                            currentScreen = "live_run"
-                        },
-                        onNavigateBack = {
-                            currentScreen = "physical_activity"
-                        }
+                        onStartRun = { currentScreen = "live_run" },
+                        onNavigateBack = { currentScreen = "physical_activity" }
                     )
                 }
                 "live_run" -> {
                     LiveRunScreen(
                         viewModel = runTrackingViewModel,
-                        onFinishRun = {
-                            currentScreen = "run_summary"
-                        },
-                        onDiscardRun = {
-                            currentScreen = "physical_activity"
-                        }
+                        onFinishRun = { currentScreen = "run_summary" },
+                        onDiscardRun = { currentScreen = "physical_activity" }
                     )
                 }
                 "run_summary" -> {
                     RunSummaryScreen(
                         viewModel = runTrackingViewModel,
-                        onSaveAndExit = {
-                            currentScreen = "physical_activity"
-                        },
-                        onDiscardAndExit = {
-                            currentScreen = "physical_activity"
-                        }
+                        onSaveAndExit = { currentScreen = "physical_activity" },
+                        onDiscardAndExit = { currentScreen = "physical_activity" }
                     )
                 }
                 "food_intake" -> {
@@ -241,7 +232,7 @@ fun HomeScreen(
                             .fillMaxSize()
                             .background(Color.White)
                     ) {
-                    // Top Header
+                        // Top Header
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -256,11 +247,7 @@ fun HomeScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-
-                                // KIRI: LOGO
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
                                     Image(
                                         painter = painterResource(id = R.drawable.logo),
                                         contentDescription = "LifeCare Logo",
@@ -270,8 +257,6 @@ fun HomeScreen(
                                         contentScale = ContentScale.FillHeight
                                     )
                                 }
-
-                                // KANAN: AVATAR
                                 Surface(
                                     modifier = Modifier.size(40.dp),
                                     shape = CircleShape,
@@ -288,675 +273,800 @@ fun HomeScreen(
                             }
                         }
 
-
                         Column(
                             modifier = Modifier
                                 .weight(1f)
                                 .verticalScroll(rememberScrollState())
                                 .padding(20.dp)
-                       ) {
-                        // Greeting
-                        val dateFormat = SimpleDateFormat("EEEE, d MMM", Locale("id", "ID"))
-                        Text(
-                            dateFormat.format(Date()),
-                            fontSize = 14.sp,
-                            color = Color(0xFFADB5BD)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            "Hi, Selamat Datang",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2D3748)
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Calculate today's health metrics for goals and tips
-                        val todaySteps = healthDataManager.getTodayTotalSteps()
-                        val todayCalories = healthDataManager.getTodayTotalCaloriesIntake()
-                        val todayExercise = healthDataManager.getTodayTotalExerciseMinutes()
-
-                        // Latest Records Card
-                        val latestBP = healthDataManager.getLatestBloodPressure()
-                        val latestBS = healthDataManager.getLatestBloodSugar()
-                        val latestBM = healthDataManager.getLatestBodyMetrics()
-
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                            shape = RoundedCornerShape(16.dp)
                         ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Text(
-                                    "Data Kesehatan Terbaru",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF2D3748)
-                                )
-
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                // Blood Pressure
-                                if (latestBP != null) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(Color(0xFFFCE4EC))
-                                            .clickable { currentScreen = "health_metrics" }
-                                            .padding(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(40.dp)
-                                                    .clip(RoundedCornerShape(8.dp))
-                                                    .background(Color.White),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Icon(
-                                                    Icons.Default.Favorite,
-                                                    contentDescription = null,
-                                                    tint = Color(0xFFE91E63),
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                            }
-                                            Column {
-                                                Text(
-                                                    "Tekanan Darah",
-                                                    fontSize = 12.sp,
-                                                    color = Color(0xFF2D3748)
-                                                )
-                                                Text(
-                                                    "${latestBP.systolic}/${latestBP.diastolic} mmHg",
-                                                    fontSize = 14.sp,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = Color(0xFFE91E63)
-                                                )
-                                            }
-                                        }
-                                        Icon(
-                                            Icons.Default.ChevronRight,
-                                            contentDescription = null,
-                                            tint = Color(0xFFADB5BD),
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                }
-
-                                // Blood Sugar
-                                if (latestBS != null) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(Color(0xFFF3E5F5))
-                                            .clickable { currentScreen = "health_metrics" }
-                                            .padding(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(40.dp)
-                                                    .clip(RoundedCornerShape(8.dp))
-                                                    .background(Color.White),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Icon(
-                                                    Icons.Default.WaterDrop,
-                                                    contentDescription = null,
-                                                    tint = Color(0xFF9C27B0),
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                            }
-                                            Column {
-                                                Text(
-                                                    "Gula Darah",
-                                                    fontSize = 12.sp,
-                                                    color = Color(0xFF2D3748)
-                                                )
-                                                Text(
-                                                    "${latestBS.level} mg/dL",
-                                                    fontSize = 14.sp,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = Color(0xFF9C27B0)
-                                                )
-                                            }
-                                        }
-                                        Icon(
-                                            Icons.Default.ChevronRight,
-                                            contentDescription = null,
-                                            tint = Color(0xFFADB5BD),
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                }
-
-                                // Body Metrics
-                                if (latestBM != null) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(Color(0xFFE3F2FD))
-                                            .clickable { currentScreen = "health_metrics" }
-                                            .padding(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(40.dp)
-                                                    .clip(RoundedCornerShape(8.dp))
-                                                    .background(Color.White),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Icon(
-                                                    Icons.Default.MonitorWeight,
-                                                    contentDescription = null,
-                                                    tint = Color(0xFF2196F3),
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                            }
-                                            Column {
-                                                Text(
-                                                    "BMI",
-                                                    fontSize = 12.sp,
-                                                    color = Color(0xFF2D3748)
-                                                )
-                                                Text(
-                                                    String.format("%.1f", latestBM.bmi),
-                                                    fontSize = 14.sp,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = Color(0xFF2196F3)
-                                                )
-                                            }
-                                        }
-                                        Icon(
-                                            Icons.Default.ChevronRight,
-                                            contentDescription = null,
-                                            tint = Color(0xFFADB5BD),
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                    }
-                                }
-
-                                // If no data
-                                if (latestBP == null && latestBS == null && latestBM == null) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(Color(0xFFF8F9FA))
-                                            .padding(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Info,
-                                            contentDescription = null,
-                                            tint = Color(0xFFADB5BD),
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            "Belum ada data. Mulai catat kesehatan Anda!",
-                                            fontSize = 14.sp,
-                                            color = Color(0xFFADB5BD)
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Health Goals & Progress
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Text(
-                                    "Target Kesehatan Hari Ini",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF2D3748)
-                                )
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                // Steps Goal
-                                val stepsGoal = 10000
-                                ProgressGoal(
-                                    label = "Langkah",
-                                    current = todaySteps,
-                                    goal = stepsGoal,
-                                    icon = Icons.Default.DirectionsWalk,
-                                    color = Color(0xFF5DCCB4),
-                                    unit = "langkah"
-                                )
-
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                // Calories Goal
-                                val caloriesGoal = 2000
-                                ProgressGoal(
-                                    label = "Kalori",
-                                    current = todayCalories,
-                                    goal = caloriesGoal,
-                                    icon = Icons.Default.Restaurant,
-                                    color = Color(0xFFFF9800),
-                                    unit = "kal"
-                                )
-
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                // Exercise Goal
-                                val exerciseGoal = 30
-                                ProgressGoal(
-                                    label = "Olahraga",
-                                    current = todayExercise,
-                                    goal = exerciseGoal,
-                                    icon = Icons.Default.FitnessCenter,
-                                    color = Color(0xFF4CAF50),
-                                    unit = "menit"
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Health Summary Today
-                        Text(
-                            "Ringkasan Hari Ini",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2D3748)
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Card(
-                                modifier = Modifier.weight(1f),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5F3)),
-                                shape = RoundedCornerShape(16.dp),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        Icons.Default.DirectionsWalk,
-                                        contentDescription = null,
-                                        tint = Color(0xFF5DCCB4),
-                                        modifier = Modifier.size(32.dp)
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(
-                                        "${healthDataManager.getTodayTotalSteps()}",
-                                        fontSize = 24.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF2D3748)
-                                    )
-                                    Text(
-                                        "Langkah",
-                                        fontSize = 12.sp,
-                                        color = Color(0xFFADB5BD)
-                                    )
-                                }
-                            }
-
-                            Card(
-                                modifier = Modifier.weight(1f),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
-                                shape = RoundedCornerShape(16.dp),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        Icons.Default.Restaurant,
-                                        contentDescription = null,
-                                        tint = Color(0xFFFF9800),
-                                        modifier = Modifier.size(32.dp)
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(
-                                        "${healthDataManager.getTodayTotalCaloriesIntake()}",
-                                        fontSize = 24.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF2D3748)
-                                    )
-                                    Text(
-                                        "Kalori",
-                                        fontSize = 12.sp,
-                                        color = Color(0xFFADB5BD)
-                                    )
-                                }
-                            }
-
-                            Card(
-                                modifier = Modifier.weight(1f),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
-                                shape = RoundedCornerShape(16.dp),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        Icons.Default.FitnessCenter,
-                                        contentDescription = null,
-                                        tint = Color(0xFF4CAF50),
-                                        modifier = Modifier.size(32.dp)
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(
-                                        "${healthDataManager.getTodayTotalExerciseMinutes()}",
-                                        fontSize = 24.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF2D3748)
-                                    )
-                                    Text(
-                                        "Menit",
-                                        fontSize = 12.sp,
-                                        color = Color(0xFFADB5BD)
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Health Monitoring Section
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                            // Greeting
+                            val dateFormat = SimpleDateFormat("EEEE, d MMM", Locale("id", "ID"))
                             Text(
-                                "Monitoring Kesehatan",
+                                dateFormat.format(Date()),
+                                fontSize = 14.sp,
+                                color = Color(0xFFADB5BD)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                "Hi, Selamat Datang",
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF2D3748)
+                            )
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Calculate today's health metrics for goals and tips
+                            val todaySteps = healthDataManager.getTodayTotalSteps()
+                            val todayCalories = healthDataManager.getTodayTotalCaloriesIntake()
+                            val todayExercise = healthDataManager.getTodayTotalExerciseMinutes()
+
+                            // Latest Records Card
+                            val latestBP = healthDataManager.getLatestBloodPressure()
+                            val latestBS = healthDataManager.getLatestBloodSugar()
+                            val latestBM = healthDataManager.getLatestBodyMetrics()
+
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp)
+                                ) {
+                                    Text(
+                                        "Data Kesehatan Terbaru",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF2D3748)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    // Blood Pressure
+                                    if (latestBP != null) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(Color(0xFFFCE4EC))
+                                                .clickable { currentScreen = "health_metrics" }
+                                                .padding(12.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(40.dp)
+                                                        .clip(RoundedCornerShape(8.dp))
+                                                        .background(Color.White),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.Favorite,
+                                                        contentDescription = null,
+                                                        tint = Color(0xFFE91E63),
+                                                        modifier = Modifier.size(20.dp)
+                                                    )
+                                                }
+                                                Column {
+                                                    Text(
+                                                        "Tekanan Darah",
+                                                        fontSize = 12.sp,
+                                                        color = Color(0xFF2D3748)
+                                                    )
+                                                    Text(
+                                                        "${latestBP.systolic}/${latestBP.diastolic} mmHg",
+                                                        fontSize = 14.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = Color(0xFFE91E63)
+                                                    )
+                                                }
+                                            }
+                                            Icon(
+                                                Icons.Default.ChevronRight,
+                                                contentDescription = null,
+                                                tint = Color(0xFFADB5BD),
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
+
+                                    // Blood Sugar
+                                    if (latestBS != null) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(Color(0xFFF3E5F5))
+                                                .clickable { currentScreen = "health_metrics" }
+                                                .padding(12.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(40.dp)
+                                                        .clip(RoundedCornerShape(8.dp))
+                                                        .background(Color.White),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.WaterDrop,
+                                                        contentDescription = null,
+                                                        tint = Color(0xFF9C27B0),
+                                                        modifier = Modifier.size(20.dp)
+                                                    )
+                                                }
+                                                Column {
+                                                    Text(
+                                                        "Gula Darah",
+                                                        fontSize = 12.sp,
+                                                        color = Color(0xFF2D3748)
+                                                    )
+                                                    Text(
+                                                        "${latestBS.level} mg/dL",
+                                                        fontSize = 14.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = Color(0xFF9C27B0)
+                                                    )
+                                                }
+                                            }
+                                            Icon(
+                                                Icons.Default.ChevronRight,
+                                                contentDescription = null,
+                                                tint = Color(0xFFADB5BD),
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
+
+                                    // Body Metrics
+                                    if (latestBM != null) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(Color(0xFFE3F2FD))
+                                                .clickable { currentScreen = "health_metrics" }
+                                                .padding(12.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(40.dp)
+                                                        .clip(RoundedCornerShape(8.dp))
+                                                        .background(Color.White),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.MonitorWeight,
+                                                        contentDescription = null,
+                                                        tint = Color(0xFF2196F3),
+                                                        modifier = Modifier.size(20.dp)
+                                                    )
+                                                }
+                                                Column {
+                                                    Text(
+                                                        "BMI",
+                                                        fontSize = 12.sp,
+                                                        color = Color(0xFF2D3748)
+                                                    )
+                                                    Text(
+                                                        String.format("%.1f", latestBM.bmi),
+                                                        fontSize = 14.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = Color(0xFF2196F3)
+                                                    )
+                                                }
+                                            }
+                                            Icon(
+                                                Icons.Default.ChevronRight,
+                                                contentDescription = null,
+                                                tint = Color(0xFFADB5BD),
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                    }
+
+                                    // If no data
+                                    if (latestBP == null && latestBS == null && latestBM == null) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(Color(0xFFF8F9FA))
+                                                .padding(12.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Info,
+                                                contentDescription = null,
+                                                tint = Color(0xFFADB5BD),
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                "Belum ada data. Mulai catat kesehatan Anda!",
+                                                fontSize = 14.sp,
+                                                color = Color(0xFFADB5BD)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Health Goals & Progress
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp)
+                                ) {
+                                    Text(
+                                        "Target Kesehatan Hari Ini",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF2D3748)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    // Steps Goal
+                                    val stepsGoal = 10000
+                                    ProgressGoal(
+                                        label = "Langkah",
+                                        current = todaySteps,
+                                        goal = stepsGoal,
+                                        icon = Icons.Default.DirectionsWalk,
+                                        color = Color(0xFF5DCCB4),
+                                        unit = "langkah"
+                                    )
+
+                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    // Calories Goal
+                                    val caloriesGoal = 2000
+                                    ProgressGoal(
+                                        label = "Kalori",
+                                        current = todayCalories,
+                                        goal = caloriesGoal,
+                                        icon = Icons.Default.Restaurant,
+                                        color = Color(0xFFFF9800),
+                                        unit = "kal"
+                                    )
+
+                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    // Exercise Goal
+                                    val exerciseGoal = 30
+                                    ProgressGoal(
+                                        label = "Olahraga",
+                                        current = todayExercise,
+                                        goal = exerciseGoal,
+                                        icon = Icons.Default.FitnessCenter,
+                                        color = Color(0xFF4CAF50),
+                                        unit = "menit"
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Health Summary Today
+                            Text(
+                                "Ringkasan Hari Ini",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF2D3748)
                             )
-                        }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        // Grid of health categories
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
-                                HealthCategoryCard(
-                                    title = "Data\nKesehatan",
-                                    subtitle = "Tekanan darah, gula darah, berat badan",
-                                    icon = Icons.Default.MonitorHeart,
-                                    backgroundColor = Color(0xFFE8F5F3),
-                                    iconColor = Color(0xFF5DCCB4),
+                                Card(
                                     modifier = Modifier.weight(1f),
-                                    onClick = { currentScreen = "health_metrics" }
-                                )
-                                HealthCategoryCard(
-                                    title = "Aktivitas\nFisik",
-                                    subtitle = "Catat olahraga",
-                                    icon = Icons.Default.DirectionsRun,
-                                    backgroundColor = Color(0xFFE8F5E9),
-                                    iconColor = Color(0xFF4CAF50),
-                                    modifier = Modifier.weight(1f),
-                                    onClick = { currentScreen = "physical_activity" }
-                                )
-                            }
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                HealthCategoryCard(
-                                    title = "Grafik\nKesehatan",
-                                    subtitle = "Visualisasi data kesehatan",
-                                    icon = Icons.Default.ShowChart,
-                                    backgroundColor = Color(0xFFFFF3E0),
-                                    iconColor = Color(0xFFFF9800),
-                                    modifier = Modifier.weight(1f),
-                                    onClick = { currentScreen = "charts" }
-                                )
-                                HealthCategoryCard(
-                                    title = "Pengingat\nKesehatan",
-                                    subtitle = "Atur reminder harian",
-                                    icon = Icons.Default.Notifications,
-                                    backgroundColor = Color(0xFFF3E5F5),
-                                    iconColor = Color(0xFF9C27B0),
-                                    modifier = Modifier.weight(1f),
-                                    onClick = { currentScreen = "reminders" }
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Food Intake Summary
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { currentScreen = "food_intake" },
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5F3)),
+                                    shape = RoundedCornerShape(16.dp),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                                 ) {
-                                    Box(
+                                    Column(
                                         modifier = Modifier
-                                            .size(50.dp)
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(Color(0xFFFFF3E0)),
-                                        contentAlignment = Alignment.Center
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Icon(
-                                            Icons.Default.Restaurant,
+                                            Icons.Default.DirectionsWalk,
                                             contentDescription = null,
-                                            tint = Color(0xFFFF9800),
-                                            modifier = Modifier.size(24.dp)
+                                            tint = Color(0xFF5DCCB4),
+                                            modifier = Modifier.size(32.dp)
                                         )
-                                    }
-                                    Column {
+                                        Spacer(modifier = Modifier.height(8.dp))
                                         Text(
-                                            "Asupan Makanan",
-                                            fontSize = 16.sp,
+                                            "${healthDataManager.getTodayTotalSteps()}",
+                                            fontSize = 24.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = Color(0xFF2D3748)
                                         )
                                         Text(
-                                            "${healthDataManager.getTodayTotalCaloriesIntake()} kalori hari ini",
+                                            "Langkah",
                                             fontSize = 12.sp,
                                             color = Color(0xFFADB5BD)
                                         )
                                     }
                                 }
-                                Icon(
-                                    Icons.Default.ChevronRight,
-                                    contentDescription = null,
-                                    tint = Color(0xFFADB5BD)
+
+                                Card(
+                                    modifier = Modifier.weight(1f),
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
+                                    shape = RoundedCornerShape(16.dp),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Restaurant,
+                                            contentDescription = null,
+                                            tint = Color(0xFFFF9800),
+                                            modifier = Modifier.size(32.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            "${healthDataManager.getTodayTotalCaloriesIntake()}",
+                                            fontSize = 24.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF2D3748)
+                                        )
+                                        Text(
+                                            "Kalori",
+                                            fontSize = 12.sp,
+                                            color = Color(0xFFADB5BD)
+                                        )
+                                    }
+                                }
+
+                                Card(
+                                    modifier = Modifier.weight(1f),
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                                    shape = RoundedCornerShape(16.dp),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Icon(
+                                            Icons.Default.FitnessCenter,
+                                            contentDescription = null,
+                                            tint = Color(0xFF4CAF50),
+                                            modifier = Modifier.size(32.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            "${healthDataManager.getTodayTotalExerciseMinutes()}",
+                                            fontSize = 24.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF2D3748)
+                                        )
+                                        Text(
+                                            "Menit",
+                                            fontSize = 12.sp,
+                                            color = Color(0xFFADB5BD)
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Health Monitoring Section
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Monitoring Kesehatan",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF2D3748)
                                 )
                             }
-                        }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        // Weekly Summary
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
+                            // Grid of health categories
+                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
-                                    Text(
-                                        "Statistik Minggu Ini",
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF2D3748)
+                                    HealthCategoryCard(
+                                        title = "Data\nKesehatan",
+                                        subtitle = "Tekanan darah, gula darah, berat badan",
+                                        icon = Icons.Default.MonitorHeart,
+                                        backgroundColor = Color(0xFFE8F5F3),
+                                        iconColor = Color(0xFF5DCCB4),
+                                        modifier = Modifier.weight(1f),
+                                        onClick = { currentScreen = "health_metrics" }
                                     )
-                                    Icon(
-                                        Icons.Default.TrendingUp,
-                                        contentDescription = null,
-                                        tint = Color(0xFF5DCCB4),
-                                        modifier = Modifier.size(20.dp)
+                                    HealthCategoryCard(
+                                        title = "Aktivitas\nFisik",
+                                        subtitle = "Catat olahraga",
+                                        icon = Icons.Default.DirectionsRun,
+                                        backgroundColor = Color(0xFFE8F5E9),
+                                        iconColor = Color(0xFF4CAF50),
+                                        modifier = Modifier.weight(1f),
+                                        onClick = { currentScreen = "physical_activity" }
                                     )
                                 }
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                // Get weekly stats
-                                val bpCount = healthDataManager.getBloodPressureList().count {
-                                    isThisWeek(it.timestamp)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    HealthCategoryCard(
+                                        title = "Grafik\nKesehatan",
+                                        subtitle = "Visualisasi data kesehatan",
+                                        icon = Icons.Default.ShowChart,
+                                        backgroundColor = Color(0xFFFFF3E0),
+                                        iconColor = Color(0xFFFF9800),
+                                        modifier = Modifier.weight(1f),
+                                        onClick = { currentScreen = "charts" }
+                                    )
+                                    HealthCategoryCard(
+                                        title = "Pengingat\nKesehatan",
+                                        subtitle = "Atur reminder harian",
+                                        icon = Icons.Default.Notifications,
+                                        backgroundColor = Color(0xFFF3E5F5),
+                                        iconColor = Color(0xFF9C27B0),
+                                        modifier = Modifier.weight(1f),
+                                        onClick = { currentScreen = "reminders" }
+                                    )
                                 }
-                                val bsCount = healthDataManager.getBloodSugarList().count {
-                                    isThisWeek(it.timestamp)
-                                }
-                                val activityCount = healthDataManager.getPhysicalActivityList().count {
-                                    isThisWeek(it.timestamp)
-                                }
-                                val foodCount = healthDataManager.getFoodIntakeList().count {
-                                    isThisWeek(it.timestamp)
-                                }
-
-                                WeeklyStatItem(
-                                    label = "Tekanan Darah",
-                                    count = bpCount,
-                                    icon = Icons.Default.Favorite,
-                                    color = Color(0xFFE91E63)
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                WeeklyStatItem(
-                                    label = "Gula Darah",
-                                    count = bsCount,
-                                    icon = Icons.Default.WaterDrop,
-                                    color = Color(0xFF9C27B0)
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                WeeklyStatItem(
-                                    label = "Aktivitas Fisik",
-                                    count = activityCount,
-                                    icon = Icons.Default.DirectionsRun,
-                                    color = Color(0xFF4CAF50)
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                WeeklyStatItem(
-                                    label = "Asupan Makanan",
-                                    count = foodCount,
-                                    icon = Icons.Default.Restaurant,
-                                    color = Color(0xFFFF9800)
-                                )
                             }
-                        }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        // Health Insights
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5F3)),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Row(
+                            // Food Intake Summary
+                            Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    .clickable { currentScreen = "food_intake" },
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                shape = RoundedCornerShape(16.dp)
                             ) {
-                                Icon(
-                                    Icons.Default.Lightbulb,
-                                    contentDescription = null,
-                                    tint = Color(0xFF5DCCB4),
-                                    modifier = Modifier.size(32.dp)
-                                )
-                                Column {
-                                    Text(
-                                        "Tips Kesehatan",
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF2D3748)
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        getHealthTip(todaySteps, todayCalories, todayExercise),
-                                        fontSize = 12.sp,
-                                        color = Color(0xFF4A5568),
-                                        lineHeight = 16.sp
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(50.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(Color(0xFFFFF3E0)),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Restaurant,
+                                                contentDescription = null,
+                                                tint = Color(0xFFFF9800),
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        }
+                                        Column {
+                                            Text(
+                                                "Asupan Makanan",
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color(0xFF2D3748)
+                                            )
+                                            Text(
+                                                "${healthDataManager.getTodayTotalCaloriesIntake()} kalori hari ini",
+                                                fontSize = 12.sp,
+                                                color = Color(0xFFADB5BD)
+                                            )
+                                        }
+                                    }
+                                    Icon(
+                                        Icons.Default.ChevronRight,
+                                        contentDescription = null,
+                                        tint = Color(0xFFADB5BD)
                                     )
                                 }
                             }
-                        }
 
-                        Spacer(modifier = Modifier.height(24.dp)) // Extra space
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Weekly Summary
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            "Statistik Minggu Ini",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF2D3748)
+                                        )
+                                        Icon(
+                                            Icons.Default.TrendingUp,
+                                            contentDescription = null,
+                                            tint = Color(0xFF5DCCB4),
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    // Get weekly stats
+                                    val bpCount = healthDataManager.getBloodPressureList().count {
+                                        isThisWeek(it.timestamp)
+                                    }
+                                    val bsCount = healthDataManager.getBloodSugarList().count {
+                                        isThisWeek(it.timestamp)
+                                    }
+                                    val activityCount = healthDataManager.getPhysicalActivityList().count {
+                                        isThisWeek(it.timestamp)
+                                    }
+                                    val foodCount = healthDataManager.getFoodIntakeList().count {
+                                        isThisWeek(it.timestamp)
+                                    }
+
+                                    WeeklyStatItem(
+                                        label = "Tekanan Darah",
+                                        count = bpCount,
+                                        icon = Icons.Default.Favorite,
+                                        color = Color(0xFFE91E63)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    WeeklyStatItem(
+                                        label = "Gula Darah",
+                                        count = bsCount,
+                                        icon = Icons.Default.WaterDrop,
+                                        color = Color(0xFF9C27B0)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    WeeklyStatItem(
+                                        label = "Aktivitas Fisik",
+                                        count = activityCount,
+                                        icon = Icons.Default.DirectionsRun,
+                                        color = Color(0xFF4CAF50)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    WeeklyStatItem(
+                                        label = "Asupan Makanan",
+                                        count = foodCount,
+                                        icon = Icons.Default.Restaurant,
+                                        color = Color(0xFFFF9800)
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Health Insights
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5F3)),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Lightbulb,
+                                        contentDescription = null,
+                                        tint = Color(0xFF5DCCB4),
+                                        modifier = Modifier.size(32.dp)
+                                    )
+                                    Column {
+                                        Text(
+                                            "Tips Kesehatan",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF2D3748)
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            getHealthTip(todaySteps, todayCalories, todayExercise),
+                                            fontSize = 12.sp,
+                                            color = Color(0xFF4A5568),
+                                            lineHeight = 16.sp
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp)) // Extra space
+                        }
                     }
-                }
                 }
             }
         }
     }
 }
 
+private class CustomNotchedBottomBarShape : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        val fabSize = with(density) { 56.dp.toPx() }
+        val fabRadius = fabSize / 2f
+        val notchRadius = fabRadius + with(density) { 12.dp.toPx() }
+        val cornerRadius = with(density) { 32.dp.toPx() }
+
+        val path = Path().apply {
+            addRoundRect(
+                RoundRect(
+                    rect = Rect(0f, 0f, size.width, size.height),
+                    cornerRadius = CornerRadius(cornerRadius, cornerRadius)
+                )
+            )
+        }
+
+        val cutoutPath = Path().apply {
+            addOval(
+                Rect(
+                    center = androidx.compose.ui.geometry.Offset(size.width / 2, 0f),
+                    radius = notchRadius
+                )
+            )
+        }
+
+        return Outline.Generic(
+            Path.combine(
+                operation = PathOperation.Difference,
+                path1 = path,
+                path2 = cutoutPath
+            )
+        )
+    }
+}
+
+@Composable
+fun BottomNavigationBar(
+    selectedItem: String,
+    onItemSelected: (String) -> Unit
+) {
+    val shape = remember { CustomNotchedBottomBarShape() }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(96.dp), // Height to contain the bar and give space
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .padding(horizontal = 16.dp)
+                .border(1.5.dp, LifeCareBlue, shape),
+            shape = shape,
+            color = Color.White,
+            tonalElevation = 8.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceEvenly) {
+                    BottomNavItem(
+                        icon = Icons.Default.Home,
+                        selected = selectedItem == "home",
+                        onClick = { onItemSelected("home") }
+                    )
+                    BottomNavItem(
+                        icon = Icons.Default.DirectionsRun,
+                        selected = selectedItem == "activity",
+                        onClick = { onItemSelected("activity") }
+                    )
+                }
+                Spacer(modifier = Modifier.width(64.dp)) // Spacer for FAB
+                Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceEvenly) {
+                    BottomNavItem(
+                        icon = Icons.Default.CalendarToday,
+                        selected = selectedItem == "calendar",
+                        onClick = { onItemSelected("calendar") }
+                    )
+                    BottomNavItem(
+                        icon = Icons.Default.Person,
+                        selected = selectedItem == "profile",
+                        onClick = { onItemSelected("profile") }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BottomNavItem(
+    icon: ImageVector,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                if (selected) Color(0xFFB3E5FC) // Biru muda
+                else Color.Transparent
+            )
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(28.dp),
+            tint = if (selected) Color(0xFF0288D1) // Biru tua saat selected
+            else Color(0xFF757575) // Abu-abu saat tidak selected
+        )
+    }
+}
+
+// Composable lainnya (ProgressGoal, WeeklyStatItem, dll.) tetap sama ...
 fun isThisWeek(timestamp: Long): Boolean {
     val calendar = Calendar.getInstance()
     val weekStart = calendar.apply {
@@ -990,8 +1100,6 @@ fun ProgressGoal(
     unit: String
 ) {
     val progress = (current.toFloat() / goal.toFloat()).coerceIn(0f, 1f)
-    val percentage = (progress * 100).toInt()
-
     Column {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -1022,27 +1130,14 @@ fun ProgressGoal(
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Box(
+        LinearProgressIndicator(
+            progress = progress,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(8.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(Color(0xFFF1F3F5))
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(progress)
-                    .fillMaxHeight()
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(color)
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            "$percentage% tercapai",
-            fontSize = 11.sp,
-            color = if (progress >= 1f) color else Color(0xFFADB5BD),
-            fontWeight = if (progress >= 1f) FontWeight.Bold else FontWeight.Normal
+                .clip(RoundedCornerShape(4.dp)),
+            color = color,
+            trackColor = Color(0xFFF1F3F5)
         )
     }
 }
@@ -1089,48 +1184,6 @@ fun WeeklyStatItem(
             fontWeight = FontWeight.Bold,
             color = color
         )
-    }
-}
-
-@Composable
-fun QuickActionCard(
-    title: String,
-    icon: ImageVector,
-    backgroundColor: Color,
-    iconColor: Color,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = modifier
-            .height(100.dp)
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                modifier = Modifier.size(32.dp),
-                tint = iconColor
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = title,
-                fontSize = 11.sp,
-                color = Color(0xFF2D3748),
-                fontWeight = FontWeight.Medium,
-                lineHeight = 14.sp
-            )
-        }
     }
 }
 
@@ -1189,75 +1242,5 @@ fun HealthCategoryCard(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun BottomNavigationBar(
-    selectedItem: String,
-    onItemSelected: (String) -> Unit
-) {
-    NavigationBar(
-        modifier = Modifier.fillMaxWidth(),
-        containerColor = Color.White,
-        tonalElevation = 8.dp
-    ) {
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Home,
-                    contentDescription = "Home",
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-            label = { Text("Home", fontSize = 12.sp) },
-            selected = selectedItem == "home",
-            onClick = { onItemSelected("home") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF5DCCB4),
-                selectedTextColor = Color(0xFF5DCCB4),
-                indicatorColor = Color(0xFF5DCCB4).copy(alpha = 0.15f),
-                unselectedIconColor = Color(0xFFADB5BD),
-                unselectedTextColor = Color(0xFFADB5BD)
-            )
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.CalendarToday,
-                    contentDescription = "Riwayat",
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-            label = { Text("Riwayat", fontSize = 12.sp) },
-            selected = selectedItem == "calendar",
-            onClick = { onItemSelected("calendar") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF5DCCB4),
-                selectedTextColor = Color(0xFF5DCCB4),
-                indicatorColor = Color(0xFF5DCCB4).copy(alpha = 0.15f),
-                unselectedIconColor = Color(0xFFADB5BD),
-                unselectedTextColor = Color(0xFFADB5BD)
-            )
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Person,
-                    contentDescription = "Profile",
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-            label = { Text("Profile", fontSize = 12.sp) },
-            selected = selectedItem == "profile",
-            onClick = { onItemSelected("profile") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF5DCCB4),
-                selectedTextColor = Color(0xFF5DCCB4),
-                indicatorColor = Color(0xFF5DCCB4).copy(alpha = 0.15f),
-                unselectedIconColor = Color(0xFFADB5BD),
-                unselectedTextColor = Color(0xFFADB5BD)
-            )
-        )
     }
 }
