@@ -406,21 +406,20 @@ private fun SettingsMenuItem(
             .fillMaxWidth()
             .height(60.dp)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(1.dp, LifeBlue),
+        shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 14.dp),
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                // ICON BOX (tetap biru)
                 Box(
                     modifier = Modifier
                         .size(36.dp)
@@ -435,7 +434,9 @@ private fun SettingsMenuItem(
                         modifier = Modifier.size(20.dp)
                     )
                 }
+
                 Spacer(modifier = Modifier.width(12.dp))
+
                 Text(
                     text = label,
                     fontSize = 14.sp,

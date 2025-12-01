@@ -51,7 +51,7 @@ fun ProfileStatisticScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF5DCCB4),
+                    containerColor = Color(0xFF33A1E0),
                     titleContentColor = Color.White
                 )
             )
@@ -72,7 +72,7 @@ fun ProfileStatisticScreen(
                 imageVector = Icons.Default.ShowChart,
                 contentDescription = null,
                 modifier = Modifier.size(72.dp),
-                tint = Color(0xFF5DCCB4)
+                tint = Color(0xFF33A1E0)
             )
 
             Spacer(modifier = Modifier.height(12.dp))

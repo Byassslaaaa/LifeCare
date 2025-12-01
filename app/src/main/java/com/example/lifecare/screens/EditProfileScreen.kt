@@ -31,8 +31,8 @@ import coil.compose.AsyncImage
 import com.example.lifecare.data.HealthDataManager
 import androidx.compose.ui.platform.LocalContext
 
-private val EditPrimary = Color(0xFF5DCCB4)
-private val EditBackground = Color(0xFFF8F9FA)
+private val EditPrimary = Color(0xFF33A1E0)
+private val EditBackground = Color.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -369,7 +369,7 @@ fun EditProfileScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(24.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = EditPrimary
                 ),
