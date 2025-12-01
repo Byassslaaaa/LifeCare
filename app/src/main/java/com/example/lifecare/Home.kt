@@ -292,6 +292,7 @@ fun HomeScreen(
                             // Greeting
                             val dateFormat = SimpleDateFormat("EEEE, d MMM yyyy", Locale("id", "ID"))
                             val todayText = dateFormat.format(Date())
+                            val userName = healthDataManager.getUserData()?.fullName ?: "User"
 
                             Column(
                                 modifier = Modifier
@@ -305,7 +306,7 @@ fun HomeScreen(
                                 )
 
                                 Text(
-                                    text = "Hi, Selamat Datang",
+                                    text = "Halo, $userName",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = LifeCareBlue
