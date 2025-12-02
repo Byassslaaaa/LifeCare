@@ -75,6 +75,8 @@ fun HomeScreen(
     var selectedBottomNav by remember { mutableStateOf("home") }
     var isGoalsExpanded by remember { mutableStateOf(false) }
     var isWeeklyStatsExpanded by remember { mutableStateOf(false) }
+    var showSearchDialog by remember { mutableStateOf(false) }
+    var showNotifications by remember { mutableStateOf(false) }
 
     // Back button handler
     BackHandler(enabled = currentScreen != null) {
@@ -254,11 +256,33 @@ fun HomeScreen(
                         isWeeklyStatsExpanded = isWeeklyStatsExpanded,
                         onGoalsExpandToggle = { isGoalsExpanded = !isGoalsExpanded },
                         onWeeklyStatsExpandToggle = { isWeeklyStatsExpanded = !isWeeklyStatsExpanded },
-                        onNavigateToScreen = { screen -> currentScreen = screen }
+                        onNavigateToScreen = { screen -> currentScreen = screen },
+                        onSearchClick = { showSearchDialog = true },
+                        onNotificationClick = { showNotifications = true }
                     )
                 }
             }
         }
+    }
+
+    // Search Dialog
+    if (showSearchDialog) {
+        SearchDialog(
+            healthDataManager = healthDataManager,
+            onDismiss = { showSearchDialog = false },
+            onResultClick = { screen ->
+                showSearchDialog = false
+                currentScreen = screen
+            }
+        )
+    }
+
+    // Notifications Bottom Sheet
+    if (showNotifications) {
+        NotificationsBottomSheet(
+            healthDataManager = healthDataManager,
+            onDismiss = { showNotifications = false }
+        )
     }
 }
 
@@ -402,7 +426,9 @@ fun HomeMainScreen(
     isWeeklyStatsExpanded: Boolean,
     onGoalsExpandToggle: () -> Unit,
     onWeeklyStatsExpandToggle: () -> Unit,
-    onNavigateToScreen: (String) -> Unit
+    onNavigateToScreen: (String) -> Unit,
+    onSearchClick: () -> Unit = {},
+    onNotificationClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -436,13 +462,13 @@ fun HomeMainScreen(
                         Icons.Default.Search,
                         contentDescription = "Search",
                         tint = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.size(24.dp).clickable { }
+                        modifier = Modifier.size(24.dp).clickable { onSearchClick() }
                     )
                     Icon(
                         Icons.Default.Notifications,
                         contentDescription = "Notifications",
                         tint = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.size(24.dp).clickable { }
+                        modifier = Modifier.size(24.dp).clickable { onNotificationClick() }
                     )
                 }
             }
@@ -1451,5 +1477,463 @@ fun WeeklyStatItem(
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchDialog(
+    healthDataManager: HealthDataManager,
+    onDismiss: () -> Unit,
+    onResultClick: (String) -> Unit
+) {
+    var searchQuery by remember { mutableStateOf("") }
+
+    val searchResults = remember(searchQuery) {
+        if (searchQuery.isBlank()) {
+            emptyList()
+        } else {
+            buildList {
+                // Search dalam menu
+                if ("data kesehatan".contains(searchQuery, ignoreCase = true) ||
+                    "health records".contains(searchQuery, ignoreCase = true)) {
+                    add(SearchResult("Data Kesehatan", "Lihat riwayat data kesehatan Anda", "health_records", Icons.Default.Favorite))
+                }
+                if ("aktivitas".contains(searchQuery, ignoreCase = true) ||
+                    "physical".contains(searchQuery, ignoreCase = true)) {
+                    add(SearchResult("Aktivitas Fisik", "Catat aktivitas fisik harian", "physical_activity", Icons.Default.DirectionsRun))
+                }
+                if ("makanan".contains(searchQuery, ignoreCase = true) ||
+                    "food".contains(searchQuery, ignoreCase = true)) {
+                    add(SearchResult("Asupan Makanan", "Catat asupan makanan", "food_intake", Icons.Default.Restaurant))
+                }
+                if ("grafik".contains(searchQuery, ignoreCase = true) ||
+                    "chart".contains(searchQuery, ignoreCase = true)) {
+                    add(SearchResult("Grafik Kesehatan", "Lihat grafik kesehatan", "charts", Icons.Default.Assessment))
+                }
+                if ("pengingat".contains(searchQuery, ignoreCase = true) ||
+                    "reminder".contains(searchQuery, ignoreCase = true)) {
+                    add(SearchResult("Pengingat", "Atur pengingat kesehatan", "reminders", Icons.Default.Alarm))
+                }
+                if ("profil".contains(searchQuery, ignoreCase = true) ||
+                    "profile".contains(searchQuery, ignoreCase = true)) {
+                    add(SearchResult("Profil", "Lihat dan edit profil", "profile", Icons.Default.Person))
+                }
+            }
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(20.dp),
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+            ) {
+                // Header
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Cari Fitur",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Search TextField
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("Cari fitur atau menu...") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Search, contentDescription = null)
+                    },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { searchQuery = "" }) {
+                                Icon(Icons.Default.Close, contentDescription = "Clear")
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = HealthColors.NeonGreen,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Results
+                if (searchQuery.isNotBlank()) {
+                    if (searchResults.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(120.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.Search,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(48.dp),
+                                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Tidak ada hasil",
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 300.dp)
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            searchResults.forEach { result ->
+                                SearchResultItem(
+                                    result = result,
+                                    onClick = { onResultClick(result.screen) }
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    // Suggestion saat kosong
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Saran Pencarian:",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+
+                        listOf("Data Kesehatan", "Aktivitas", "Makanan", "Grafik").forEach { suggestion ->
+                            SuggestionChip(
+                                onClick = { searchQuery = suggestion },
+                                label = { Text(suggestion, fontSize = 12.sp) },
+                                colors = SuggestionChipDefaults.suggestionChipColors(
+                                    containerColor = HealthColors.NeonGreen.copy(alpha = 0.1f),
+                                    labelColor = HealthColors.NeonGreen
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+data class SearchResult(
+    val title: String,
+    val description: String,
+    val screen: String,
+    val icon: ImageVector
+)
+
+@Composable
+fun SearchResultItem(
+    result: SearchResult,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(HealthColors.NeonGreen.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = result.icon,
+                    contentDescription = result.title,
+                    tint = HealthColors.NeonGreen,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = result.title,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = result.description,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
+
+            Icon(
+                Icons.Default.ArrowForward,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NotificationsBottomSheet(
+    healthDataManager: HealthDataManager,
+    onDismiss: () -> Unit
+) {
+    // Generate sample notifications based on health data
+    val notifications = remember {
+        buildList {
+            val now = Calendar.getInstance()
+
+            // Notification for daily challenge
+            add(
+                NotificationItem(
+                    id = 1,
+                    title = "Daily Challenge",
+                    message = "Jangan lupa capai target harianmu!",
+                    timestamp = now.timeInMillis,
+                    icon = Icons.Default.EmojiEvents,
+                    color = HealthColors.NeonGreen
+                )
+            )
+
+            // Notification for reminder
+            add(
+                NotificationItem(
+                    id = 2,
+                    title = "Pengingat Kesehatan",
+                    message = "Saatnya cek tekanan darah Anda",
+                    timestamp = now.timeInMillis - 3600000, // 1 hour ago
+                    icon = Icons.Default.Alarm,
+                    color = HealthColors.BloodPressure
+                )
+            )
+
+            // Notification for achievement
+            add(
+                NotificationItem(
+                    id = 3,
+                    title = "Pencapaian Baru!",
+                    message = "Selamat! Anda telah mencapai 10.000 langkah hari ini",
+                    timestamp = now.timeInMillis - 7200000, // 2 hours ago
+                    icon = Icons.Default.Star,
+                    color = Color(0xFFFFD700)
+                )
+            )
+
+            // Notification for health tip
+            add(
+                NotificationItem(
+                    id = 4,
+                    title = "Tips Kesehatan",
+                    message = "Jangan lupa minum air minimal 8 gelas sehari",
+                    timestamp = now.timeInMillis - 86400000, // 1 day ago
+                    icon = Icons.Default.Lightbulb,
+                    color = HealthColors.Activity
+                )
+            )
+        }
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp)
+        ) {
+            // Header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Notifikasi",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                TextButton(onClick = { /* Mark all as read */ }) {
+                    Text(
+                        text = "Tandai Semua Dibaca",
+                        color = HealthColors.NeonGreen,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Notification list
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 500.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                notifications.forEach { notification ->
+                    NotificationCard(notification = notification)
+                }
+            }
+        }
+    }
+}
+
+data class NotificationItem(
+    val id: Int,
+    val title: String,
+    val message: String,
+    val timestamp: Long,
+    val icon: ImageVector,
+    val color: Color,
+    val isRead: Boolean = false
+)
+
+@Composable
+fun NotificationCard(notification: NotificationItem) {
+    val timeAgo = remember(notification.timestamp) {
+        val diff = System.currentTimeMillis() - notification.timestamp
+        when {
+            diff < 60000 -> "Baru saja"
+            diff < 3600000 -> "${diff / 60000} menit yang lalu"
+            diff < 86400000 -> "${diff / 3600000} jam yang lalu"
+            else -> "${diff / 86400000} hari yang lalu"
+        }
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = if (notification.isRead)
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            else
+                MaterialTheme.colorScheme.surfaceVariant
+        ),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            // Icon
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(notification.color.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = notification.icon,
+                    contentDescription = notification.title,
+                    tint = notification.color,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // Content
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = notification.title,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = notification.message,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    lineHeight = 16.sp
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = timeAgo,
+                    fontSize = 10.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
+            }
+
+            // Unread indicator
+            if (!notification.isRead) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(HealthColors.NeonGreen)
+                )
+            }
+        }
     }
 }
