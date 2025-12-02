@@ -12,6 +12,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -61,7 +62,7 @@ fun ProfileStatisticScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color(0xFFF8F9FA))
+                .background(MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -81,7 +82,7 @@ fun ProfileStatisticScreen(
                 text = "Statistik Kesehatan",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF2D3748)
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -89,7 +90,7 @@ fun ProfileStatisticScreen(
             Text(
                 text = "Ringkasan aktivitas dan pencatatan kesehatan Anda.",
                 fontSize = 13.sp,
-                color = Color(0xFF6C757D)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(24.dp))

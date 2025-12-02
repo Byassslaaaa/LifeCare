@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Straighten
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,7 +89,7 @@ fun RunSummaryScreen(
                         text = SimpleDateFormat("EEEE, dd MMM yyyy • HH:mm", Locale("id", "ID"))
                             .format(Date()),
                         style = HealthTypography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.9f)
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f)
                     )
                 }
             }

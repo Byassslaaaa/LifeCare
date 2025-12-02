@@ -115,94 +115,95 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(horizontal = 32.dp)
                 .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
+
+            Spacer(modifier = Modifier.weight(1f))
 
             // Logo
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.logoDepan),
                 contentDescription = "Logo App",
-                modifier = Modifier.size(Dimensions.LogoSize)
+                modifier = Modifier.size(120.dp)
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // App Name
+            Text(
+                "Life Care",
+                color = textColor,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Title
             Text(
                 "Masuk",
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                color = com.example.lifecare.ui.theme.HealthColors.NeonGreen,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
             )
 
-            Text(
-                "Masuk untuk melanjutkan",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 12.sp
-            )
-
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         // EMAIL FIELD
-        OutlinedTextField(
+        TextField(
             value = email,
             onValueChange = {
                 email = it
                 validateEmail()
             },
-            label = { Text("Email") },
-            placeholder = { Text("Masukkan email Anda") },
+            placeholder = { Text("Email", color = MaterialTheme.colorScheme.onSurfaceVariant) },
             shape = RoundedCornerShape(50.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             enabled = !isLoading,
-            isError = emailError != null,
-            supportingText = emailError?.let { { Text(it, color = Color.Red, fontSize = 12.sp) } },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 autoCorrect = false
             ),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                errorBorderColor = MaterialTheme.colorScheme.error,
-                disabledBorderColor = MaterialTheme.colorScheme.outline,
-                disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor,
+                focusedContainerColor = surfaceColor,
+                unfocusedContainerColor = surfaceColor,
+                disabledContainerColor = surfaceColor,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
             )
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // PASSWORD FIELD
-        OutlinedTextField(
+        TextField(
             value = password,
             onValueChange = {
                 password = it
                 validatePassword()
             },
-            label = { Text("Password") },
-            placeholder = { Text("Masukkan password Anda") },
+            placeholder = { Text("Password", color = MaterialTheme.colorScheme.onSurfaceVariant) },
             shape = RoundedCornerShape(50.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             enabled = !isLoading,
-            isError = passwordError != null,
-            supportingText = passwordError?.let { { Text(it, color = Color.Red, fontSize = 12.sp) } },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                errorBorderColor = MaterialTheme.colorScheme.error,
-                disabledBorderColor = MaterialTheme.colorScheme.outline,
-                disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor,
+                focusedContainerColor = surfaceColor,
+                unfocusedContainerColor = surfaceColor,
+                disabledContainerColor = surfaceColor,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
             ),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
@@ -210,37 +211,37 @@ fun LoginScreen(
                     Icon(
                         imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                         contentDescription = if (passwordVisible) "Sembunyikan password" else "Tampilkan password",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         )
 
-        Spacer(modifier = Modifier.height(25.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         // LOGIN BUTTON
         Button(
             onClick = {
                 authViewModel.loginWithEmail(email, password)
             },
-            shape = RoundedCornerShape(50),
+            shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                containerColor = com.example.lifecare.ui.theme.HealthColors.NeonGreen,
+                contentColor = Color.White
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(56.dp),
             enabled = !isLoading
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.White,
                     strokeWidth = 2.dp
                 )
             } else {
-                Text("Login", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text("Masuk", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -264,19 +265,18 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         // GOOGLE SIGN-IN BUTTON
-        OutlinedButton(
+        Button(
             onClick = {
                 authViewModel.signInWithGoogle()
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface
+                .height(56.dp),
+            shape = RoundedCornerShape(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = surfaceColor,
+                contentColor = textColor
             ),
-            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
             enabled = !isLoading
         ) {
             if (isLoading) {
@@ -290,37 +290,43 @@ fun LoginScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        Icons.Default.Email,
+                    Image(
+                        painter = painterResource(id = R.drawable.logoGoogle),
                         contentDescription = "Google",
-                        tint = Color(0xFF4285F4),
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         "Masuk dengan Google",
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.weight(1f))
 
         // Sign Up Link
-        Text(
-            text = buildAnnotatedString {
-                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
-                    append("Belum punya akun? ")
-                }
-                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)) {
-                    append("Daftar")
-                }
-            },
-            fontSize = 14.sp,
-            modifier = Modifier.clickable(enabled = !isLoading) { onRegisterClick() }
-        )
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Belum punya akun? ",
+                color = textColor,
+                fontSize = 14.sp
+            )
+            Text(
+                text = "Daftar",
+                color = com.example.lifecare.ui.theme.HealthColors.NeonGreen,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable(enabled = !isLoading) { onRegisterClick() }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +33,6 @@ import com.example.lifecare.data.HealthDataManager
 import androidx.compose.ui.platform.LocalContext
 
 private val EditPrimary = Color(0xFF33A1E0)
-private val EditBackground = Color.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,7 +107,7 @@ fun EditProfileScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(EditBackground)
+                .background(MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -128,7 +128,7 @@ fun EditProfileScreen(
                         modifier = Modifier
                             .size(120.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFE5E5E5))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .clickable { photoPickerLauncher.launch("image/*") },
                         contentScale = ContentScale.Crop
                     )
@@ -137,14 +137,14 @@ fun EditProfileScreen(
                         modifier = Modifier
                             .size(120.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFE5E5E5))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .clickable { photoPickerLauncher.launch("image/*") },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Foto Profil",
-                            tint = Color(0xFF9E9E9E),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(60.dp)
                         )
                     }
@@ -175,7 +175,7 @@ fun EditProfileScreen(
                 "Ubah informasi profil Anda",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF2D3748)
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -183,7 +183,7 @@ fun EditProfileScreen(
             // ===== CARD FORM =====
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {

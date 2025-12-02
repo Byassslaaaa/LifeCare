@@ -8,6 +8,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -17,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -94,9 +96,13 @@ fun ProfileScreen(
         }
     }
 
+    // Determine logo based on theme
+    val isDarkMode = isSystemInDarkTheme()
+    val logoResource = if (isDarkMode) R.drawable.logoDarkMode else R.drawable.logoLightMode
+
     Scaffold(
         topBar = {
-            // top bar: back di kiri, logo di kanan (kecil, tidak mengubah tinggi app bar)
+            // top bar: back di kiri, logo di kanan (mode-specific)
             TopAppBar(
                 title = { },
                 navigationIcon = {
@@ -104,22 +110,22 @@ fun ProfileScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = LifeBlue
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
                 actions = {
                     Image(
-                        painter = painterResource(id = R.drawable.logo),
+                        painter = painterResource(id = logoResource),
                         contentDescription = "LifeCare Logo",
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
-                            .height(28.dp)
+                            .height(32.dp)
                             .padding(end = 8.dp)
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -127,7 +133,7 @@ fun ProfileScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
@@ -135,70 +141,56 @@ fun ProfileScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Profile photo with edit button
-                Box(
-                    modifier = Modifier.size(140.dp),
-                    contentAlignment = Alignment.BottomEnd
-                ) {
-                    // Profile photo or default avatar
-                    if (profilePhotoUri != null) {
-                        AsyncImage(
-                            model = profilePhotoUri,
-                            contentDescription = "Foto Profil",
-                            modifier = Modifier
-                                .size(140.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFE5E5E5))
-                                .clickable { photoPickerLauncher.launch("image/*") },
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .size(140.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFE5E5E5))
-                                .clickable { photoPickerLauncher.launch("image/*") },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Default Avatar",
-                                modifier = Modifier.size(70.dp),
-                                tint = Color.Gray
-                            )
-                        }
-                    }
-
-                    // Camera icon button
-                    FloatingActionButton(
-                        onClick = { photoPickerLauncher.launch("image/*") },
-                        modifier = Modifier.size(40.dp),
-                        containerColor = LifeGreen,
-                        contentColor = Color.White
+                // Profile photo (larger, circular, gray placeholder)
+                if (profilePhotoUri != null) {
+                    AsyncImage(
+                        model = profilePhotoUri,
+                        contentDescription = "Foto Profil",
+                        modifier = Modifier
+                            .size(200.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFE0E0E0))
+                            .clickable { photoPickerLauncher.launch("image/*") },
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(200.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFE0E0E0))
+                            .clickable { photoPickerLauncher.launch("image/*") },
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.CameraAlt,
-                            contentDescription = "Ubah Foto",
-                            modifier = Modifier.size(20.dp)
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Default Avatar",
+                            modifier = Modifier.size(100.dp),
+                            tint = Color(0xFFBDBDBD)
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // User name (bold, theme-aware color)
                 Text(
                     text = userFullName,
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = LifeBlue
+                    color = MaterialTheme.colorScheme.onBackground
                 )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Email (NeonGreen)
                 Text(
                     text = userEmail,
-                    fontSize = 12.sp,
-                    color = LifeGreen
+                    fontSize = 14.sp,
+                    color = com.example.lifecare.ui.theme.HealthColors.NeonGreen
                 )
             }
 
@@ -209,7 +201,7 @@ fun ProfileScreen(
                 text = "Settings",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = LifeBlue,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
 
@@ -253,7 +245,7 @@ fun ProfileScreen(
             Text(
                 text = "LifeCare v1.0",
                 fontSize = 12.sp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -404,11 +396,11 @@ private fun SettingsMenuItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
+            .height(64.dp)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
@@ -419,37 +411,37 @@ private fun SettingsMenuItem(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
 
-                // ICON BOX (tetap biru)
+                // ICON BOX with NeonGreen background
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(40.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(LifeBlue),
+                        .background(com.example.lifecare.ui.theme.HealthColors.NeonGreen),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = icon,
                         contentDescription = label,
                         tint = Color.White,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
                 Text(
                     text = label,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
-                    color = LifeBlue
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,
-                tint = LifeBlue,
-                modifier = Modifier.size(20.dp)
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp)
             )
         }
     }
@@ -469,7 +461,7 @@ fun StatisticSection(healthDataManager: HealthDataManager) {
             text = "My Statistic",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF2D3748)
+            color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -511,7 +503,7 @@ fun StatisticItem(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(14.dp)
     ) {
@@ -523,7 +515,7 @@ fun StatisticItem(
             Text(
                 text = label,
                 fontSize = 12.sp,
-                color = Color(0xFF9E9E9E)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
@@ -541,7 +533,7 @@ fun StatisticItem(
                 Text(
                     text = "Lihat detail data",
                     fontSize = 12.sp,
-                    color = Color(0xFF9E9E9E)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Icon(
                     imageVector = Icons.Filled.Visibility,
@@ -573,13 +565,13 @@ private fun AccountSection(
             "Account",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF2D3748)
+            color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(12.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -602,7 +594,7 @@ private fun AccountSection(
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -633,12 +625,12 @@ fun UserInfoItem(label: String, value: String) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(label, fontSize = 14.sp, color = Color.Gray)
+        Text(label, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(
             value,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF2D3748)
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -682,15 +674,15 @@ fun SettingItem(
                     title,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFF2D3748)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(subtitle, fontSize = 12.sp, color = Color.Gray)
+                Text(subtitle, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         Icon(
             Icons.Default.ChevronRight,
             contentDescription = null,
-            tint = Color.Gray,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp)
         )
     }

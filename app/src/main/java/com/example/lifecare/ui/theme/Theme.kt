@@ -34,10 +34,10 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = HealthColors.BloodPressure,
     onTertiary = HealthColors.TextOnPrimary,
 
-    // Background & Surface - Pure black theme
+    // Background & Surface - Pure black theme with wireframe colors
     background = HealthColors.DarkBackground,        // Pure Black #000000
     onBackground = HealthColors.DarkTextPrimary,     // Light gray text
-    surface = HealthColors.DarkSurface,              // Very dark gray #121212
+    surface = HealthColors.CardDark,                 // Card dark #1A1A1A
     onSurface = HealthColors.DarkTextPrimary,        // Light gray text
     surfaceVariant = HealthColors.DarkSurfaceVariant,// Dark gray #1E1E1E
     onSurfaceVariant = HealthColors.DarkTextSecondary,
@@ -74,10 +74,10 @@ private val LightColorScheme = lightColorScheme(
     tertiary = HealthColors.BloodPressure,
     onTertiary = HealthColors.TextOnPrimary,
 
-    // Background & Surface
-    background = HealthColors.Background,
+    // Background & Surface with wireframe colors
+    background = HealthColors.Surface,               // White #FFFFFF
     onBackground = HealthColors.TextPrimary,
-    surface = HealthColors.Surface,
+    surface = HealthColors.CardLight,                // Card light #EDEDED
     onSurface = HealthColors.TextPrimary,
     surfaceVariant = HealthColors.SurfaceVariant,
     onSurfaceVariant = HealthColors.TextSecondary,

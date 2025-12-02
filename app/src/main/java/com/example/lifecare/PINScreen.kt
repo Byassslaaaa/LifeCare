@@ -63,29 +63,46 @@ fun PINScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
 
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Logo
         Image(
-            painter = painterResource(id = R.drawable.logo),
+            painter = painterResource(id = R.drawable.logoDepan),
             contentDescription = "Logo",
-            modifier = Modifier.size(Dimensions.LogoSizeLarge)
+            modifier = Modifier.size(100.dp)
         )
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
+        // App Name
         Text(
-            text = if (isSettingPIN) "Buat PIN Anda" else "Masukkan PIN Anda",
-            fontSize = 14.sp,
-            color = Color(0xFF5A5A5A)
+            text = "Life Care",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Spacer(modifier = Modifier.height(80.dp))
+
+        // Title
+        Text(
+            text = "Masukkan PIN Anda",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // PIN BOX
+        // PIN BOX - 6 boxes rounded
         Row(
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.clickable {
                 focusRequester.requestFocus()
                 keyboardController?.show()
@@ -95,21 +112,33 @@ fun PINScreen(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(45.dp)
-                        .padding(4.dp)
-                        .background(Color(0xFFEDEDED), RoundedCornerShape(8.dp))
+                        .size(48.dp)
+                        .background(
+                            MaterialTheme.colorScheme.surfaceVariant,
+                            RoundedCornerShape(12.dp)
+                        )
                 ) {
                     Text(
                         text = if (index < pin.length) "●" else "",
-                        fontSize = 20.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
+
+        // Divider line
+        Box(
+            modifier = Modifier
+                .width(200.dp)
+                .height(1.dp)
+                .background(MaterialTheme.colorScheme.outlineVariant)
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
 
         // Invisible TextField
         TextField(
@@ -137,8 +166,7 @@ fun PINScreen(
             )
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
-
+        // Masuk Button
         Button(
             onClick = {
                 if (pin.length != Constants.PIN_LENGTH) {
@@ -161,31 +189,37 @@ fun PINScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(56.dp),
             shape = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(Color(0xFF33A1E0))
+            colors = ButtonDefaults.buttonColors(
+                containerColor = com.example.lifecare.ui.theme.HealthColors.NeonGreen,
+                contentColor = Color.White
+            )
         ) {
             Text(
-                text = if (isSettingPIN) "Buat PIN" else "Masuk",
+                text = "Masuk",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
         }
 
-        Spacer(modifier = Modifier.height(240.dp))
+        Spacer(modifier = Modifier.weight(1f))
 
         // Show "Forgot PIN" only when verifying (not creating)
         if (!isSettingPIN) {
             Text(
-                text = "Lupa PIN",
-                color = Color(0xFFB7D800),
-                fontSize = 12.sp,
+                text = "Forgot PIN",
+                color = com.example.lifecare.ui.theme.HealthColors.NeonGreen,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
                 modifier = Modifier.clickable {
                     showForgotPINDialog = true
                 }
             )
         }
+
+        Spacer(modifier = Modifier.height(48.dp))
     }
 
     // Forgot PIN Dialog

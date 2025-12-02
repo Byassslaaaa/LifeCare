@@ -25,6 +25,30 @@ object HealthColors {
     val Food = Color(0xFFFBBF24)                 // Warm Yellow
     val FoodLight = Color(0xFFFDE7)            // Very light yellow background
 
+    // Wireframe Design Colors - Exact colors from reference
+    val NeonGreen = Color(0xFFA7E047)            // Green neon FAB - Light mode
+    val NeonGreenDark = Color(0xFF7FBF2F)        // Green neon FAB - Dark mode (more neon)
+
+    // Light Mode Colors
+    val BackgroundLight = Color(0xFFFFFFFF)      // Pure white background
+    val CardLight = Color(0xFFF4F4F4)            // Card background light #F4F4F4-#FAFAFA
+    val CardLightAlt = Color(0xFFFAFAFA)         // Alternative card background
+    val BorderLight = Color(0xFFE5E5E5)          // Border light
+    val TextPrimaryLight = Color(0xFF000000)     // Black text
+    val TextSecondaryLight = Color(0xFF4A4A4A)   // Gray text
+    val IconLight = Color(0xFF000000)            // Black icons
+
+    // Dark Mode Colors
+    val BackgroundDark = Color(0xFF000000)       // Pure black background
+    val CardDark = Color(0xFF1A1A1A)             // Card background dark #1A1A1A-#1C1C1C
+    val CardDarkAlt = Color(0xFF1C1C1C)          // Alternative card background
+    val BorderDark = Color(0xFF2A2A2A)           // Border dark
+    val TextPrimaryDark = Color(0xFFFFFFFF)      // White text
+    val TextSecondaryDark = Color(0xFFC7C7C7)    // Gray text
+    val IconDark = Color(0xFFFFFFFF)             // White icons
+    val DividerLight = Color(0xFFCFCFCF)         // Divider - Light mode
+    val BottomBarDark = Color(0xFF151515)        // Bottom bar - Dark mode
+
     // Neutral Colors
     val Background = Color(0xFFF8FAFB)           // Very light gray
     val Surface = Color(0xFFFFFFFF)              // White

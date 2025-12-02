@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,7 +82,7 @@ fun HealthRecordsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color(0xFFF8F9FA))
+                .background(MaterialTheme.colorScheme.background)
         ) {
             // Filter & Sort Info
             if (dateFilter != DateFilter.ALL || sortOrder != SortOrder.DATE_DESC) {
@@ -101,7 +102,7 @@ fun HealthRecordsScreen(
                         Text(
                             "Filter: ${getFilterLabel(dateFilter)} • Sort: ${getSortLabel(sortOrder)}",
                             fontSize = 12.sp,
-                            color = Color(0xFF2D3748)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         TextButton(
                             onClick = {
@@ -301,12 +302,12 @@ fun AllRecordsSection(
                     "Timeline Riwayat",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF2D3748)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     "${sortedRecords.size} records",
                     fontSize = 14.sp,
-                    color = Color(0xFF6C757D)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -326,7 +327,7 @@ fun AllRecordsSection(
 fun SummaryCard(title: String, count: Int, icon: androidx.compose.ui.graphics.vector.ImageVector, color: Color) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -354,7 +355,7 @@ fun SummaryCard(title: String, count: Int, icon: androidx.compose.ui.graphics.ve
                     title,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFF2D3748)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             Text(
@@ -382,7 +383,7 @@ fun BodyMetricsCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { showDetailDialog = true },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -394,7 +395,7 @@ fun BodyMetricsCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = Color.Gray)
+                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("Berat: ${data.weight} kg | Tinggi: ${data.height} cm", fontSize = 14.sp, fontWeight = FontWeight.Medium)
             }
@@ -450,7 +451,7 @@ fun BloodPressureCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { showDetailDialog = true },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -462,11 +463,11 @@ fun BloodPressureCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = Color.Gray)
+                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("${data.systolic}/${data.diastolic} mmHg", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFFE91E63))
                 if (data.heartRate != null) {
-                    Text("Detak: ${data.heartRate} BPM", fontSize = 12.sp, color = Color.Gray)
+                    Text("Detak: ${data.heartRate} BPM", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             IconButton(
@@ -511,7 +512,7 @@ fun BloodSugarCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { showDetailDialog = true },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -523,10 +524,10 @@ fun BloodSugarCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = Color.Gray)
+                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("${data.level} mg/dL", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF9C27B0))
-                Text(data.measurementType, fontSize = 12.sp, color = Color.Gray)
+                Text(data.measurementType, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             IconButton(
                 onClick = { showDeleteDialog = true },
@@ -570,7 +571,7 @@ fun ActivityCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { showDetailDialog = true },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -583,7 +584,7 @@ fun ActivityCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(data.activityType, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
-                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = Color.Gray)
+                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -633,7 +634,7 @@ fun FoodCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { showDetailDialog = true },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -645,8 +646,8 @@ fun FoodCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(data.foodName, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("${data.mealType} • ${dateFormat.format(Date(data.timestamp))}", fontSize = 12.sp, color = Color.Gray)
+                Text(data.foodName, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                Text("${data.mealType} • ${dateFormat.format(Date(data.timestamp))}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -979,7 +980,7 @@ fun ExportDialog(
                 Text(
                     "Pilih format export data:",
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -1009,7 +1010,7 @@ fun ExportDialog(
                                     else -> ""
                                 },
                                 fontSize = 11.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -1035,7 +1036,7 @@ fun ExportDialog(
                         Text(
                             "Data akan disimpan ke folder Downloads",
                             fontSize = 12.sp,
-                            color = Color(0xFF2D3748)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }

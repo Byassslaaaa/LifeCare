@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,11 +38,11 @@ fun LiveRunScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // Top Bar with discard button
         Surface(
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(
@@ -56,7 +57,7 @@ fun LiveRunScreen(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Buang",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))
@@ -84,12 +85,12 @@ fun LiveRunScreen(
                     fontSize = 72.sp,
                     fontWeight = FontWeight.Bold
                 ),
-                color = Color.White
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = "kilometer",
                 style = HealthTypography.titleMedium,
-                color = Color.White.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
 
             // Target Progress (if set)
@@ -108,7 +109,7 @@ fun LiveRunScreen(
                 Text(
                     text = "Target: %.2f km (%.0f%%)".format(target, progress * 100),
                     style = HealthTypography.bodySmall,
-                    color = Color.White.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                     modifier = Modifier.padding(top = HealthSpacing.extraSmall)
                 )
             }
@@ -161,7 +162,7 @@ fun LiveRunScreen(
 
         // Control Buttons
         Surface(
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(
@@ -180,13 +181,13 @@ fun LiveRunScreen(
                             viewModel.pauseTracking()
                         }
                     },
-                    containerColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
                     modifier = Modifier.size(72.dp)
                 ) {
                     Icon(
                         imageVector = if (runState.isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
                         contentDescription = if (runState.isPaused) "Resume" else "Pause",
-                        tint = Color.Black,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(36.dp)
                     )
                 }
@@ -255,12 +256,12 @@ private fun StatItem(
             style = HealthTypography.headlineMedium.copy(
                 fontWeight = FontWeight.Bold
             ),
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
         Text(
             text = label,
             style = HealthTypography.bodySmall,
-            color = Color.White.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
         )
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +22,6 @@ import com.example.lifecare.data.HealthDataManager
 import com.example.lifecare.data.ThemeManager
 
 private val AccountPrimary = Color(0xFF5DCCB4)
-private val AccountBackground = Color(0xFFF8F9FA)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,7 +73,7 @@ fun AccountScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(AccountBackground)
+                .background(MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -95,7 +95,7 @@ fun AccountScreen(
                 text = "Pengaturan Akun",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF2D3748)
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -103,7 +103,7 @@ fun AccountScreen(
             Text(
                 text = "Kelola informasi akun, tema, dan data aplikasi Anda.",
                 fontSize = 13.sp,
-                color = Color(0xFF6C757D)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -111,7 +111,7 @@ fun AccountScreen(
             // ===== Card informasi akun =====
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
@@ -125,7 +125,7 @@ fun AccountScreen(
                         "Informasi Akun",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF2D3748)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -152,7 +152,7 @@ fun AccountScreen(
             // ===== Card pengaturan tema & data =====
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
@@ -166,7 +166,7 @@ fun AccountScreen(
                         "Pengaturan",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF2D3748)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Spacer(modifier = Modifier.height(6.dp))
