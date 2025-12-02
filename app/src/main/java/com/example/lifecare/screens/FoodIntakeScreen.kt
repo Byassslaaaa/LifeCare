@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.lifecare.data.FoodIntake
 import com.example.lifecare.data.HealthDataManager
 import com.example.lifecare.ui.components.*
@@ -42,15 +43,25 @@ fun FoodIntakeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Data Kesehatan", style = HealthTypography.titleLarge) },
+                title = {
+                    Text(
+                        "Tambah Asupan Makanan",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = HealthColors.NeonGreen)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = HealthColors.NeonGreen
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
@@ -73,33 +84,33 @@ fun FoodIntakeScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(HealthSpacing.screenPadding),
+                    .padding(16.dp),
                 colors = CardDefaults.cardColors(containerColor = HealthColors.NeonGreen),
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(20.dp)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         Icons.Default.Restaurant,
                         contentDescription = null,
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(40.dp),
                         tint = Color.White
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
                             "Total Kalori Hari ini",
-                            style = HealthTypography.bodyMedium,
-                            color = Color.White
+                            fontSize = 13.sp,
+                            color = Color.White.copy(alpha = 0.9f)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             "$todayCalories Kal",
-                            style = HealthTypography.displaySmall,
+                            fontSize = 32.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -109,19 +120,19 @@ fun FoodIntakeScreen(
 
             Text(
                 "Riwayat",
-                style = HealthTypography.headlineSmall,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
             )
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small)
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 items(foodList) { food ->
                     FoodIntakeHistoryItem(food)
-                    Spacer(modifier = Modifier.height(HealthSpacing.small))
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
         }
@@ -148,7 +159,8 @@ fun FoodIntakeHistoryItem(food: FoodIntake) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -159,26 +171,26 @@ fun FoodIntakeHistoryItem(food: FoodIntake) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         food.foodName,
-                        style = HealthTypography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
                         color = HealthColors.NeonGreen
                     )
                     Text(
                         "${food.mealType} • ${dateFormat.format(Date(food.timestamp))}",
-                        style = HealthTypography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 }
                 Text(
                     "${food.calories} Kal",
-                    style = HealthTypography.titleLarge,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = HealthColors.NeonGreen
                 )
             }
 
             if (food.protein != null || food.carbs != null || food.fat != null) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -196,11 +208,11 @@ fun FoodIntakeHistoryItem(food: FoodIntake) {
 fun NutrientLabel(name: String, value: String) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(6.dp)
     ) {
         Text(
             "$name: $value",
-            style = HealthTypography.labelSmall,
+            fontSize = 11.sp,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

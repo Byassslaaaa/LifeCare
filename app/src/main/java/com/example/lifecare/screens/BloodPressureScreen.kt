@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.lifecare.data.BloodPressure
 import com.example.lifecare.data.HealthDataManager
 import com.example.lifecare.ui.components.*
@@ -40,18 +41,32 @@ fun BloodPressureScreen(
     var showDialog by remember { mutableStateOf(false) }
     var bpList by remember { mutableStateOf(healthDataManager.getBloodPressureList()) }
 
+    // Get latest body metrics and blood sugar data
+    val metricsList = healthDataManager.getBodyMetricsList()
+    val bsList = healthDataManager.getBloodSugarList()
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Data Kesehatan", style = HealthTypography.titleLarge) },
+                title = {
+                    Text(
+                        "Data Kesehatan",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = HealthColors.NeonGreen)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = HealthColors.NeonGreen
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -65,14 +80,14 @@ fun BloodPressureScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(HealthSpacing.screenPadding),
+                    .padding(16.dp),
                 colors = CardDefaults.cardColors(containerColor = HealthColors.NeonGreen),
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(20.dp)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(20.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     // Berat Badan
@@ -80,18 +95,19 @@ fun BloodPressureScreen(
                         Icon(
                             Icons.Default.MonitorWeight,
                             contentDescription = null,
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(28.dp),
                             tint = Color.White
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             "Berat Badan",
-                            style = HealthTypography.bodySmall,
-                            color = Color.White
+                            fontSize = 11.sp,
+                            color = Color.White.copy(alpha = 0.9f)
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            "-",
-                            style = HealthTypography.titleLarge,
+                            metricsList.firstOrNull()?.let { "${it.weight.toInt()} kg" } ?: "-",
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -102,18 +118,19 @@ fun BloodPressureScreen(
                         Icon(
                             Icons.Default.Favorite,
                             contentDescription = null,
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(28.dp),
                             tint = Color.White
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             "Tekanan Darah",
-                            style = HealthTypography.bodySmall,
-                            color = Color.White
+                            fontSize = 11.sp,
+                            color = Color.White.copy(alpha = 0.9f)
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            bpList.firstOrNull()?.let { "${it.systolic}/${it.diastolic}" } ?: "70/50",
-                            style = HealthTypography.titleLarge,
+                            bpList.firstOrNull()?.let { "${it.systolic}/${it.diastolic}" } ?: "-/-",
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -124,18 +141,19 @@ fun BloodPressureScreen(
                         Icon(
                             Icons.Default.Bloodtype,
                             contentDescription = null,
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(28.dp),
                             tint = Color.White
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             "Gula Darah",
-                            style = HealthTypography.bodySmall,
-                            color = Color.White
+                            fontSize = 11.sp,
+                            color = Color.White.copy(alpha = 0.9f)
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            "-",
-                            style = HealthTypography.titleLarge,
+                            bsList.firstOrNull()?.let { "${it.level.toInt()}" } ?: "-",
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -146,13 +164,11 @@ fun BloodPressureScreen(
             // Input Data Baru Section
             Text(
                 "Input Data Baru",
-                style = HealthTypography.headlineSmall,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Input fields
             var systolic by remember { mutableStateOf("") }
@@ -162,10 +178,10 @@ fun BloodPressureScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = HealthSpacing.screenPadding),
+                    .padding(horizontal = 16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     // Section header
@@ -177,13 +193,13 @@ fun BloodPressureScreen(
                             Icons.Default.Favorite,
                             contentDescription = null,
                             tint = HealthColors.NeonGreen,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(22.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Tekanan Darah",
-                            style = HealthTypography.titleMedium,
-                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -193,37 +209,53 @@ fun BloodPressureScreen(
                     // Input fields
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         TextField(
                             value = systolic,
                             onValueChange = { systolic = it },
-                            placeholder = { Text("Sistolik") },
+                            placeholder = {
+                                Text(
+                                    "Sistolik",
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                )
+                            },
                             singleLine = true,
                             modifier = Modifier.weight(1f),
                             colors = TextFieldDefaults.colors(
+                                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                                 focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent
                             ),
-                            shape = RoundedCornerShape(50.dp),
+                            shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
 
                         TextField(
                             value = diastolic,
                             onValueChange = { diastolic = it },
-                            placeholder = { Text("Diastolik") },
+                            placeholder = {
+                                Text(
+                                    "Diastolik",
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                )
+                            },
                             singleLine = true,
                             modifier = Modifier.weight(1f),
                             colors = TextFieldDefaults.colors(
+                                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                                 focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent
                             ),
-                            shape = RoundedCornerShape(50.dp),
+                            shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
                     }
@@ -232,7 +264,7 @@ fun BloodPressureScreen(
 
                     Text(
                         "Normal: 120/80 mmHg",
-                        style = HealthTypography.bodySmall,
+                        fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 }
@@ -244,7 +276,7 @@ fun BloodPressureScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(HealthSpacing.screenPadding)
+                    .padding(16.dp)
             ) {
                 Button(
                     onClick = {
@@ -261,19 +293,24 @@ fun BloodPressureScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = HealthColors.NeonGreen),
-                    shape = RoundedCornerShape(50.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Simpan Data", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(
+                        "Simpan Data",
+                        fontSize = 15.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     "Anda dapat mengisi satu, dua, atau semua data sekaligus",
-                    style = HealthTypography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
