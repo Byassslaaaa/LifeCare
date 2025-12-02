@@ -125,7 +125,7 @@ fun LoginScreen(
 
             // Logo
             Image(
-                painter = painterResource(id = R.drawable.logoDepan),
+                painter = painterResource(id = R.drawable.logodepan),
                 contentDescription = "Logo App",
                 modifier = Modifier.size(120.dp)
             )
@@ -291,7 +291,7 @@ fun LoginScreen(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.logoGoogle),
+                        painter = painterResource(id = R.drawable.logogoogle),
                         contentDescription = "Google",
                         modifier = Modifier.size(20.dp)
                     )

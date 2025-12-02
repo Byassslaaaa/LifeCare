@@ -47,6 +47,13 @@ import androidx.compose.ui.text.style.TextAlign
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.SpanStyle
 
 private val LifeCareBlue = Color(0xFF33A1E0)
 private val LifeCareGreen = Color(0xFF98CD00)
@@ -583,84 +590,119 @@ fun HomeMainScreen(
 @Composable
 fun GreetingWithChallengeCard(
     userName: String,
-    dailyProgress: Float = 0f
+    dailyProgress: Float = 0f // 0..1
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = RoundedCornerShape(24.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(18.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left side: illustration + text
-            Row(
-                modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically
+            // LEFT SIDE: Column dengan Greeting di atas dan Row (Image + Title/Desc) di bawah
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
             ) {
-                // Illustration placeholder (box with icon)
-                Box(
+                // Greeting (di paling kiri, atas)
+                Text(
+                    text = "Halo, $userName!",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF111111),
+                    modifier = Modifier.align(Alignment.Start)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // thin divider (sebagai pemisah di bawah greeting)
+                Divider(
                     modifier = Modifier
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(HealthColors.NeonGreen.copy(alpha = 0.2f)),
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth(0.85f)
+                        .height(1.dp)
+                        .alpha(0.12f),
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Baris: gambar di kiri, text (title + description) di kanan
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = HealthColors.NeonGreen,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
+                    // kotak kecil untuk ilustrasi
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(LifeCareBlue.copy(alpha = 0.06f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.card),
+                            contentDescription = "Ilustrasi Daily Challenge",
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clip(RoundedCornerShape(10.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
 
-                Column {
-                    Text(
-                        text = "Halo, $userName!",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Daily Challenges",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = HealthColors.NeonGreen
-                    )
-                    Text(
-                        text = "Capai targetmu hari ini sebelum\njam 09.00",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 14.sp
-                    )
+                    // Judul + deskripsi (sejajar dengan gambar)
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
+                        Text(
+                            text = "Daily Challenges",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = LifeCareGreen
+                        )
+
+                        Text(
+                            text = "Capai targetmu hari ini sebelum jam 09.00",
+                            fontSize = 8.sp,
+                            color = Color(0xFF616161),
+                            lineHeight = 16.sp
+                        )
+                    }
                 }
             }
 
-            // Right side: Circular progress with real data
+            // RIGHT SIDE: Circular percentage ring (tetap)
             Box(
-                modifier = Modifier.size(72.dp),
+                modifier = Modifier
+                    .width(110.dp)
+                    .fillMaxHeight(),
                 contentAlignment = Alignment.Center
             ) {
+                val percent = (dailyProgress * 100).coerceIn(0f, 100f).toInt()
+
                 CircularProgressIndicator(
-                    progress = { dailyProgress },
-                    modifier = Modifier.size(72.dp),
-                    color = HealthColors.NeonGreen,
-                    strokeWidth = 6.dp,
-                    trackColor = MaterialTheme.colorScheme.outlineVariant,
+                    progress = dailyProgress.coerceIn(0f, 1f),
+                    modifier = Modifier.size(96.dp),
+                    color = LifeCareGreen,
+                    strokeWidth = 10.dp,
+                    trackColor = Color(0xFFE6E6E6)
                 )
+
                 Text(
-                    text = "${(dailyProgress * 100).toInt()}%",
-                    fontSize = 16.sp,
+                    text = "${percent}%",
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = Color(0xFF222222)
                 )
             }
         }
@@ -668,55 +710,89 @@ fun GreetingWithChallengeCard(
 }
 
 @Composable
-fun WeeklyCalendar() {
-    val calendar = Calendar.getInstance()
-    val daysOfWeek = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
-    val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1 // 0-indexed
+private fun WeeklyCalendar() {
+    // Format nama hari & tanggal
+    val localeEn = Locale("en") // biar Sun, Mon, Tue...
+    val dayFormat = remember { SimpleDateFormat("EEE", localeEn) }   // Sun
+    val dateFormat = remember { SimpleDateFormat("dd", localeEn) }   // 01
 
-    // Get the current week's dates
-    val currentWeekDates = mutableListOf<Int>()
-    val tempCalendar = Calendar.getInstance()
-    tempCalendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
-    for (i in 0..6) {
-        currentWeekDates.add(tempCalendar.get(Calendar.DAY_OF_MONTH))
-        tempCalendar.add(Calendar.DAY_OF_MONTH, 1)
+    val today = Calendar.getInstance()
+    val startOfWeek = Calendar.getInstance().apply {
+        firstDayOfWeek = Calendar.SUNDAY
+        set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
     }
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        daysOfWeek.forEachIndexed { index, day ->
-            val dayNumber = currentWeekDates[index]
-            val isSelected = index == currentDayOfWeek
+        val cal = startOfWeek.clone() as Calendar
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+        repeat(7) {
+            val dayName = dayFormat.format(cal.time)    // Sun, Mon, ...
+            val dayNumber = dateFormat.format(cal.time) // 01, 02, ...
+            val isToday =
+                cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                        cal.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+
+            // HANYA hari ini yang berwarna biru, lainnya abu-abu
+            val backgroundColor = if (isToday) Color(0xFF98CD00) else Color(0xFFE8E8E8)
+            val textColor = if (isToday) Color.White else Color.White
+            val dotColor = if (isToday) Color.White else Color.White
+
+            Box(
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (isSelected) HealthColors.NeonGreen
-                        else MaterialTheme.colorScheme.surfaceVariant
-                    )
-                    .clickable { },
-                verticalArrangement = Arrangement.Center
+                    .width(46.dp)
+                    .height(68.dp)
+                    .clip(RoundedCornerShape(23.dp))          // bentuk oval
+                    .background(backgroundColor),
+                contentAlignment = Alignment.TopCenter
             ) {
-                Text(
-                    text = day,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = String.format("%02d", dayNumber),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 4.dp, bottom = 6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // titik kecil di atas
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(dotColor)
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    // Hari + tanggal
+                    Text(
+                        text = "$dayName\n$dayNumber",   // Sun\n01
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = textColor,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 14.sp
+                    )
+                }
             }
+
+            cal.add(Calendar.DAY_OF_YEAR, 1)
         }
     }
+
+    Spacer(modifier = Modifier.height(12.dp))
+
+    // divider tipis bawah (sebagai pemisah dari konten berikutnya)
+    Divider(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
+        color = Color(0xFFE0E0E0),
+        thickness = 1.dp
+    )
 }
 
 @Composable
@@ -724,8 +800,8 @@ fun MonitoringKesehatanSection(
     onNavigateToScreen: (String) -> Unit,
     activityProgress: Float = 0f
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // First row: 3 cards (Data Kesehatan, Aktivitas Fisik, Asupan Makanan)
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        // First row: 3 cards (kotak proporsional, tinggi tetap)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -734,43 +810,53 @@ fun MonitoringKesehatanSection(
                 title = "Data Kesehatan",
                 subtitle = "Tambahkan Data\nKesehatan Anda",
                 icon = Icons.Default.Favorite,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(140.dp),         // tinggi konsisten untuk baris atas
                 onClick = { onNavigateToScreen("health_records") }
             )
             MonitoringCard(
                 title = "Aktivitas Fisik",
-                subtitle = "Tambahkan Aktivitas\nHari ini",
+                subtitle = "Tambahkan Aktivitas Hari ini",
                 icon = Icons.Default.DirectionsRun,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(140.dp),
                 progress = activityProgress,
                 onClick = { onNavigateToScreen("physical_activity") }
             )
             MonitoringCard(
                 title = "Asupan Makanan",
-                subtitle = "Tambahkan Aktivitas\nHari ini",
+                subtitle = "Tambahkan Asupan\nHari ini",
                 icon = Icons.Default.Restaurant,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(140.dp),
                 onClick = { onNavigateToScreen("food_intake") }
             )
         }
 
-        // Second row: 2 cards (Grafik Kesehatan, Pengingat Kesehatan)
+        // Second row: 2 wide cards (lebih lebar, tinggi sama dengan atas atau sedikit lebih besar)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             MonitoringCard(
                 title = "Grafik Kesehatan",
-                subtitle = "Tambahkan Aktivitas\nHari ini",
+                subtitle = "Cek Grafik Kesehatan",
                 icon = Icons.Default.Assessment,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(140.dp),     // tinggi tetap sama sehingga rata
                 onClick = { onNavigateToScreen("charts") }
             )
             MonitoringCard(
                 title = "Pengingat Kesehatan",
-                subtitle = "Tambahkan Aktivitas\nHari ini",
+                subtitle = "Tambahkan Pengingat\nKesehatan",
                 icon = Icons.Default.Alarm,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(140.dp),
                 onClick = { onNavigateToScreen("reminders") }
             )
         }
@@ -788,53 +874,84 @@ fun MonitoringCard(
 ) {
     Card(
         modifier = modifier
-            .height(120.dp)
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            .heightIn(min = 140.dp)                  // pastikan tinggi cukup
+            .clickable(onClick = onClick)
+            .shadow(6.dp, RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(16.dp)
     ) {
+        // susunan: top = icon, middle = content (title+subtitle) kiri, bottom = progress
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(14.dp),
+                .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Icon(
-                icon,
-                contentDescription = title,
-                tint = HealthColors.NeonGreen,
-                modifier = Modifier.size(26.dp)
-            )
+            // ICON di pojok kiri atas
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(HealthColors.NeonGreen.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = title,
+                        tint = HealthColors.NeonGreen,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
 
-            Column {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            // CONTENT (title + subtitle) — rata kiri seperti contoh
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
                 Text(
                     text = title,
-                    fontSize = 11.sp,
+                    fontSize = 8.sp,                            // lebih besar
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = Color(0xFF222222),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(2.dp))
+
                 Text(
                     text = subtitle,
-                    fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 10.sp
+                    fontSize = 6.sp,                            // jelas & readable
+                    color = Color(0xFF6B6B6B),
+                    lineHeight = 8.sp,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
+            // PROGRESS bar (jika ada) di paling bawah
             if (progress != null) {
+                val p = progress.coerceIn(0f, 1f)
+                Spacer(modifier = Modifier.height(10.dp))
                 LinearProgressIndicator(
-                    progress = { progress },
+                    progress = p,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(4.dp)
-                        .clip(RoundedCornerShape(2.dp)),
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(6.dp)),
                     color = HealthColors.NeonGreen,
-                    trackColor = MaterialTheme.colorScheme.outlineVariant,
+                    trackColor = Color(0xFFF0F0F0)
                 )
             } else {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
@@ -879,37 +996,42 @@ fun RingkasanCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.height(140.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        modifier = modifier
+            .height(140.dp)
+            .shadow(8.dp, RoundedCornerShape(22.dp)),    // shadow lembut
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(22.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
+            // ICON — besar dan neon green seperti gambar
             Icon(
                 icon,
                 contentDescription = label,
                 tint = HealthColors.NeonGreen,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(42.dp)
             )
-            Spacer(modifier = Modifier.height(12.dp))
+
+            // VALUE — tebal, tidak terlalu besar agar tidak "meloncat"
             Text(
                 text = value,
-                fontSize = 32.sp,
+                fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = Color.Black
             )
-            Spacer(modifier = Modifier.height(4.dp))
+
+            // LABEL — kecil, rapi, sama seperti referensi desain
             Text(
                 text = label,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = Color(0xFF98CD00)
             )
         }
     }
@@ -925,14 +1047,14 @@ fun TargetKesehatanHariIni(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = RoundedCornerShape(24.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(20.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(18.dp)
         ) {
             // Header
             Row(
@@ -946,20 +1068,26 @@ fun TargetKesehatanHariIni(
                     text = "Target Kesehatan Hari Ini",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = Color(0xFF222222)
                 )
                 Icon(
-                    if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = if (isExpanded) "Collapse" else "Expand",
                     tint = HealthColors.NeonGreen,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(26.dp)
                 )
             }
 
             if (isExpanded) {
-                Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Divider(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color(0xFFE6E6E6),
+                    thickness = 1.dp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Langkah
                 TargetProgressItem(
@@ -970,7 +1098,7 @@ fun TargetKesehatanHariIni(
                     unit = "Langkah"
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 // Kalori
                 TargetProgressItem(
@@ -981,7 +1109,7 @@ fun TargetKesehatanHariIni(
                     unit = "Kal"
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 // Menit
                 TargetProgressItem(
@@ -1004,42 +1132,71 @@ fun TargetProgressItem(
     goal: Int,
     unit: String
 ) {
+    val p = (current.toFloat() / goal.toFloat()).coerceIn(0f, 1f)
     Column {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            // icon box
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(HealthColors.NeonGreen.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
-                    icon,
+                    imageVector = icon,
                     contentDescription = label,
                     tint = HealthColors.NeonGreen,
                     modifier = Modifier.size(20.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = label,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // label kiri
+            Text(
+                text = label,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF222222),
+                modifier = Modifier.weight(1f)
+            )
+
+            // current / goal di kanan (angka hijau)
+            val annotated = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = HealthColors.NeonGreen, fontWeight = FontWeight.Bold)) {
+                    append(current.toString())
+                }
+                append(" / ")
+                withStyle(style = SpanStyle(color = Color(0xFF9E9E9E))) {
+                    append(goal.toString())
+                }
+                append(" ")
+                withStyle(style = SpanStyle(color = Color(0xFF9E9E9E))) {
+                    append(unit)
+                }
             }
             Text(
-                text = "$current / $goal $unit",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = annotated,
+                fontSize = 13.sp,
+                textAlign = TextAlign.End
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // progress bar
         LinearProgressIndicator(
-            progress = { (current.toFloat() / goal.toFloat()).coerceIn(0f, 1f) },
+            progress = p,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(8.dp)
-                .clip(RoundedCornerShape(4.dp)),
+                .clip(RoundedCornerShape(6.dp)),
             color = HealthColors.NeonGreen,
-            trackColor = MaterialTheme.colorScheme.outlineVariant,
+            trackColor = Color(0xFFEFEFEF)
         )
     }
 }
@@ -1055,16 +1212,16 @@ fun StatistikMingguIni(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = RoundedCornerShape(24.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(20.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(18.dp)
         ) {
-            // Header
+            // Header: judul kiri + panah kanan
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1076,28 +1233,34 @@ fun StatistikMingguIni(
                     text = "Statistik Minggu Ini",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = Color(0xFF222222)
                 )
                 Icon(
-                    if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = if (isExpanded) "Collapse" else "Expand",
+                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = if (isExpanded) "Tutup" else "Buka",
                     tint = HealthColors.NeonGreen,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(26.dp)
                 )
             }
 
             if (isExpanded) {
-                Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
+                Divider(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color(0xFFE6E6E6),
+                    thickness = 1.dp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Items
                 StatistikItem(
                     icon = Icons.Default.Favorite,
                     label = "Tekanan Darah",
                     count = bloodPressureCount,
                     iconBgColor = HealthColors.BloodPressure
                 )
-
                 Spacer(modifier = Modifier.height(12.dp))
 
                 StatistikItem(
@@ -1106,7 +1269,6 @@ fun StatistikMingguIni(
                     count = bloodSugarCount,
                     iconBgColor = HealthColors.BloodSugar
                 )
-
                 Spacer(modifier = Modifier.height(12.dp))
 
                 StatistikItem(
@@ -1115,7 +1277,6 @@ fun StatistikMingguIni(
                     count = activityCount,
                     iconBgColor = HealthColors.Activity
                 )
-
                 Spacer(modifier = Modifier.height(12.dp))
 
                 StatistikItem(
@@ -1137,38 +1298,49 @@ fun StatistikItem(
     iconBgColor: Color
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        // left: icon + label
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f)
+        ) {
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(42.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(iconBgColor.copy(alpha = 0.2f)),
+                    .background(iconBgColor.copy(alpha = 0.14f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    icon,
+                    imageVector = icon,
                     contentDescription = label,
                     tint = iconBgColor,
                     modifier = Modifier.size(20.dp)
                 )
             }
+
             Spacer(modifier = Modifier.width(12.dp))
+
             Text(
                 text = label,
-                fontSize = 13.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = Color(0xFF222222)
             )
         }
+
+        // right: count (bold)
         Text(
             text = "$count Kali",
-            fontSize = 13.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = Color(0xFF222222),
+            modifier = Modifier.padding(start = 8.dp)
         )
     }
 }

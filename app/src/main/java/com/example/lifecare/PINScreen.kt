@@ -73,12 +73,10 @@ fun PINScreen(
 
         // Logo
         Image(
-            painter = painterResource(id = R.drawable.logoDepan),
+            painter = painterResource(id = R.drawable.logodepan),
             contentDescription = "Logo",
             modifier = Modifier.size(100.dp)
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
 
         // App Name
         Text(
@@ -88,17 +86,17 @@ fun PINScreen(
             color = MaterialTheme.colorScheme.onBackground
         )
 
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Title
         Text(
             text = "Masukkan PIN Anda",
-            fontSize = 16.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onBackground
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // PIN BOX - 6 boxes rounded
         Row(
@@ -138,7 +136,7 @@ fun PINScreen(
                 .background(MaterialTheme.colorScheme.outlineVariant)
         )
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Invisible TextField
         TextField(

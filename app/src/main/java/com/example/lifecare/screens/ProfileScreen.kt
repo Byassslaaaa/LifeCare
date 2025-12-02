@@ -98,7 +98,7 @@ fun ProfileScreen(
 
     // Determine logo based on theme
     val isDarkMode = isSystemInDarkTheme()
-    val logoResource = if (isDarkMode) R.drawable.logoDarkMode else R.drawable.logoLightMode
+    val logoResource = if (isDarkMode) R.drawable.logodarkmode else R.drawable.logolightmode
 
     Scaffold(
         topBar = {
