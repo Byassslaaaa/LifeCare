@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -13,9 +14,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import com.example.lifecare.data.FoodIntake
 import com.example.lifecare.data.HealthDataManager
 import com.example.lifecare.ui.components.*
@@ -39,24 +42,23 @@ fun FoodIntakeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Asupan Makanan", style = HealthTypography.titleLarge) },
+                title = { Text("Data Kesehatan", style = HealthTypography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = HealthColors.NeonGreen)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = HealthColors.Food,
-                    titleContentColor = HealthColors.TextOnPrimary,
-                    navigationIconContentColor = HealthColors.TextOnPrimary
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
+            SmallFloatingActionButton(
                 onClick = { showDialog = true },
-                containerColor = HealthColors.Food,
-                contentColor = HealthColors.TextOnPrimary
+                containerColor = HealthColors.NeonGreen,
+                contentColor = Color.White
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
@@ -67,26 +69,51 @@ fun FoodIntakeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            FeaturedCard(
-                modifier = Modifier.fillMaxWidth().padding(HealthSpacing.screenPadding),
-                backgroundColor = HealthColors.Food,
-                contentColor = HealthColors.TextOnPrimary
+            // Summary Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(HealthSpacing.screenPadding),
+                colors = CardDefaults.cardColors(containerColor = HealthColors.NeonGreen),
+                shape = RoundedCornerShape(24.dp)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Restaurant, contentDescription = null, modifier = Modifier.size(HealthSpacing.iconSizeLarge), tint = HealthColors.TextOnPrimary)
-                    Spacer(modifier = Modifier.width(HealthSpacing.medium))
+                    Icon(
+                        Icons.Default.Restaurant,
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp),
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
                     Column {
-                        Text("Total Kalori Hari Ini", style = HealthTypography.bodySmall, color = HealthColors.TextOnPrimary.copy(alpha = 0.8f))
-                        Spacer(modifier = Modifier.height(HealthSpacing.xxSmall))
-                        Text("$todayCalories kal", style = HealthTypography.displaySmall, fontWeight = FontWeight.Bold, color = HealthColors.TextOnPrimary)
+                        Text(
+                            "Total Kalori Hari ini",
+                            style = HealthTypography.bodyMedium,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            "$todayCalories Kal",
+                            style = HealthTypography.displaySmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
                     }
                 }
             }
 
-            Text("Riwayat", style = HealthTypography.headlineSmall, modifier = Modifier.padding(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small))
+            Text(
+                "Riwayat",
+                style = HealthTypography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small)
+            )
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -118,21 +145,48 @@ fun FoodIntakeScreen(
 fun FoodIntakeHistoryItem(food: FoodIntake) {
     val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
 
-    HealthCard(modifier = Modifier.fillMaxWidth()) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column {
-                Text(food.foodName, style = HealthTypography.titleMedium, fontWeight = FontWeight.Bold)
-                Text("${food.mealType} • ${dateFormat.format(Date(food.timestamp))}", style = HealthTypography.bodySmall, color = HealthColors.TextSecondary)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        food.foodName,
+                        style = HealthTypography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = HealthColors.NeonGreen
+                    )
+                    Text(
+                        "${food.mealType} • ${dateFormat.format(Date(food.timestamp))}",
+                        style = HealthTypography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                }
+                Text(
+                    "${food.calories} Kal",
+                    style = HealthTypography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = HealthColors.NeonGreen
+                )
             }
-            Text("${food.calories} kal", style = HealthTypography.headlineSmall, fontWeight = FontWeight.Bold, color = HealthColors.Food)
-        }
 
-        if (food.protein != null || food.carbs != null || food.fat != null) {
-            Spacer(modifier = Modifier.height(HealthSpacing.small))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(HealthSpacing.small)) {
-                if (food.protein != null) NutrientLabel("Protein", "${food.protein}g")
-                if (food.carbs != null) NutrientLabel("Karbo", "${food.carbs}g")
-                if (food.fat != null) NutrientLabel("Lemak", "${food.fat}g")
+            if (food.protein != null || food.carbs != null || food.fat != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (food.protein != null) NutrientLabel("Protein", "${food.protein}g")
+                    if (food.carbs != null) NutrientLabel("Karbo", "${food.carbs}g")
+                    if (food.fat != null) NutrientLabel("Lemak", "${food.fat}g")
+                }
             }
         }
     }
@@ -140,8 +194,16 @@ fun FoodIntakeHistoryItem(food: FoodIntake) {
 
 @Composable
 fun NutrientLabel(name: String, value: String) {
-    Surface(color = HealthColors.FoodLight, shape = MaterialTheme.shapes.small) {
-        Text("$name: $value", style = HealthTypography.labelSmall, modifier = Modifier.padding(horizontal = HealthSpacing.small, vertical = HealthSpacing.xxSmall), color = HealthColors.Food)
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Text(
+            "$name: $value",
+            style = HealthTypography.labelSmall,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -166,27 +228,41 @@ fun AddFoodIntakeDialog(onDismiss: () -> Unit, onSave: (String, Int, String, Dou
         onDismissRequest = onDismiss,
         title = { Text("Tambah Asupan Makanan", style = HealthTypography.titleLarge) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(HealthSpacing.small)) {
-                OutlinedTextField(
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                TextField(
                     value = foodName,
                     onValueChange = { foodName = it; foodNameError = null },
-                    label = { Text("Nama Makanan") },
-                    placeholder = { Text("Contoh: Nasi Goreng") },
+                    placeholder = { Text("Nama Makanan") },
                     singleLine = true,
                     isError = foodNameError != null,
                     supportingText = { if (foodNameError != null) Text(foodNameError!!, color = HealthColors.Error) },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.Food, focusedLabelColor = HealthColors.Food)
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    shape = RoundedCornerShape(50.dp)
                 )
 
                 ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-                    OutlinedTextField(
-                        value = mealType, onValueChange = {}, label = { Text("Waktu Makan") }, readOnly = true,
+                    TextField(
+                        value = mealType,
+                        onValueChange = {},
+                        placeholder = { Text("Waktu Makan") },
+                        readOnly = true,
                         isError = mealTypeError != null,
                         supportingText = { if (mealTypeError != null) Text(mealTypeError!!, color = HealthColors.Error) },
                         modifier = Modifier.fillMaxWidth().menuAnchor(),
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.Food, focusedLabelColor = HealthColors.Food)
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        shape = RoundedCornerShape(50.dp)
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         mealTypes.forEach { type ->
@@ -195,49 +271,69 @@ fun AddFoodIntakeDialog(onDismiss: () -> Unit, onSave: (String, Int, String, Dou
                     }
                 }
 
-                OutlinedTextField(
+                TextField(
                     value = calories,
                     onValueChange = { if (it.isEmpty() || (it.all { c -> c.isDigit() } && it.length <= 5)) { calories = it; caloriesError = null } },
-                    label = { Text("Kalori") },
-                    placeholder = { Text("Contoh: 450") },
+                    placeholder = { Text("Kalori") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     isError = caloriesError != null,
                     supportingText = { if (caloriesError != null) Text(caloriesError!!, color = HealthColors.Error) },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.Food, focusedLabelColor = HealthColors.Food)
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    shape = RoundedCornerShape(50.dp)
                 )
 
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(HealthSpacing.xSmall)) {
-                    OutlinedTextField(
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextField(
                         value = protein,
                         onValueChange = { if (it.isEmpty() || (it.all { c -> c.isDigit() } && it.length <= 4)) protein = it },
-                        label = { Text("Protein (g)") },
-                        placeholder = { Text("15") },
+                        placeholder = { Text("Protein (g)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true,
                         modifier = Modifier.weight(1f),
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.Food, focusedLabelColor = HealthColors.Food)
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        shape = RoundedCornerShape(50.dp)
                     )
-                    OutlinedTextField(
+                    TextField(
                         value = carbs,
                         onValueChange = { if (it.isEmpty() || (it.all { c -> c.isDigit() } && it.length <= 4)) carbs = it },
-                        label = { Text("Karbo (g)") },
-                        placeholder = { Text("60") },
+                        placeholder = { Text("Karbo (g)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true,
                         modifier = Modifier.weight(1f),
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.Food, focusedLabelColor = HealthColors.Food)
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        shape = RoundedCornerShape(50.dp)
                     )
-                    OutlinedTextField(
+                    TextField(
                         value = fat,
                         onValueChange = { if (it.isEmpty() || (it.all { c -> c.isDigit() } && it.length <= 4)) fat = it },
-                        label = { Text("Lemak (g)") },
-                        placeholder = { Text("10") },
+                        placeholder = { Text("Lemak (g)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true,
                         modifier = Modifier.weight(1f),
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.Food, focusedLabelColor = HealthColors.Food)
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        shape = RoundedCornerShape(50.dp)
                     )
                 }
             }
@@ -268,9 +364,11 @@ fun AddFoodIntakeDialog(onDismiss: () -> Unit, onSave: (String, Int, String, Dou
                         onSave(foodName, cal, mealType, prot, carb, ft)
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = HealthColors.Food)
-            ) { Text("Simpan") }
+                colors = ButtonDefaults.buttonColors(containerColor = HealthColors.NeonGreen),
+                modifier = Modifier.height(56.dp),
+                shape = RoundedCornerShape(50.dp)
+            ) { Text("Simpan", color = Color.White) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Batal", color = HealthColors.TextSecondary) } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Batal", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) } }
     )
 }

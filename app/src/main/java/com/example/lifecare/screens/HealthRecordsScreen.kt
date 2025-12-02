@@ -45,22 +45,22 @@ fun HealthRecordsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Riwayat Kesehatan") },
+                title = { Text("Riwayat Kesehatan", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = com.example.lifecare.ui.theme.HealthColors.NeonGreen)
                     }
                 },
                 actions = {
                     IconButton(onClick = { showFilterDialog = true }) {
-                        Icon(Icons.Default.FilterList, contentDescription = "Filter", tint = Color.White)
+                        Icon(Icons.Default.FilterList, contentDescription = "Filter", tint = MaterialTheme.colorScheme.onBackground)
                     }
                     IconButton(onClick = { showSortDialog = true }) {
-                        Icon(Icons.Default.Sort, contentDescription = "Sort", tint = Color.White)
+                        Icon(Icons.Default.Sort, contentDescription = "Sort", tint = MaterialTheme.colorScheme.onBackground)
                     }
                     var showExportDialog by remember { mutableStateOf(false) }
                     IconButton(onClick = { showExportDialog = true }) {
-                        Icon(Icons.Default.Share, contentDescription = "Export", tint = Color.White)
+                        Icon(Icons.Default.Share, contentDescription = "Export", tint = MaterialTheme.colorScheme.onBackground)
                     }
 
                     if (showExportDialog) {
@@ -71,9 +71,7 @@ fun HealthRecordsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF5DCCB4),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -230,13 +228,14 @@ fun AllRecordsSection(
         // Summary Header
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF5DCCB4)),
+            colors = CardDefaults.cardColors(containerColor = com.example.lifecare.ui.theme.HealthColors.NeonGreen),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(24.dp)
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     "Total Riwayat Kesehatan",
@@ -246,45 +245,45 @@ fun AllRecordsSection(
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             "${healthDataManager.getBodyMetricsList().size + healthDataManager.getBloodPressureList().size + healthDataManager.getBloodSugarList().size}",
-                            fontSize = 24.sp,
+                            fontSize = 32.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
                         Text(
                             "Data Kesehatan",
-                            fontSize = 11.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            fontSize = 12.sp,
+                            color = Color.White.copy(alpha = 0.9f)
                         )
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             "${healthDataManager.getPhysicalActivityList().size}",
-                            fontSize = 24.sp,
+                            fontSize = 32.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
                         Text(
                             "Aktivitas",
-                            fontSize = 11.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            fontSize = 12.sp,
+                            color = Color.White.copy(alpha = 0.9f)
                         )
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             "${healthDataManager.getFoodIntakeList().size}",
-                            fontSize = 24.sp,
+                            fontSize = 32.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
                         Text(
                             "Makanan",
-                            fontSize = 11.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            fontSize = 12.sp,
+                            color = Color.White.copy(alpha = 0.9f)
                         )
                     }
                 }
@@ -385,7 +384,7 @@ fun BodyMetricsCard(
             .clickable { showDetailDialog = true },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier
@@ -395,17 +394,17 @@ fun BodyMetricsCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Berat: ${data.weight} kg | Tinggi: ${data.height} cm", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = com.example.lifecare.ui.theme.HealthColors.NeonGreen)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Berat: ${data.weight} kg | Tinggi: ${data.height} cm", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("BMI", fontSize = 10.sp, color = Color.Gray)
-                    Text(String.format("%.1f", data.bmi), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = getBMIColor(data.bmi))
+                    Text("BMI", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(String.format("%.1f", data.bmi), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = com.example.lifecare.ui.theme.HealthColors.NeonGreen)
                 }
                 IconButton(
                     onClick = { showDeleteDialog = true },
@@ -453,7 +452,7 @@ fun BloodPressureCard(
             .clickable { showDetailDialog = true },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier
@@ -463,18 +462,26 @@ fun BloodPressureCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("${data.systolic}/${data.diastolic} mmHg", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = com.example.lifecare.ui.theme.HealthColors.NeonGreen)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("${data.systolic}/${data.diastolic} mmHg", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFFE91E63))
+                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (data.heartRate != null) {
                     Text("Detak: ${data.heartRate} BPM", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-            IconButton(
-                onClick = { showDeleteDialog = true },
-                modifier = Modifier.size(32.dp)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color(0xFFF44336), modifier = Modifier.size(20.dp))
+                if (data.heartRate != null) {
+                    Text("${data.heartRate} BPM", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = com.example.lifecare.ui.theme.HealthColors.NeonGreen)
+                }
+                IconButton(
+                    onClick = { showDeleteDialog = true },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color(0xFFF44336), modifier = Modifier.size(20.dp))
+                }
             }
         }
     }
@@ -514,7 +521,7 @@ fun BloodSugarCard(
             .clickable { showDetailDialog = true },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier
@@ -524,16 +531,22 @@ fun BloodSugarCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("${data.level} mg/dL", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = com.example.lifecare.ui.theme.HealthColors.NeonGreen)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("${data.level} mg/dL", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF9C27B0))
+                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(data.measurementType, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            IconButton(
-                onClick = { showDeleteDialog = true },
-                modifier = Modifier.size(32.dp)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color(0xFFF44336), modifier = Modifier.size(20.dp))
+                Text(data.measurementType, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = com.example.lifecare.ui.theme.HealthColors.NeonGreen)
+                IconButton(
+                    onClick = { showDeleteDialog = true },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color(0xFFF44336), modifier = Modifier.size(20.dp))
+                }
             }
         }
     }
@@ -573,7 +586,7 @@ fun ActivityCard(
             .clickable { showDetailDialog = true },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier
@@ -583,14 +596,14 @@ fun ActivityCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(data.activityType, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
+                Text(data.activityType, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = com.example.lifecare.ui.theme.HealthColors.NeonGreen)
                 Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("${data.duration} min", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
+                Text("${data.duration} min", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = com.example.lifecare.ui.theme.HealthColors.NeonGreen)
                 IconButton(
                     onClick = { showDeleteDialog = true },
                     modifier = Modifier.size(32.dp)
@@ -636,7 +649,7 @@ fun FoodCard(
             .clickable { showDetailDialog = true },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier
@@ -646,14 +659,16 @@ fun FoodCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(data.foodName, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                Text("${data.mealType} • ${dateFormat.format(Date(data.timestamp))}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(data.foodName, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = com.example.lifecare.ui.theme.HealthColors.NeonGreen)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("${data.mealType}", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(dateFormat.format(Date(data.timestamp)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("${data.calories} kal", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFF9800))
+                Text("${data.calories} kal", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = com.example.lifecare.ui.theme.HealthColors.NeonGreen)
                 IconButton(
                     onClick = { showDeleteDialog = true },
                     modifier = Modifier.size(32.dp)

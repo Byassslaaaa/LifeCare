@@ -4,11 +4,14 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.MonitorWeight
+import androidx.compose.material.icons.filled.Bloodtype
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import com.example.lifecare.data.BloodPressure
 import com.example.lifecare.data.HealthDataManager
 import com.example.lifecare.ui.components.*
@@ -39,32 +43,17 @@ fun BloodPressureScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        "Tekanan Darah",
-                        style = HealthTypography.titleLarge
-                    )
-                },
+                title = { Text("Data Kesehatan", style = HealthTypography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = HealthColors.NeonGreen)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = HealthColors.BloodPressure,
-                    titleContentColor = HealthColors.TextOnPrimary,
-                    navigationIconContentColor = HealthColors.TextOnPrimary
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showDialog = true },
-                containerColor = HealthColors.BloodPressure,
-                contentColor = HealthColors.TextOnPrimary
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
         }
     ) { paddingValues ->
         Column(
@@ -72,15 +61,114 @@ fun BloodPressureScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Latest BP Card
-            bpList.firstOrNull()?.let { latest ->
-                FeaturedCard(
+            // Summary Card with 3 sections
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(HealthSpacing.screenPadding),
+                colors = CardDefaults.cardColors(containerColor = HealthColors.NeonGreen),
+                shape = RoundedCornerShape(24.dp)
+            ) {
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(HealthSpacing.screenPadding),
-                    backgroundColor = HealthColors.BloodPressure,
-                    contentColor = HealthColors.TextOnPrimary
+                        .padding(24.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
+                    // Berat Badan
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Default.MonitorWeight,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "Berat Badan",
+                            style = HealthTypography.bodySmall,
+                            color = Color.White
+                        )
+                        Text(
+                            "-",
+                            style = HealthTypography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+
+                    // Tekanan Darah
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Default.Favorite,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "Tekanan Darah",
+                            style = HealthTypography.bodySmall,
+                            color = Color.White
+                        )
+                        Text(
+                            bpList.firstOrNull()?.let { "${it.systolic}/${it.diastolic}" } ?: "70/50",
+                            style = HealthTypography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+
+                    // Gula Darah
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Default.Bloodtype,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "Gula Darah",
+                            style = HealthTypography.bodySmall,
+                            color = Color.White
+                        )
+                        Text(
+                            "-",
+                            style = HealthTypography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+
+            // Input Data Baru Section
+            Text(
+                "Input Data Baru",
+                style = HealthTypography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Input fields
+            var systolic by remember { mutableStateOf("") }
+            var diastolic by remember { mutableStateOf("") }
+
+            // Card 1: Tekanan Darah
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = HealthSpacing.screenPadding),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    // Section header
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
@@ -88,68 +176,107 @@ fun BloodPressureScreen(
                         Icon(
                             Icons.Default.Favorite,
                             contentDescription = null,
-                            modifier = Modifier.size(HealthSpacing.iconSizeLarge),
-                            tint = HealthColors.TextOnPrimary
+                            tint = HealthColors.NeonGreen,
+                            modifier = Modifier.size(24.dp)
                         )
-                        Spacer(modifier = Modifier.width(HealthSpacing.medium))
-                        Column {
-                            Text(
-                                "Data Terbaru",
-                                style = HealthTypography.bodySmall,
-                                color = HealthColors.TextOnPrimary.copy(alpha = 0.8f)
-                            )
-                            Spacer(modifier = Modifier.height(HealthSpacing.xxSmall))
-                            Text(
-                                "${latest.systolic}/${latest.diastolic} mmHg",
-                                style = HealthTypography.displaySmall,
-                                fontWeight = FontWeight.Bold,
-                                color = HealthColors.TextOnPrimary
-                            )
-                            if (latest.heartRate != null) {
-                                Text(
-                                    "Detak Jantung: ${latest.heartRate} BPM",
-                                    style = HealthTypography.bodySmall,
-                                    color = HealthColors.TextOnPrimary.copy(alpha = 0.8f)
-                                )
-                            }
-                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Tekanan Darah",
+                            style = HealthTypography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
-                }
-            }
 
-            // History List
-            Text(
-                "Riwayat",
-                style = HealthTypography.headlineSmall,
-                modifier = Modifier.padding(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small)
-            )
+                    Spacer(modifier = Modifier.height(12.dp))
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small)
-            ) {
-                items(bpList) { bp ->
-                    BloodPressureHistoryItem(bp)
-                    Spacer(modifier = Modifier.height(HealthSpacing.small))
-                }
-            }
-        }
+                    // Input fields
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        TextField(
+                            value = systolic,
+                            onValueChange = { systolic = it },
+                            placeholder = { Text("Sistolik") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            shape = RoundedCornerShape(50.dp),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
 
-        if (showDialog) {
-            AddBloodPressureDialog(
-                onDismiss = { showDialog = false },
-                onSave = { systolic, diastolic, heartRate ->
-                    val bp = BloodPressure(
-                        systolic = systolic,
-                        diastolic = diastolic,
-                        heartRate = heartRate
+                        TextField(
+                            value = diastolic,
+                            onValueChange = { diastolic = it },
+                            placeholder = { Text("Diastolik") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            shape = RoundedCornerShape(50.dp),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        "Normal: 120/80 mmHg",
+                        style = HealthTypography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
-                    healthDataManager.saveBloodPressure(bp)
-                    bpList = healthDataManager.getBloodPressureList()
-                    Toast.makeText(context, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
-                    showDialog = false
                 }
-            )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Save button and note
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(HealthSpacing.screenPadding)
+            ) {
+                Button(
+                    onClick = {
+                        val sys = systolic.toIntOrNull()
+                        val dia = diastolic.toIntOrNull()
+                        if (sys != null && dia != null) {
+                            val bp = BloodPressure(systolic = sys, diastolic = dia, heartRate = null)
+                            healthDataManager.saveBloodPressure(bp)
+                            bpList = healthDataManager.getBloodPressureList()
+                            Toast.makeText(context, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
+                            systolic = ""
+                            diastolic = ""
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = HealthColors.NeonGreen),
+                    shape = RoundedCornerShape(50.dp)
+                ) {
+                    Text("Simpan Data", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    "Anda dapat mengisi satu, dua, atau semua data sekaligus",
+                    style = HealthTypography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
         }
     }
 }

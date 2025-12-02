@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -17,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.lifecare.data.PhysicalActivity
 import com.example.lifecare.data.HealthDataManager
 import com.example.lifecare.ui.components.*
@@ -40,23 +43,21 @@ fun PhysicalActivityScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Aktivitas Fisik", style = HealthTypography.titleLarge) },
+                title = { Text("Aktivitas Fisik", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = HealthColors.NeonGreen)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = HealthColors.Activity,
-                    titleContentColor = HealthColors.TextOnPrimary,
-                    navigationIconContentColor = HealthColors.TextOnPrimary
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showDialog = true },
-                containerColor = HealthColors.Activity,
+                containerColor = HealthColors.NeonGreen,
                 contentColor = HealthColors.TextOnPrimary
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
@@ -69,22 +70,45 @@ fun PhysicalActivityScreen(
                 .padding(paddingValues)
         ) {
             // Summary Card
-            FeaturedCard(
-                modifier = Modifier.fillMaxWidth().padding(HealthSpacing.screenPadding),
-                backgroundColor = HealthColors.Activity,
-                contentColor = HealthColors.TextOnPrimary
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                colors = CardDefaults.cardColors(containerColor = HealthColors.NeonGreen),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                shape = RoundedCornerShape(24.dp)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.DirectionsRun, contentDescription = null, modifier = Modifier.size(HealthSpacing.iconSizeLarge), tint = HealthColors.TextOnPrimary)
-                    Spacer(modifier = Modifier.width(HealthSpacing.medium))
+                    Icon(
+                        Icons.Default.DirectionsRun,
+                        contentDescription = null,
+                        modifier = Modifier.size(64.dp),
+                        tint = HealthColors.TextOnPrimary
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
                     Column {
-                        Text("Hari Ini", style = HealthTypography.bodySmall, color = HealthColors.TextOnPrimary.copy(alpha = 0.8f))
-                        Spacer(modifier = Modifier.height(HealthSpacing.xxSmall))
-                        Text("${healthDataManager.getTodayTotalSteps()} langkah", style = HealthTypography.displaySmall, fontWeight = FontWeight.Bold, color = HealthColors.TextOnPrimary)
-                        Text("${healthDataManager.getTodayTotalExerciseMinutes()} menit olahraga", style = HealthTypography.bodySmall, color = HealthColors.TextOnPrimary.copy(alpha = 0.8f))
+                        Text(
+                            "Hari ini",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = HealthColors.TextOnPrimary.copy(alpha = 0.9f)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            "${healthDataManager.getTodayTotalSteps()} Langkah",
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = HealthColors.TextOnPrimary
+                        )
+                        Text(
+                            "${healthDataManager.getTodayTotalExerciseMinutes()} menit olahraga",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = HealthColors.TextOnPrimary.copy(alpha = 0.9f)
+                        )
                     }
                 }
             }
@@ -94,30 +118,42 @@ fun PhysicalActivityScreen(
                 onClick = onStartGPSTracking,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = HealthSpacing.screenPadding)
-                    .padding(top = HealthSpacing.medium),
+                    .padding(horizontal = 16.dp)
+                    .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = HealthColors.Activity
-                )
+                    containerColor = HealthColors.NeonGreen
+                ),
+                shape = RoundedCornerShape(50.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.GpsFixed,
                     contentDescription = null,
-                    modifier = Modifier.size(HealthSpacing.iconSizeMedium)
+                    modifier = Modifier.size(24.dp),
+                    tint = HealthColors.TextOnPrimary
                 )
-                Spacer(modifier = Modifier.width(HealthSpacing.small))
-                Text("Track dengan GPS", style = HealthTypography.titleMedium)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "Track dengan GPS",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = HealthColors.TextOnPrimary
+                )
             }
 
-            Text("Riwayat", style = HealthTypography.headlineSmall, modifier = Modifier.padding(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small))
+            Text(
+                "Riwayat",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+            )
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = HealthSpacing.screenPadding, vertical = HealthSpacing.small)
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(activityList) { activity ->
                     PhysicalActivityHistoryItem(activity)
-                    Spacer(modifier = Modifier.height(HealthSpacing.small))
                 }
             }
         }
@@ -141,23 +177,64 @@ fun PhysicalActivityScreen(
 fun PhysicalActivityHistoryItem(activity: PhysicalActivity) {
     val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
 
-    HealthCard(modifier = Modifier.fillMaxWidth()) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column {
-                Text(activity.activityType, style = HealthTypography.titleMedium, fontWeight = FontWeight.Bold, color = HealthColors.Activity)
-                Text(dateFormat.format(Date(activity.timestamp)), style = HealthTypography.bodySmall, color = HealthColors.TextSecondary)
-            }
-            Text("${activity.duration} min", style = HealthTypography.headlineSmall, fontWeight = FontWeight.Bold, color = HealthColors.Activity)
-        }
-
-        if (activity.steps != null || activity.caloriesBurned != null) {
-            Spacer(modifier = Modifier.height(HealthSpacing.small))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(HealthSpacing.medium)) {
-                if (activity.steps != null) {
-                    Text("${activity.steps} langkah", style = HealthTypography.bodySmall, color = HealthColors.TextSecondary)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        activity.activityType,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = HealthColors.NeonGreen
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        dateFormat.format(Date(activity.timestamp)),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-                if (activity.caloriesBurned != null) {
-                    Text("${activity.caloriesBurned} kal", style = HealthTypography.bodySmall, color = HealthColors.TextSecondary)
+                Text(
+                    "${activity.duration} min",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = HealthColors.NeonGreen
+                )
+            }
+
+            if (activity.steps != null || activity.caloriesBurned != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    if (activity.caloriesBurned != null) {
+                        Text(
+                            "${activity.caloriesBurned} kal",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    if (activity.steps != null) {
+                        Text(
+                            "${activity.steps} langkah",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
@@ -202,7 +279,7 @@ fun AddPhysicalActivityDialog(onDismiss: () -> Unit, onSave: (String, Int, Int?,
                         supportingText = { if (activityError != null) Text(activityError!!, color = HealthColors.Error) },
                         modifier = Modifier.fillMaxWidth().menuAnchor(),
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.Activity, focusedLabelColor = HealthColors.Activity)
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.NeonGreen, focusedLabelColor = HealthColors.NeonGreen)
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         activityTypes.forEach { type ->
@@ -219,7 +296,7 @@ fun AddPhysicalActivityDialog(onDismiss: () -> Unit, onSave: (String, Int, Int?,
                     isError = durationError != null,
                     supportingText = { if (durationError != null) Text(durationError!!, color = HealthColors.Error) },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.Activity, focusedLabelColor = HealthColors.Activity)
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.NeonGreen, focusedLabelColor = HealthColors.NeonGreen)
                 )
 
                 OutlinedTextField(
@@ -228,7 +305,7 @@ fun AddPhysicalActivityDialog(onDismiss: () -> Unit, onSave: (String, Int, Int?,
                     label = { Text("Langkah (opsional)") }, placeholder = { Text("Jumlah langkah") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.Activity, focusedLabelColor = HealthColors.Activity)
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.NeonGreen, focusedLabelColor = HealthColors.NeonGreen)
                 )
 
                 OutlinedTextField(
@@ -239,7 +316,7 @@ fun AddPhysicalActivityDialog(onDismiss: () -> Unit, onSave: (String, Int, Int?,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), singleLine = true,
                     supportingText = { if (estimatedCalories != null && calories.isEmpty()) Text("Estimasi: ~$estimatedCalories kal", color = HealthColors.TextSecondary) },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.Activity, focusedLabelColor = HealthColors.Activity)
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = HealthColors.NeonGreen, focusedLabelColor = HealthColors.NeonGreen)
                 )
             }
         },
@@ -268,7 +345,7 @@ fun AddPhysicalActivityDialog(onDismiss: () -> Unit, onSave: (String, Int, Int?,
                         onSave(activityType, dur, stp, cal)
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = HealthColors.Activity)
+                colors = ButtonDefaults.buttonColors(containerColor = HealthColors.NeonGreen)
             ) { Text("Simpan") }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Batal", color = HealthColors.TextSecondary) } }

@@ -2,26 +2,28 @@ package com.example.lifecare.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import com.example.lifecare.data.HealthDataManager
 import com.example.lifecare.data.ThemeManager
-
-private val AccountPrimary = Color(0xFF5DCCB4)
+import com.example.lifecare.ui.theme.HealthColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +52,8 @@ fun AccountScreen(
                     Text(
                         "Account",
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 navigationIcon = {
@@ -58,13 +61,12 @@ fun AccountScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Kembali",
-                            tint = Color.White
+                            tint = HealthColors.NeonGreen
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AccountPrimary,
-                    titleContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -79,146 +81,165 @@ fun AccountScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Icon and Title Section with NeonGreen circle
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(HealthColors.NeonGreen),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = Color.White
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Icon + heading (mirip style PIN)
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = null,
-                modifier = Modifier.size(80.dp),
-                tint = AccountPrimary
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = "Pengaturan Akun",
-                fontSize = 22.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onBackground
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Kelola informasi akun, tema, dan data aplikasi Anda.",
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = "Kelola informasi akun, tema, dan data aplikasi anda",
+                fontSize = 14.sp,
+                color = HealthColors.NeonGreen
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ===== Card informasi akun =====
-            Card(
+            // ===== Informasi Akun Section =====
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = RoundedCornerShape(16.dp)
+                horizontalAlignment = Alignment.Start
             ) {
-                Column(
+                Text(
+                    text = "Informasi Akun",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = HealthColors.NeonGreen,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                // Email card
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(horizontal = 20.dp, vertical = 14.dp)
                 ) {
                     Text(
-                        "Informasi Akun",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        text = "Email: ${if (userEmail.isNotEmpty()) userEmail else "example@gmail.com"}",
+                        fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
+                }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    UserInfoItem(
-                        label = "Email",
-                        value = userEmail
+                // Age card
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(horizontal = 20.dp, vertical = 14.dp)
+                ) {
+                    Text(
+                        text = "Umur: ${if (userAge.isNotEmpty()) "$userAge Tahun" else "22 Tahun"}",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-                    Divider(modifier = Modifier.padding(vertical = 6.dp))
-                    UserInfoItem(
-                        label = "Umur",
-                        value = if (userAge.isNotEmpty()) "$userAge tahun" else "Belum diisi"
-                    )
-                    Divider(modifier = Modifier.padding(vertical = 6.dp))
-                    UserInfoItem(
-                        label = "Jenis Kelamin",
-                        value = if (userGender.isNotEmpty()) userGender else "Belum diisi"
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Gender card
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(horizontal = 20.dp, vertical = 14.dp)
+                ) {
+                    Text(
+                        text = "Jenis Kelamin: ${if (userGender.isNotEmpty()) userGender else "Female"}",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // ===== Card pengaturan tema & data =====
-            Card(
+            // ===== Pengaturan Akun Section =====
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = RoundedCornerShape(16.dp)
+                horizontalAlignment = Alignment.Start
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Text(
-                        "Pengaturan",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                Text(
+                    text = "Pengaturan Akun",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
 
-                    Spacer(modifier = Modifier.height(6.dp))
+                // Tema Aplikasi Button
+                AccountActionButton(
+                    icon = Icons.Default.DarkMode,
+                    title = "Tema Aplikasi",
+                    subtitle = "Saat ini: ${themeManager.getThemeDisplayName()}",
+                    onClick = {
+                        onThemeToggle()
+                        Toast.makeText(
+                            context,
+                            "Tema diubah ke: ${themeManager.getThemeDisplayName()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                )
 
-                    // Ubah tema
-                    SettingItem(
-                        icon = Icons.Default.DarkMode,
-                        title = "Tema Aplikasi",
-                        subtitle = "Saat ini: ${themeManager.getThemeDisplayName()}",
-                        onClick = {
-                            onThemeToggle()
-                            Toast.makeText(
-                                context,
-                                "Tema diubah ke: ${themeManager.getThemeDisplayName()}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Divider(modifier = Modifier.padding(vertical = 4.dp))
+                // Hapus Semua Data Button
+                AccountActionButton(
+                    icon = Icons.Default.Delete,
+                    title = "Hapus Semua Data",
+                    subtitle = "Hapus seluruh data kesehatan",
+                    onClick = { showClearDataDialog = true }
+                )
 
-                    // Hapus semua data (tanpa logout)
-                    SettingItem(
-                        icon = Icons.Default.DeleteForever,
-                        title = "Hapus Semua Data",
-                        subtitle = "Hapus seluruh data kesehatan",
-                        iconColor = Color(0xFFFF6B6B),
-                        onClick = { showClearDataDialog = true }
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Divider(modifier = Modifier.padding(vertical = 4.dp))
+                // Hapus Data & Logout Button
+                AccountActionButton(
+                    icon = Icons.Default.Warning,
+                    title = "Hapus Data & Logout",
+                    subtitle = "Hapus semua data dan keluar dari akun",
+                    onClick = { showHardClearDialog = true }
+                )
 
-                    // Hapus semua data & logout
-                    SettingItem(
-                        icon = Icons.Default.Warning,
-                        title = "Hapus Data & Logout",
-                        subtitle = "Hapus semua data dan keluar dari akun",
-                        iconColor = Color(0xFFFF6B6B),
-                        onClick = { showHardClearDialog = true }
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Divider(modifier = Modifier.padding(vertical = 4.dp))
-
-                    // Keluar dari akun saja
-                    SettingItem(
-                        icon = Icons.Default.ExitToApp,
-                        title = "Keluar dari Akun",
-                        subtitle = "Akun tetap tersimpan, hanya logout",
-                        iconColor = LifeBlue,
-                        onClick = { showLogoutDialog = true }
-                    )
-                }
+                // Keluar dari Akun Button
+                AccountActionButton(
+                    icon = Icons.Default.ExitToApp,
+                    title = "Keluar dari Akun",
+                    subtitle = "Akun tetap tersimpan, hanya Logout",
+                    onClick = { showLogoutDialog = true }
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -332,7 +353,7 @@ fun AccountScreen(
                 Icon(
                     Icons.Default.ExitToApp,
                     contentDescription = null,
-                    tint = LifeBlue
+                    tint = HealthColors.NeonGreen
                 )
             },
             title = { Text("Keluar dari Akun?") },
@@ -347,9 +368,9 @@ fun AccountScreen(
                         showLogoutDialog = false
                         onLogout()
                     },
-                    colors = ButtonDefaults.buttonColors(LifeBlue)
+                    colors = ButtonDefaults.buttonColors(HealthColors.NeonGreen)
                 ) {
-                    Text("Keluar")
+                    Text("Keluar", color = Color.White)
                 }
             },
             dismissButton = {
@@ -358,5 +379,77 @@ fun AccountScreen(
                 }
             }
         )
+    }
+}
+
+// ===== AccountActionButton Composable =====
+@Composable
+fun AccountActionButton(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(HealthColors.NeonGreen)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Icon box with white background
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color.White.copy(alpha = 0.3f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                // Title and subtitle
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = title,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = subtitle,
+                        fontSize = 12.sp,
+                        color = Color.White.copy(alpha = 0.9f)
+                    )
+                }
+            }
+
+            // Right arrow icon
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }

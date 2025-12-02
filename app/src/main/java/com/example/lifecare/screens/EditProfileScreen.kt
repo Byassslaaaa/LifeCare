@@ -4,6 +4,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,11 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.lifecare.R
 import com.example.lifecare.data.HealthDataManager
 import androidx.compose.ui.platform.LocalContext
 
@@ -82,9 +85,10 @@ fun EditProfileScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Edit Profil",
+                        "Edit Profile",
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 navigationIcon = {
@@ -92,13 +96,12 @@ fun EditProfileScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Kembali",
-                            tint = Color.White
+                            tint = com.example.lifecare.ui.theme.HealthColors.NeonGreen
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = EditPrimary,
-                    titleContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -113,199 +116,162 @@ fun EditProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // ===== AVATAR + CHANGE PHOTO =====
-            Box(
-                modifier = Modifier.size(120.dp),
-                contentAlignment = Alignment.BottomEnd
-            ) {
-                // Profile photo or default avatar
-                if (profilePhotoUri != null) {
-                    AsyncImage(
-                        model = profilePhotoUri,
-                        contentDescription = "Foto Profil",
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .clickable { photoPickerLauncher.launch("image/*") },
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .clickable { photoPickerLauncher.launch("image/*") },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Foto Profil",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(60.dp)
-                        )
-                    }
-                }
-
-                // badge kamera kecil di pojok bawah
+            // ===== AVATAR (Large) =====
+            if (profilePhotoUri != null) {
+                AsyncImage(
+                    model = profilePhotoUri,
+                    contentDescription = "Foto Profil",
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFE0E0E0))
+                        .clickable { photoPickerLauncher.launch("image/*") },
+                    contentScale = ContentScale.Crop
+                )
+            } else {
                 Box(
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .size(32.dp)
+                        .size(200.dp)
                         .clip(CircleShape)
-                        .background(EditPrimary)
+                        .background(Color(0xFFE0E0E0))
                         .clickable { photoPickerLauncher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.CameraAlt,
-                        contentDescription = "Ubah Foto",
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Foto Profil",
+                        tint = Color(0xFFBDBDBD),
+                        modifier = Modifier.size(100.dp)
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // User name (bold, theme-aware)
             Text(
-                "Ubah informasi profil Anda",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                text = fullName.ifEmpty { "Nama Lengkap" },
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Email (NeonGreen)
+            Text(
+                text = userData?.email ?: "email@example.com",
+                fontSize = 14.sp,
+                color = com.example.lifecare.ui.theme.HealthColors.NeonGreen
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ===== CARD FORM =====
-            Card(
+            // Title text (NeonGreen)
+            Text(
+                "Ubah Informasi Profile Anda",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = com.example.lifecare.ui.theme.HealthColors.NeonGreen
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ===== INPUT FIELDS (Gray Background) =====
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = RoundedCornerShape(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+
+                // Nama Lengkap
+                TextField(
+                    value = fullName,
+                    onValueChange = {
+                        if (it.length <= 50) {
+                            fullName = it
+                            fullNameError = null
+                        }
+                    },
+                    placeholder = { Text("Nama Lengkap", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(50.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
+                )
+
+                // Umur
+                TextField(
+                    value = age,
+                    onValueChange = {
+                        if (it.isEmpty() || (it.all { ch -> ch.isDigit() } && it.length <= 3)) {
+                            age = it
+                            ageError = null
+                        }
+                    },
+                    placeholder = { Text("Umur", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(50.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
+                )
+
+                // Gender (dropdown)
+                ExposedDropdownMenuBox(
+                    expanded = genderExpanded,
+                    onExpandedChange = { genderExpanded = !genderExpanded }
                 ) {
-
-                    // Nama Lengkap
-                    OutlinedTextField(
-                        value = fullName,
-                        onValueChange = {
-                            if (it.length <= 50) {
-                                fullName = it
-                                fullNameError = null
-                            }
+                    TextField(
+                        value = gender,
+                        onValueChange = {},
+                        placeholder = { Text("Jenis Kelamin", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                        readOnly = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(),
+                        shape = RoundedCornerShape(50.dp),
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded)
                         },
-                        label = { Text("Nama Lengkap") },
-                        placeholder = { Text("Masukkan nama lengkap") },
-                        singleLine = true,
-                        isError = fullNameError != null,
-                        supportingText = {
-                            fullNameError?.let { err ->
-                                Text(
-                                    err,
-                                    color = MaterialTheme.colorScheme.error,
-                                    fontSize = 11.sp
-                                )
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = EditPrimary,
-                            focusedLabelColor = EditPrimary,
-                            cursorColor = EditPrimary
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
                         )
                     )
 
-                    // Umur
-                    OutlinedTextField(
-                        value = age,
-                        onValueChange = {
-                            if (it.isEmpty() || (it.all { ch -> ch.isDigit() } && it.length <= 3)) {
-                                age = it
-                                ageError = null
-                            }
-                        },
-                        label = { Text("Umur") },
-                        placeholder = { Text("Masukkan umur") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        isError = ageError != null,
-                        supportingText = {
-                            ageError?.let { err ->
-                                Text(
-                                    err,
-                                    color = MaterialTheme.colorScheme.error,
-                                    fontSize = 11.sp
-                                )
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = EditPrimary,
-                            focusedLabelColor = EditPrimary,
-                            cursorColor = EditPrimary
-                        )
-                    )
-
-                    // Gender (dropdown)
-                    ExposedDropdownMenuBox(
+                    ExposedDropdownMenu(
                         expanded = genderExpanded,
-                        onExpandedChange = { genderExpanded = !genderExpanded }
+                        onDismissRequest = { genderExpanded = false }
                     ) {
-                        OutlinedTextField(
-                            value = gender,
-                            onValueChange = {},
-                            label = { Text("Jenis Kelamin") },
-                            placeholder = { Text("Pilih jenis kelamin") },
-                            readOnly = true,
-                            isError = genderError != null,
-                            supportingText = {
-                                genderError?.let { err ->
-                                    Text(
-                                        err,
-                                        color = MaterialTheme.colorScheme.error,
-                                        fontSize = 11.sp
-                                    )
+                        genderOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option) },
+                                onClick = {
+                                    gender = option
+                                    genderError = null
+                                    genderExpanded = false
                                 }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(),
-                            shape = RoundedCornerShape(12.dp),
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded)
-                            },
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = EditPrimary,
-                                focusedLabelColor = EditPrimary,
-                                cursorColor = EditPrimary
                             )
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = genderExpanded,
-                            onDismissRequest = { genderExpanded = false }
-                        ) {
-                            genderOptions.forEach { option ->
-                                DropdownMenuItem(
-                                    text = { Text(option) },
-                                    onClick = {
-                                        gender = option
-                                        genderError = null
-                                        genderExpanded = false
-                                    }
-                                )
-                            }
                         }
                     }
                 }
@@ -313,7 +279,7 @@ fun EditProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ===== BUTTON SIMPAN =====
+            // ===== BUTTON SIMPAN (NeonGreen) =====
             Button(
                 onClick = {
                     var hasError = false
@@ -368,10 +334,10 @@ fun EditProfileScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(24.dp),
+                    .height(56.dp),
+                shape = RoundedCornerShape(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = EditPrimary
+                    containerColor = com.example.lifecare.ui.theme.HealthColors.NeonGreen
                 ),
                 enabled = !isLoading
             ) {
@@ -393,25 +359,24 @@ fun EditProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Info kecil
+            // Info note (theme-aware)
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
-                shape = RoundedCornerShape(12.dp)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "Catatan:",
+                        "Catatan :",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2196F3)
+                        color = com.example.lifecare.ui.theme.HealthColors.NeonGreen
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "Pastikan data profil yang Anda masukkan sudah benar. " +
-                                "Perubahan ini akan digunakan untuk personalisasi dan analisis kesehatan Anda.",
+                        "Pastikan data profil yang Anda masukkan sudah benar. Perubahan ini akan digunakan untuk personalisasi dan analisis kesehatan Anda.",
                         fontSize = 12.sp,
-                        color = Color(0xFF2196F3),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp
                     )
                 }

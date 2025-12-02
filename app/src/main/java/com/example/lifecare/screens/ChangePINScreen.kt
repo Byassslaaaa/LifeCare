@@ -9,7 +9,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -43,9 +42,10 @@ fun ChangePINScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Ganti PIN",
+                        "Ubah PIN",
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 navigationIcon = {
@@ -53,13 +53,12 @@ fun ChangePINScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Kembali",
-                            tint = Color.White
+                            tint = com.example.lifecare.ui.theme.HealthColors.NeonGreen
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF5DCCB4),
-                    titleContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -75,13 +74,23 @@ fun ChangePINScreen(
         ) {
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Icon
-            Icon(
-                Icons.Default.Lock,
-                contentDescription = null,
-                modifier = Modifier.size(80.dp),
-                tint = Color(0xFF5DCCB4)
-            )
+            // Icon with 123
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .background(
+                        color = com.example.lifecare.ui.theme.HealthColors.NeonGreen,
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "123",
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -97,78 +106,84 @@ fun ChangePINScreen(
             Text(
                 "Masukkan PIN lama dan PIN baru Anda",
                 fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = com.example.lifecare.ui.theme.HealthColors.NeonGreen
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             // Old PIN Field
-            OutlinedTextField(
+            TextField(
                 value = oldPin,
                 onValueChange = {
                     if (it.length <= 6 && it.all { char -> char.isDigit() }) {
                         oldPin = it
                     }
                 },
-                label = { Text("PIN Lama") },
-                placeholder = { Text("Masukkan PIN lama (6 digit)") },
+                placeholder = { Text("PIN Lama", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF5DCCB4),
-                    focusedLabelColor = Color(0xFF5DCCB4),
-                    cursorColor = Color(0xFF5DCCB4)
+                shape = RoundedCornerShape(50.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // New PIN Field
-            OutlinedTextField(
+            TextField(
                 value = newPin,
                 onValueChange = {
                     if (it.length <= 6 && it.all { char -> char.isDigit() }) {
                         newPin = it
                     }
                 },
-                label = { Text("PIN Baru") },
-                placeholder = { Text("Masukkan PIN baru (6 digit)") },
+                placeholder = { Text("PIN Baru", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF5DCCB4),
-                    focusedLabelColor = Color(0xFF5DCCB4),
-                    cursorColor = Color(0xFF5DCCB4)
+                shape = RoundedCornerShape(50.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Confirm PIN Field
-            OutlinedTextField(
+            TextField(
                 value = confirmPin,
                 onValueChange = {
                     if (it.length <= 6 && it.all { char -> char.isDigit() }) {
                         confirmPin = it
                     }
                 },
-                label = { Text("Konfirmasi PIN Baru") },
-                placeholder = { Text("Masukkan ulang PIN baru") },
+                placeholder = { Text("Konfirmasi PIN Baru", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF5DCCB4),
-                    focusedLabelColor = Color(0xFF5DCCB4),
-                    cursorColor = Color(0xFF5DCCB4)
+                shape = RoundedCornerShape(50.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
             )
 
@@ -219,10 +234,10 @@ fun ChangePINScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(12.dp),
+                    .height(56.dp),
+                shape = RoundedCornerShape(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF5DCCB4)
+                    containerColor = com.example.lifecare.ui.theme.HealthColors.NeonGreen
                 ),
                 enabled = !isLoading
             ) {
@@ -234,7 +249,7 @@ fun ChangePINScreen(
                     )
                 } else {
                     Text(
-                        "Ubah PIN",
+                        "Simpan Perubahan",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -242,24 +257,24 @@ fun ChangePINScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Info Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFE3F2FD)
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        "Tips Keamanan PIN:",
+                        "Catatan :",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2196F3)
+                        color = com.example.lifecare.ui.theme.HealthColors.NeonGreen
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -268,7 +283,7 @@ fun ChangePINScreen(
                         "• Ubah PIN secara berkala untuk keamanan\n" +
                         "• Jangan bagikan PIN Anda kepada siapapun",
                         fontSize = 12.sp,
-                        color = Color(0xFF2196F3),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp
                     )
                 }
