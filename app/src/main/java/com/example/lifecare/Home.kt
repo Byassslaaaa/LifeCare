@@ -596,7 +596,7 @@ fun GreetingWithChallengeCard(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         shape = RoundedCornerShape(18.dp)
     ) {
@@ -617,7 +617,7 @@ fun GreetingWithChallengeCard(
                     text = "Halo, $userName!",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF111111),
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.align(Alignment.Start)
                 )
 
@@ -629,7 +629,7 @@ fun GreetingWithChallengeCard(
                         .fillMaxWidth(0.85f)
                         .height(1.dp)
                         .alpha(0.12f),
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -674,7 +674,7 @@ fun GreetingWithChallengeCard(
                         Text(
                             text = "Capai targetmu hari ini sebelum jam 09.00",
                             fontSize = 8.sp,
-                            color = Color(0xFF616161),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                             lineHeight = 16.sp
                         )
                     }
@@ -702,7 +702,7 @@ fun GreetingWithChallengeCard(
                     text = "${percent}%",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF222222)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -738,10 +738,10 @@ private fun WeeklyCalendar() {
                 cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                         cal.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
 
-            // HANYA hari ini yang berwarna biru, lainnya abu-abu
-            val backgroundColor = if (isToday) Color(0xFF98CD00) else Color(0xFFE8E8E8)
-            val textColor = if (isToday) Color.White else Color.White
-            val dotColor = if (isToday) Color.White else Color.White
+            // HANYA hari ini yang berwarna hijau, lainnya theme-aware
+            val backgroundColor = if (isToday) Color(0xFF98CD00) else MaterialTheme.colorScheme.surfaceVariant
+            val textColor = if (isToday) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+            val dotColor = if (isToday) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
 
             Box(
                 modifier = Modifier
@@ -790,7 +790,7 @@ private fun WeeklyCalendar() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp),
-        color = Color(0xFFE0E0E0),
+        color = MaterialTheme.colorScheme.outlineVariant,
         thickness = 1.dp
     )
 }
@@ -877,7 +877,7 @@ fun MonitoringCard(
             .heightIn(min = 140.dp)                  // pastikan tinggi cukup
             .clickable(onClick = onClick)
             .shadow(6.dp, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -922,7 +922,7 @@ fun MonitoringCard(
                     text = title,
                     fontSize = 8.sp,                            // lebih besar
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF222222),
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -930,7 +930,7 @@ fun MonitoringCard(
                 Text(
                     text = subtitle,
                     fontSize = 6.sp,                            // jelas & readable
-                    color = Color(0xFF6B6B6B),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     lineHeight = 8.sp,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
@@ -999,7 +999,7 @@ fun RingkasanCard(
         modifier = modifier
             .height(140.dp)
             .shadow(8.dp, RoundedCornerShape(22.dp)),    // shadow lembut
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(22.dp)
     ) {
@@ -1023,7 +1023,7 @@ fun RingkasanCard(
                 text = value,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             // LABEL — kecil, rapi, sama seperti referensi desain
@@ -1047,7 +1047,7 @@ fun TargetKesehatanHariIni(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -1068,7 +1068,7 @@ fun TargetKesehatanHariIni(
                     text = "Target Kesehatan Hari Ini",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF222222)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
@@ -1161,7 +1161,7 @@ fun TargetProgressItem(
                 text = label,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF222222),
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f)
             )
 
@@ -1212,7 +1212,7 @@ fun StatistikMingguIni(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -1233,7 +1233,7 @@ fun StatistikMingguIni(
                     text = "Statistik Minggu Ini",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF222222)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
@@ -1330,7 +1330,7 @@ fun StatistikItem(
                 text = label,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF222222)
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -1339,7 +1339,7 @@ fun StatistikItem(
             text = "$count Kali",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF222222),
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(start = 8.dp)
         )
     }
