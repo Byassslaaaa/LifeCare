@@ -15,9 +15,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.lifecare.ui.theme.HealthColors
 import com.example.lifecare.ui.theme.HealthSpacing
 import com.example.lifecare.ui.theme.HealthTypography
@@ -40,14 +43,24 @@ fun RunTrackingSetupScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Setup Aktivitas") },
+                title = {
+                    Text(
+                        "Setup Aktivitas",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Kembali")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Kembali",
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = HealthColors.Activity
+                    containerColor = HealthColors.NeonGreen
                 )
             )
         }
@@ -124,19 +137,23 @@ fun RunTrackingSetupScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = HealthColors.Activity
+                    containerColor = HealthColors.NeonGreen,
+                    contentColor = Color.White
                 ),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(50.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = null,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(28.dp),
+                    tint = Color.White
                 )
                 Spacer(modifier = Modifier.width(HealthSpacing.small))
                 Text(
                     text = "Mulai ${selectedActivityType}",
-                    style = HealthTypography.titleMedium
+                    style = HealthTypography.titleMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -179,7 +196,7 @@ private fun ActivityTypeCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick),
-        color = if (selected) HealthColors.Activity.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface,
+        color = if (selected) HealthColors.NeonGreen.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface,
         tonalElevation = if (selected) 4.dp else 1.dp,
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -192,20 +209,21 @@ private fun ActivityTypeCard(
                 imageVector = icon,
                 contentDescription = label,
                 modifier = Modifier.size(32.dp),
-                tint = if (selected) HealthColors.Activity else MaterialTheme.colorScheme.onSurface
+                tint = if (selected) HealthColors.NeonGreen else MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.width(HealthSpacing.medium))
             Text(
                 text = label,
                 style = HealthTypography.titleMedium,
-                color = if (selected) HealthColors.Activity else MaterialTheme.colorScheme.onSurface
+                color = if (selected) HealthColors.NeonGreen else MaterialTheme.colorScheme.onSurface,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
             )
             Spacer(modifier = Modifier.weight(1f))
             if (selected) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = "Selected",
-                    tint = HealthColors.Activity
+                    tint = HealthColors.NeonGreen
                 )
             }
         }
@@ -238,7 +256,7 @@ private fun TargetCard(
                 imageVector = icon,
                 contentDescription = label,
                 modifier = Modifier.size(28.dp),
-                tint = HealthColors.Activity
+                tint = HealthColors.NeonGreen
             )
             Spacer(modifier = Modifier.width(HealthSpacing.medium))
             Column(modifier = Modifier.weight(1f)) {
@@ -249,7 +267,8 @@ private fun TargetCard(
                 )
                 Text(
                     text = value,
-                    style = HealthTypography.bodyLarge
+                    style = HealthTypography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
             if (onClear != null) {

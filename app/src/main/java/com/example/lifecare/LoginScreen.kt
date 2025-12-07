@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -109,19 +110,21 @@ fun LoginScreen(
     val isLoading = authState is AuthUiState.Loading
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         color = backgroundColor
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(vertical = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.5f))
 
             // Logo
             Image(
@@ -130,7 +133,7 @@ fun LoginScreen(
                 modifier = Modifier.size(120.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // App Name
             Text(
@@ -150,7 +153,7 @@ fun LoginScreen(
                 fontWeight = FontWeight.SemiBold
             )
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
         // EMAIL FIELD
         TextField(
@@ -180,7 +183,7 @@ fun LoginScreen(
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // PASSWORD FIELD
         TextField(
@@ -217,7 +220,7 @@ fun LoginScreen(
             }
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // LOGIN BUTTON
         Button(
@@ -245,7 +248,7 @@ fun LoginScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // Divider
         Row(
@@ -262,7 +265,7 @@ fun LoginScreen(
             HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // GOOGLE SIGN-IN BUTTON
         Button(
@@ -305,7 +308,7 @@ fun LoginScreen(
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(0.5f))
 
         // Sign Up Link
         Row(
@@ -325,8 +328,6 @@ fun LoginScreen(
                 modifier = Modifier.clickable(enabled = !isLoading) { onRegisterClick() }
             )
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

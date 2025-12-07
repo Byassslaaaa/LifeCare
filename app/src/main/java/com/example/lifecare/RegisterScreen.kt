@@ -109,28 +109,30 @@ fun RegisterScreen(
     val isLoading = authState is AuthUiState.Loading
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         color = backgroundColor
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(vertical = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.3f))
 
             // Logo
             Image(
                 painter = painterResource(id = R.drawable.logodepan),
                 contentDescription = "Logo",
-                modifier = Modifier.size(120.dp)
+                modifier = Modifier.size(100.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // App Name
             Text(
@@ -150,7 +152,7 @@ fun RegisterScreen(
                 fontWeight = FontWeight.SemiBold
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // FULL NAME
             TextField(
@@ -176,7 +178,7 @@ fun RegisterScreen(
                 )
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // EMAIL
             TextField(
@@ -206,7 +208,7 @@ fun RegisterScreen(
                 )
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // PASSWORD
             TextField(
@@ -244,7 +246,7 @@ fun RegisterScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // CONFIRM PASSWORD
             TextField(
@@ -281,7 +283,7 @@ fun RegisterScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // REGISTER BUTTON
             Button(
@@ -316,7 +318,7 @@ fun RegisterScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Divider
             Row(
@@ -333,7 +335,7 @@ fun RegisterScreen(
                 HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // GOOGLE SIGN-UP BUTTON
             Button(
@@ -376,7 +378,7 @@ fun RegisterScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.3f))
 
             // Sign In Link
             Row(
@@ -396,8 +398,6 @@ fun RegisterScreen(
                     modifier = Modifier.clickable(enabled = !isLoading) { onLoginClick() }
                 )
             }
-
-            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

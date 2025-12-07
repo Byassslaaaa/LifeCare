@@ -35,12 +35,12 @@ private val DarkColorScheme = darkColorScheme(
     onTertiary = HealthColors.TextOnPrimary,
 
     // Background & Surface - Pure black theme with wireframe colors
-    background = HealthColors.DarkBackground,        // Pure Black #000000
-    onBackground = HealthColors.DarkTextPrimary,     // Light gray text
+    background = HealthColors.BackgroundDark,        // Pure Black #000000
+    onBackground = HealthColors.TextPrimaryDark,     // White text
     surface = HealthColors.CardDark,                 // Card dark #1A1A1A
-    onSurface = HealthColors.DarkTextPrimary,        // Light gray text
+    onSurface = HealthColors.TextPrimaryDark,        // White text
     surfaceVariant = HealthColors.DarkSurfaceVariant,// Dark gray #1E1E1E
-    onSurfaceVariant = HealthColors.DarkTextSecondary,
+    onSurfaceVariant = HealthColors.TextSecondaryDark,
 
     // Outline & Border
     outline = HealthColors.DarkBorder,
@@ -75,10 +75,10 @@ private val LightColorScheme = lightColorScheme(
     onTertiary = HealthColors.TextOnPrimary,
 
     // Background & Surface with wireframe colors
-    background = HealthColors.Surface,               // White #FFFFFF
-    onBackground = HealthColors.TextPrimary,
-    surface = HealthColors.CardLight,                // Card light #EDEDED
-    onSurface = HealthColors.TextPrimary,
+    background = HealthColors.BackgroundLight,       // White #FFFFFF
+    onBackground = HealthColors.TextPrimaryLight,
+    surface = HealthColors.CardLight,                // Card light #F8F8F8
+    onSurface = HealthColors.TextPrimaryLight,
     surfaceVariant = HealthColors.SurfaceVariant,
     onSurfaceVariant = HealthColors.TextSecondary,
 

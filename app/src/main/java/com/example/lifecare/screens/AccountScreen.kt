@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import com.example.lifecare.data.HealthDataManager
-import com.example.lifecare.data.ThemeManager
 import com.example.lifecare.ui.theme.HealthColors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,11 +29,9 @@ import com.example.lifecare.ui.theme.HealthColors
 fun AccountScreen(
     healthDataManager: HealthDataManager,
     onBackClick: () -> Unit,
-    onLogout: () -> Unit,
-    onThemeToggle: () -> Unit
+    onLogout: () -> Unit
 ) {
     val context = LocalContext.current
-    val themeManager = remember { ThemeManager(context) }
 
     val userData = healthDataManager.getUserData()
     val userEmail = userData?.email ?: "you@example.com"
@@ -195,23 +192,6 @@ fun AccountScreen(
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
-
-                // Tema Aplikasi Button
-                AccountActionButton(
-                    icon = Icons.Default.DarkMode,
-                    title = "Tema Aplikasi",
-                    subtitle = "Saat ini: ${themeManager.getThemeDisplayName()}",
-                    onClick = {
-                        onThemeToggle()
-                        Toast.makeText(
-                            context,
-                            "Tema diubah ke: ${themeManager.getThemeDisplayName()}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
 
                 // Hapus Semua Data Button
                 AccountActionButton(

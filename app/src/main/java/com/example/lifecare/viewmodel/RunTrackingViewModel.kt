@@ -13,6 +13,8 @@ import com.example.lifecare.data.RunActivity
 import com.example.lifecare.repository.RunRepository
 import com.example.lifecare.service.LocationTrackingService
 import com.example.lifecare.utils.GPSUtils
+import android.util.Log
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,14 +46,17 @@ class RunTrackingViewModel(
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            Log.d("RunTrackingVM", "Service connected")
             val binder = service as? LocationTrackingService.LocalBinder
             trackingService = binder?.getService()
             serviceBound = true
 
             // Observe service state
-            trackingService?.let { service ->
+            trackingService?.let { trackingServiceInstance ->
+                Log.d("RunTrackingVM", "Starting to observe service state")
                 viewModelScope.launch {
-                    service.runState.collect { state ->
+                    trackingServiceInstance.runState.collect { state ->
+                        Log.d("RunTrackingVM", "Received state update: ${state.routePoints.size} points, distance: ${state.distance}")
                         _liveRunState.value = state
                     }
                 }
@@ -59,6 +64,7 @@ class RunTrackingViewModel(
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
+            Log.d("RunTrackingVM", "Service disconnected")
             trackingService = null
             serviceBound = false
         }
@@ -92,22 +98,32 @@ class RunTrackingViewModel(
     // Tracking actions
     fun startTracking(context: Context) {
         val intent = Intent(context, LocationTrackingService::class.java)
+
+        // Start service first
         context.startForegroundService(intent)
+
+        // Bind to service
         context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
 
-        trackingService?.startTracking(
-            activityType = _selectedActivityType.value,
-            targetDistance = _targetDistance.value,
-            targetDuration = _targetDuration.value
-        )
+        // Wait a bit for service to bind, then start tracking
+        viewModelScope.launch {
+            kotlinx.coroutines.delay(500) // Give time for binding
+            trackingService?.startTracking(
+                activityType = _selectedActivityType.value,
+                targetDistance = _targetDistance.value,
+                targetDuration = _targetDuration.value
+            )
+        }
     }
 
     fun pauseTracking() {
-        trackingService?.pauseTracking()
+        Log.d("RunTrackingVM", "Pause tracking requested, service bound: $serviceBound")
+        trackingService?.pauseTracking() ?: Log.e("RunTrackingVM", "Service is null, cannot pause")
     }
 
     fun resumeTracking() {
-        trackingService?.resumeTracking()
+        Log.d("RunTrackingVM", "Resume tracking requested, service bound: $serviceBound")
+        trackingService?.resumeTracking() ?: Log.e("RunTrackingVM", "Service is null, cannot resume")
     }
 
     fun stopTracking(context: Context, saveRun: Boolean = true) {

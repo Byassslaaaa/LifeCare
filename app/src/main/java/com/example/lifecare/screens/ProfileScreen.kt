@@ -4,10 +4,14 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.*
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +27,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -62,7 +67,9 @@ fun ProfileScreen(
 ) {
     val context = LocalContext.current
     val themeManager = remember { ThemeManager(context) }
+
     var currentThemeMode by remember { mutableStateOf(themeManager.getThemeMode()) }
+    var showAppearanceDialog by remember { mutableStateOf(false) }
 
     var showChangePINDialog by remember { mutableStateOf(false) }
     var showClearDataDialog by remember { mutableStateOf(false) }
@@ -71,6 +78,13 @@ fun ProfileScreen(
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     var activeMenu by remember { mutableStateOf(ProfileMenu.NONE) }
+
+    // Sync theme state when dialog opens
+    LaunchedEffect(showAppearanceDialog) {
+        if (showAppearanceDialog) {
+            currentThemeMode = themeManager.getThemeMode()
+        }
+    }
 
     val userData = healthDataManager.getUserData()
     var userFullName by remember { mutableStateOf(userData?.fullName ?: "Pengguna LifeCare") }
@@ -207,7 +221,7 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ====== MENU LIST (4 tombol putih dengan border biru) ======
+            // ====== MENU LIST (6 tombol putih dengan border biru) ======
             Column(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -222,6 +236,12 @@ fun ProfileScreen(
                     label = "My Statistic",
                     icon = Icons.Default.InsertChart,
                     onClick = onShowStatistic
+                )
+
+                SettingsMenuItem(
+                    label = "Appearance",
+                    icon = Icons.Default.Palette,
+                    onClick = { showAppearanceDialog = true }
                 )
 
                 SettingsMenuItem(
@@ -379,6 +399,74 @@ fun ProfileScreen(
             dismissButton = {
                 TextButton(onClick = { showLogoutDialog = false }) {
                     Text("Batal")
+                }
+            }
+        )
+    }
+
+    // ====== DIALOG APPEARANCE (iOS-style) ======
+    if (showAppearanceDialog) {
+        AlertDialog(
+            onDismissRequest = { showAppearanceDialog = false },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Palette,
+                        contentDescription = null,
+                        tint = com.example.lifecare.ui.theme.HealthColors.NeonGreen
+                    )
+                    Text("Appearance")
+                }
+            },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    ModernThemeOption(
+                        title = "Tema Gelap",
+                        subtitle = "Mode gelap untuk pengalaman visual yang nyaman",
+                        icon = Icons.Default.DarkMode,
+                        isSelected = currentThemeMode == ThemeManager.THEME_DARK,
+                        onToggle = {
+                            currentThemeMode = ThemeManager.THEME_DARK
+                            themeManager.setThemeMode(ThemeManager.THEME_DARK)
+                            onThemeToggle()
+                        }
+                    )
+
+                    ModernThemeOption(
+                        title = "Tema Terang",
+                        subtitle = "Mode terang untuk tampilan cerah",
+                        icon = Icons.Default.LightMode,
+                        isSelected = currentThemeMode == ThemeManager.THEME_LIGHT,
+                        onToggle = {
+                            currentThemeMode = ThemeManager.THEME_LIGHT
+                            themeManager.setThemeMode(ThemeManager.THEME_LIGHT)
+                            onThemeToggle()
+                        }
+                    )
+
+                    ModernThemeOption(
+                        title = "Ikuti Sistem",
+                        subtitle = "Sesuaikan dengan pengaturan perangkat",
+                        icon = Icons.Default.PhoneAndroid,
+                        isSelected = currentThemeMode == ThemeManager.THEME_SYSTEM,
+                        onToggle = {
+                            currentThemeMode = ThemeManager.THEME_SYSTEM
+                            themeManager.setThemeMode(ThemeManager.THEME_SYSTEM)
+                            onThemeToggle()
+                        }
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showAppearanceDialog = false }
+                ) {
+                    Text("Tutup")
                 }
             }
         )
@@ -551,8 +639,6 @@ private fun AccountSection(
     userAge: String,
     userGender: String,
     userEmail: String,
-    themeManager: ThemeManager,
-    onThemeToggle: () -> Unit,
     onShowClearData: () -> Unit,
     onShowLogout: () -> Unit
 ) {
@@ -599,13 +685,6 @@ private fun AccountSection(
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                SettingItem(
-                    icon = Icons.Default.DarkMode,
-                    title = "Tema Aplikasi",
-                    subtitle = "Saat ini: ${themeManager.getThemeDisplayName()}",
-                    onClick = onThemeToggle
-                )
-                Divider(modifier = Modifier.padding(vertical = 8.dp))
                 SettingItem(
                     icon = Icons.Default.Delete,
                     title = "Hapus Semua Data",
@@ -684,6 +763,131 @@ fun SettingItem(
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+/* ===================== MODERN THEME OPTION (iOS-style toggle switch) ===================== */
+
+@Composable
+private fun ModernThemeOption(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    isSelected: Boolean,
+    onToggle: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable(onClick = onToggle)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.weight(1f)
+        ) {
+            // Icon box
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(
+                        if (isSelected) {
+                            com.example.lifecare.ui.theme.HealthColors.NeonGreen.copy(alpha = 0.15f)
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = if (isSelected) {
+                        com.example.lifecare.ui.theme.HealthColors.NeonGreen
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+
+            // Text content
+            Column {
+                Text(
+                    text = title,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = subtitle,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        // iOS-style toggle switch
+        IOSStyleToggle(
+            checked = isSelected,
+            onCheckedChange = { onToggle() }
+        )
+    }
+}
+
+/* ===================== iOS-STYLE TOGGLE SWITCH ===================== */
+
+@Composable
+private fun IOSStyleToggle(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val backgroundColor by animateColorAsState(
+        targetValue = if (checked) {
+            com.example.lifecare.ui.theme.HealthColors.NeonGreen
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant
+        },
+        animationSpec = tween(durationMillis = 300),
+        label = "background color"
+    )
+
+    val thumbOffset by animateDpAsState(
+        targetValue = if (checked) 22.dp else 2.dp,
+        animationSpec = tween(durationMillis = 300),
+        label = "thumb offset"
+    )
+
+    Box(
+        modifier = modifier
+            .width(51.dp)
+            .height(31.dp)
+            .clip(RoundedCornerShape(15.5.dp))
+            .background(color = backgroundColor)
+            .clickable(
+                onClick = { onCheckedChange(!checked) },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            )
+            .padding(2.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        // Toggle thumb (lingkaran yang bergerak)
+        Box(
+            modifier = Modifier
+                .offset(x = thumbOffset)
+                .size(27.dp)
+                .clip(CircleShape)
+                .background(color = Color.White)
+                .shadow(2.dp, CircleShape)
         )
     }
 }

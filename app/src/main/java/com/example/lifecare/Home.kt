@@ -54,6 +54,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 
 private val LifeCareBlue = Color(0xFF33A1E0)
 private val LifeCareGreen = Color(0xFF98CD00)
@@ -99,25 +103,6 @@ fun HomeScreen(
     }
 
     Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { currentScreen = "health_metrics" },
-                modifier = Modifier
-                    .offset(y = 48.dp)
-                    .size(64.dp), // Larger FAB sesuai wireframe
-                shape = CircleShape,
-                containerColor = HealthColors.NeonGreen, // Neon green dari wireframe
-                contentColor = Color.White,
-                elevation = FloatingActionButtonDefaults.elevation(8.dp)
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = "Tambah Data",
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-        },
-        floatingActionButtonPosition = FabPosition.Center,
         bottomBar = {
             BottomNavigationBar(
                 selectedItem = selectedBottomNav,
@@ -233,8 +218,7 @@ fun HomeScreen(
                     AccountScreen(
                         healthDataManager = healthDataManager,
                         onBackClick = { currentScreen = "profile" },
-                        onLogout = onLogoutClick,
-                        onThemeToggle = onThemeToggle
+                        onLogout = onLogoutClick
                     )
                 }
                 "charts" -> {
@@ -286,108 +270,45 @@ fun HomeScreen(
     }
 }
 
-private class CustomNotchedBottomBarShape : Shape {
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density
-    ): Outline {
-        val fabSize = with(density) { 56.dp.toPx() }
-        val fabRadius = fabSize / 2f
-        val notchRadius = fabRadius + with(density) { 12.dp.toPx() }
-        val cornerRadius = with(density) { 32.dp.toPx() }
-
-        val path = Path().apply {
-            addRoundRect(
-                RoundRect(
-                    rect = Rect(0f, 0f, size.width, size.height),
-                    cornerRadius = CornerRadius(cornerRadius, cornerRadius)
-                )
-            )
-        }
-
-        val cutoutPath = Path().apply {
-            addOval(
-                Rect(
-                    center = androidx.compose.ui.geometry.Offset(size.width / 2, 0f),
-                    radius = notchRadius
-                )
-            )
-        }
-
-        return Outline.Generic(
-            Path.combine(
-                operation = PathOperation.Difference,
-                path1 = path,
-                path2 = cutoutPath
-            )
-        )
-    }
-}
-
 @Composable
 fun BottomNavigationBar(
     selectedItem: String,
     onItemSelected: (String) -> Unit
 ) {
-    Box(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp),
-        contentAlignment = Alignment.BottomCenter
+            .height(70.dp),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 3.dp
     ) {
-        Surface(
+        Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp),
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 8.dp,
-            shadowElevation = 8.dp
+                .fillMaxSize()
+                .padding(horizontal = 32.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Left side icons
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    BottomNavItem(
-                        icon = Icons.Default.Home,
-                        selected = selectedItem == "home",
-                        onClick = { onItemSelected("home") }
-                    )
-                    BottomNavItem(
-                        icon = Icons.Default.DirectionsRun,
-                        selected = selectedItem == "activity",
-                        onClick = { onItemSelected("activity") }
-                    )
-                }
-
-                // Center spacer for FAB
-                Spacer(modifier = Modifier.width(80.dp))
-
-                // Right side icons
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    BottomNavItem(
-                        icon = Icons.Default.CalendarToday,
-                        selected = selectedItem == "calendar",
-                        onClick = { onItemSelected("calendar") }
-                    )
-                    BottomNavItem(
-                        icon = Icons.Default.Person,
-                        selected = selectedItem == "profile",
-                        onClick = { onItemSelected("profile") }
-                    )
-                }
-            }
+            BottomNavItem(
+                icon = Icons.Default.Home,
+                selected = selectedItem == "home",
+                onClick = { onItemSelected("home") }
+            )
+            BottomNavItem(
+                icon = Icons.Default.DirectionsRun,
+                selected = selectedItem == "activity",
+                onClick = { onItemSelected("activity") }
+            )
+            BottomNavItem(
+                icon = Icons.Default.CalendarToday,
+                selected = selectedItem == "calendar",
+                onClick = { onItemSelected("calendar") }
+            )
+            BottomNavItem(
+                icon = Icons.Default.Person,
+                selected = selectedItem == "profile",
+                onClick = { onItemSelected("profile") }
+            )
         }
     }
 }
@@ -398,23 +319,50 @@ fun BottomNavItem(
     selected: Boolean,
     onClick: () -> Unit
 ) {
+    val isDarkTheme = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Animated color transition
+    val backgroundColor by animateColorAsState(
+        targetValue = when {
+            isPressed && isDarkTheme -> Color(0xFF3C3C3C)
+            isPressed && !isDarkTheme -> Color(0xFFE0E0E0)
+            selected && isDarkTheme -> Color(0xFF2C2C2C)
+            selected && !isDarkTheme -> Color(0xFFF0F0F0)
+            else -> Color.Transparent
+        },
+        label = "background color"
+    )
+
+    val iconTint by animateColorAsState(
+        targetValue = when {
+            isPressed -> HealthColors.NeonGreen
+            selected && isDarkTheme -> Color.White
+            selected && !isDarkTheme -> Color.Black
+            isDarkTheme -> Color.White.copy(alpha = 0.5f)
+            else -> Color.Black.copy(alpha = 0.5f)
+        },
+        label = "icon tint"
+    )
+
     Box(
         modifier = Modifier
-            .size(48.dp)
-            .clip(CircleShape)
-            .background(
-                if (selected) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-                else Color.Transparent
+            .size(52.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .clickable(
+                onClick = onClick,
+                interactionSource = interactionSource,
+                indication = null
             )
-            .clickable(onClick = onClick),
+            .background(backgroundColor),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(24.dp),
-            tint = if (selected) MaterialTheme.colorScheme.onSurface
-            else MaterialTheme.colorScheme.onSurfaceVariant
+            tint = iconTint
         )
     }
 }
@@ -721,7 +669,7 @@ fun GreetingWithChallengeCard(
                     modifier = Modifier.size(96.dp),
                     color = LifeCareGreen,
                     strokeWidth = 10.dp,
-                    trackColor = Color(0xFFE6E6E6)
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
 
                 Text(
@@ -901,10 +849,9 @@ fun MonitoringCard(
     Card(
         modifier = modifier
             .heightIn(min = 140.dp)                  // pastikan tinggi cukup
-            .clickable(onClick = onClick)
-            .shadow(6.dp, RoundedCornerShape(16.dp)),
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
         // susunan: top = icon, middle = content (title+subtitle) kiri, bottom = progress
@@ -974,7 +921,7 @@ fun MonitoringCard(
                         .height(8.dp)
                         .clip(RoundedCornerShape(6.dp)),
                     color = HealthColors.NeonGreen,
-                    trackColor = Color(0xFFF0F0F0)
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             } else {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -1023,10 +970,9 @@ fun RingkasanCard(
 ) {
     Card(
         modifier = modifier
-            .height(140.dp)
-            .shadow(8.dp, RoundedCornerShape(22.dp)),    // shadow lembut
+            .height(140.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(22.dp)
     ) {
         Column(
@@ -1109,7 +1055,7 @@ fun TargetKesehatanHariIni(
 
                 Divider(
                     modifier = Modifier.fillMaxWidth(),
-                    color = Color(0xFFE6E6E6),
+                    color = MaterialTheme.colorScheme.outlineVariant,
                     thickness = 1.dp
                 )
 
@@ -1197,11 +1143,11 @@ fun TargetProgressItem(
                     append(current.toString())
                 }
                 append(" / ")
-                withStyle(style = SpanStyle(color = Color(0xFF9E9E9E))) {
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
                     append(goal.toString())
                 }
                 append(" ")
-                withStyle(style = SpanStyle(color = Color(0xFF9E9E9E))) {
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
                     append(unit)
                 }
             }
@@ -1222,7 +1168,7 @@ fun TargetProgressItem(
                 .height(8.dp)
                 .clip(RoundedCornerShape(6.dp)),
             color = HealthColors.NeonGreen,
-            trackColor = Color(0xFFEFEFEF)
+            trackColor = MaterialTheme.colorScheme.surfaceVariant
         )
     }
 }
@@ -1274,7 +1220,7 @@ fun StatistikMingguIni(
 
                 Divider(
                     modifier = Modifier.fillMaxWidth(),
-                    color = Color(0xFFE6E6E6),
+                    color = MaterialTheme.colorScheme.outlineVariant,
                     thickness = 1.dp
                 )
 

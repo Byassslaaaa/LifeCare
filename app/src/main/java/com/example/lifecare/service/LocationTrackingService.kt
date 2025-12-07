@@ -8,6 +8,7 @@ import android.location.Location
 import android.os.Binder
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.lifecare.MainActivity
 import com.example.lifecare.R
@@ -67,6 +68,7 @@ class LocationTrackingService : Service() {
         targetDistance: Double? = null,
         targetDuration: Long? = null
     ) {
+        Log.d("LocationService", "Starting tracking for $activityType")
         startTime = System.currentTimeMillis()
         lastUpdateTime = startTime
         pausedTime = 0
@@ -79,6 +81,7 @@ class LocationTrackingService : Service() {
             targetDuration = targetDuration,
             startTime = startTime
         )
+        Log.d("LocationService", "Initial state set, isTracking: ${_runState.value.isTracking}")
 
         // BATTERY OPTIMIZATION: Select update interval based on activity type
         val updateInterval = when (activityType.lowercase()) {
@@ -107,24 +110,35 @@ class LocationTrackingService : Service() {
     }
 
     fun pauseTracking() {
-        if (!_runState.value.isTracking || _runState.value.isPaused) return
+        Log.d("LocationService", "Pause requested, isTracking: ${_runState.value.isTracking}, isPaused: ${_runState.value.isPaused}")
+        if (!_runState.value.isTracking || _runState.value.isPaused) {
+            Log.w("LocationService", "Cannot pause: not tracking or already paused")
+            return
+        }
 
         lastPauseTimestamp = System.currentTimeMillis()
         _runState.value = _runState.value.copy(isPaused = true)
+        Log.d("LocationService", "Tracking paused")
 
         updateNotification()
     }
 
     fun resumeTracking() {
-        if (!_runState.value.isTracking || !_runState.value.isPaused) return
+        Log.d("LocationService", "Resume requested, isTracking: ${_runState.value.isTracking}, isPaused: ${_runState.value.isPaused}")
+        if (!_runState.value.isTracking || !_runState.value.isPaused) {
+            Log.w("LocationService", "Cannot resume: not tracking or not paused")
+            return
+        }
 
         val pauseDuration = System.currentTimeMillis() - lastPauseTimestamp
         pausedTime += pauseDuration
+        Log.d("LocationService", "Pause duration: $pauseDuration ms, total paused: $pausedTime ms")
 
         _runState.value = _runState.value.copy(
             isPaused = false,
             pausedDuration = pausedTime
         )
+        Log.d("LocationService", "Tracking resumed")
 
         updateNotification()
     }
@@ -139,9 +153,18 @@ class LocationTrackingService : Service() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
 
-            if (_runState.value.isPaused) return
+            if (_runState.value.isPaused) {
+                Log.d("LocationService", "Location update skipped: paused")
+                return
+            }
 
-            val location = locationResult.lastLocation ?: return
+            val location = locationResult.lastLocation
+            if (location == null) {
+                Log.w("LocationService", "Location update received but location is null")
+                return
+            }
+
+            Log.d("LocationService", "Location update: lat=${location.latitude}, lng=${location.longitude}, accuracy=${location.accuracy}")
             updateLocation(location)
         }
     }

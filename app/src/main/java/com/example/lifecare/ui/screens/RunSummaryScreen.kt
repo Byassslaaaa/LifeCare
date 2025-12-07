@@ -24,6 +24,12 @@ import com.example.lifecare.ui.theme.HealthColors
 import com.example.lifecare.ui.theme.HealthSpacing
 import com.example.lifecare.ui.theme.HealthTypography
 import com.example.lifecare.viewmodel.RunTrackingViewModel
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -50,9 +56,15 @@ fun RunSummaryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ringkasan ${selectedActivityType}") },
+                title = {
+                    Text(
+                        "Ringkasan ${selectedActivityType}",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = HealthColors.Activity
+                    containerColor = HealthColors.NeonGreen
                 )
             )
         }
@@ -65,7 +77,7 @@ fun RunSummaryScreen(
         ) {
             // Header Section with main stat
             Surface(
-                color = HealthColors.Activity,
+                color = HealthColors.NeonGreen,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
@@ -95,6 +107,98 @@ fun RunSummaryScreen(
             }
 
             Spacer(modifier = Modifier.height(HealthSpacing.medium))
+
+            // Map Preview with Route
+            if (runState.routePoints.isNotEmpty()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+                        .padding(horizontal = HealthSpacing.medium),
+                    shape = RoundedCornerShape(20.dp),
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        val routeLatLngs = runState.routePoints.map {
+                            LatLng(it.latitude, it.longitude)
+                        }
+
+                        val boundsBuilder = LatLngBounds.builder()
+                        routeLatLngs.forEach { boundsBuilder.include(it) }
+                        val bounds = boundsBuilder.build()
+
+                        val cameraPositionState = rememberCameraPositionState()
+
+                        LaunchedEffect(bounds) {
+                            cameraPositionState.move(
+                                CameraUpdateFactory.newLatLngBounds(bounds, 80)
+                            )
+                        }
+
+                        GoogleMap(
+                            modifier = Modifier.fillMaxSize(),
+                            cameraPositionState = cameraPositionState,
+                            properties = MapProperties(
+                                mapType = MapType.NORMAL
+                            ),
+                            uiSettings = MapUiSettings(
+                                compassEnabled = false,
+                                zoomControlsEnabled = false,
+                                myLocationButtonEnabled = false,
+                                mapToolbarEnabled = false,
+                                scrollGesturesEnabled = false,
+                                zoomGesturesEnabled = false,
+                                rotationGesturesEnabled = false,
+                                tiltGesturesEnabled = false
+                            )
+                        ) {
+                            // Route polyline
+                            Polyline(
+                                points = routeLatLngs,
+                                color = HealthColors.NeonGreen,
+                                width = 12f
+                            )
+
+                            // Start marker
+                            if (routeLatLngs.isNotEmpty()) {
+                                Marker(
+                                    state = MarkerState(position = routeLatLngs.first()),
+                                    title = "Mulai",
+                                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
+                                )
+                            }
+
+                            // End marker
+                            if (routeLatLngs.size > 1) {
+                                Marker(
+                                    state = MarkerState(position = routeLatLngs.last()),
+                                    title = "Selesai",
+                                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
+                                )
+                            }
+                        }
+
+                        // Distance overlay badge
+                        Surface(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(12.dp),
+                            color = HealthColors.NeonGreen,
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                text = "%.2f km".format(runState.distance),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                style = HealthTypography.labelLarge,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(HealthSpacing.medium))
+            }
 
             // Achievement badges (if targets met)
             if (targetDistanceAchieved || targetDurationAchieved) {
@@ -251,18 +355,22 @@ fun RunSummaryScreen(
                         .fillMaxWidth()
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = HealthColors.Activity
+                        containerColor = HealthColors.NeonGreen,
+                        contentColor = Color.White
                     ),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(50.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Save,
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = Color.White
                     )
                     Spacer(modifier = Modifier.width(HealthSpacing.small))
                     Text(
                         text = "Simpan Aktivitas",
-                        style = HealthTypography.titleMedium
+                        style = HealthTypography.titleMedium,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
                     )
                 }
 
@@ -333,7 +441,7 @@ private fun SummaryStatCard(
             Icon(
                 imageVector = icon,
                 contentDescription = label,
-                tint = HealthColors.Activity,
+                tint = HealthColors.NeonGreen,
                 modifier = Modifier.size(28.dp)
             )
             Spacer(modifier = Modifier.height(HealthSpacing.extraSmall))
@@ -360,7 +468,7 @@ private fun AchievementBadge(
     description: String
 ) {
     Surface(
-        color = HealthColors.Activity.copy(alpha = 0.1f),
+        color = HealthColors.NeonGreen.copy(alpha = 0.1f),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -369,7 +477,7 @@ private fun AchievementBadge(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                color = HealthColors.Activity,
+                color = HealthColors.NeonGreen,
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Icon(
@@ -387,7 +495,7 @@ private fun AchievementBadge(
                     text = title,
                     style = HealthTypography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = HealthColors.Activity
+                    color = HealthColors.NeonGreen
                 )
                 Text(
                     text = description,

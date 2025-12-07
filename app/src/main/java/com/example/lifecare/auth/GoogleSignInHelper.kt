@@ -25,7 +25,8 @@ data class GoogleSignInResult(
 class GoogleSignInHelper(private val context: Context) {
 
     // Web Client ID dari Firebase Console (Web SDK configuration)
-    private val webClientId = "923227050918-uar849jimarkq0jedsl9be4s96a8lla9.apps.googleusercontent.com"
+    // IMPORTANT: Dapatkan dari Firebase Console > Authentication > Sign-in method > Google > Web SDK configuration
+    private val webClientId = "272255934300-35cp2ln1bo9lfqdejmcd0406ml6ftcsq.apps.googleusercontent.com"
 
     private val credentialManager = CredentialManager.create(context)
 

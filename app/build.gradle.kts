@@ -99,6 +99,10 @@ dependencies {
     // Google Play Services Location for GPS tracking
     implementation("com.google.android.gms:play-services-location:21.2.0")
 
+    // Google Maps for GPS tracking visualization
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.maps.android:maps-compose:4.3.3")
+
     // Coil for image loading (profile photo)
     implementation("io.coil-kt:coil-compose:2.6.0")
 

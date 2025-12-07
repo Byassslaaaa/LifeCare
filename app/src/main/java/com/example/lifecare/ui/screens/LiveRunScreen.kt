@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -21,6 +22,11 @@ import com.example.lifecare.ui.theme.HealthColors
 import com.example.lifecare.ui.theme.HealthSpacing
 import com.example.lifecare.ui.theme.HealthTypography
 import com.example.lifecare.viewmodel.RunTrackingViewModel
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.*
 
 @Composable
 fun LiveRunScreen(
@@ -35,21 +41,142 @@ fun LiveRunScreen(
 
     var showDiscardDialog by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+    // Map state
+    val hasGpsLocation = runState.routePoints.isNotEmpty()
+    val currentLocation = remember(runState.routePoints) {
+        runState.routePoints.lastOrNull()?.let { LatLng(it.latitude, it.longitude) }
+            ?: LatLng(-6.200000, 106.816666) // Default Jakarta
+    }
+
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(currentLocation, 17f)
+    }
+
+    // Update camera when location changes (only if we have GPS location)
+    LaunchedEffect(currentLocation, hasGpsLocation) {
+        if (hasGpsLocation) {
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newLatLngZoom(currentLocation, 17f),
+                durationMs = 1000
+            )
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        // Top Bar with discard button
+        if (hasGpsLocation) {
+            // Google Maps as background (only show when GPS ready)
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                properties = MapProperties(
+                    isMyLocationEnabled = false,
+                    mapType = MapType.NORMAL
+                ),
+                uiSettings = MapUiSettings(
+                    compassEnabled = true,
+                    zoomControlsEnabled = false,
+                    myLocationButtonEnabled = false,
+                    mapToolbarEnabled = false
+                )
+            ) {
+                // Draw route polyline
+                if (runState.routePoints.size > 1) {
+                    Polyline(
+                        points = runState.routePoints.map { LatLng(it.latitude, it.longitude) },
+                        color = HealthColors.NeonGreen,
+                        width = 12f
+                    )
+                }
+
+                // Current location marker
+                runState.routePoints.lastOrNull()?.let { location ->
+                    Marker(
+                        state = MarkerState(position = LatLng(location.latitude, location.longitude)),
+                        title = "Lokasi Saat Ini",
+                        icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
+                    )
+                }
+            }
+        } else {
+            // GPS Loading State - Clean placeholder
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Animated GPS icon
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                            .background(HealthColors.NeonGreen.copy(alpha = 0.1f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.GpsFixed,
+                            contentDescription = "Mencari GPS",
+                            tint = HealthColors.NeonGreen,
+                            modifier = Modifier.size(64.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    CircularProgressIndicator(
+                        color = HealthColors.NeonGreen,
+                        modifier = Modifier.size(48.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        text = "Mencari Sinyal GPS...",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Pastikan Anda berada di area terbuka",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = "untuk akurasi GPS yang lebih baik",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                }
+            }
+        }
+
+        // Top Bar with close button and status
         Surface(
-            color = MaterialTheme.colorScheme.surface,
-            modifier = Modifier.fillMaxWidth()
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
         ) {
             Row(
                 modifier = Modifier
-                    .padding(HealthSpacing.medium)
-                    .statusBarsPadding(),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .padding(HealthSpacing.medium),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(
                     onClick = { showDiscardDialog = true }
@@ -60,115 +187,137 @@ fun LiveRunScreen(
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = if (runState.isPaused) "DIJEDA" else "BERJALAN",
-                    style = HealthTypography.labelLarge,
-                    color = if (runState.isPaused) Color.Yellow else HealthColors.Activity,
-                    fontWeight = FontWeight.Bold
-                )
+
+                Surface(
+                    color = if (!hasGpsLocation) Color(0xFFF59E0B) else if (runState.isPaused) Color(0xFFFBBF24) else HealthColors.NeonGreen,
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        if (!hasGpsLocation) {
+                            Icon(
+                                imageVector = Icons.Default.GpsFixed,
+                                contentDescription = "GPS",
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        Text(
+                            text = if (!hasGpsLocation) "MENCARI GPS" else if (runState.isPaused) "DIJEDA" else "BERJALAN",
+                            style = HealthTypography.labelLarge,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                // Placeholder for symmetry
+                Box(modifier = Modifier.size(48.dp))
             }
         }
 
-        // Main Stats Area
+        // Floating Stats Card
         Column(
             modifier = Modifier
-                .weight(1f)
-                .padding(HealthSpacing.large),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(HealthSpacing.medium)
         ) {
-            // Distance (Main stat)
-            Text(
-                text = "%.2f".format(runState.distance),
-                style = HealthTypography.displayLarge.copy(
-                    fontSize = 72.sp,
-                    fontWeight = FontWeight.Bold
+            // Main Stats Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(12.dp, RoundedCornerShape(24.dp)),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Text(
-                text = "kilometer",
-                style = HealthTypography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-            )
-
-            // Target Progress (if set)
-            targetDistance?.let { target ->
-                Spacer(modifier = Modifier.height(HealthSpacing.small))
-                val progress = (runState.distance / target).coerceIn(0.0, 1.0)
-                LinearProgressIndicator(
-                    progress = { progress.toFloat() },
+                shape = RoundedCornerShape(24.dp)
+            ) {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth(0.6f)
-                        .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp)),
-                    color = HealthColors.Activity,
-                    trackColor = Color.White.copy(alpha = 0.2f)
-                )
-                Text(
-                    text = "Target: %.2f km (%.0f%%)".format(target, progress * 100),
-                    style = HealthTypography.bodySmall,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                    modifier = Modifier.padding(top = HealthSpacing.extraSmall)
-                )
-            }
+                        .fillMaxWidth()
+                        .padding(20.dp)
+                ) {
+                    // Distance - Main Stat
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "%.2f".format(runState.distance),
+                            style = HealthTypography.displayLarge.copy(
+                                fontSize = 56.sp,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = HealthColors.NeonGreen
+                        )
+                        Text(
+                            text = "kilometer",
+                            style = HealthTypography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
 
-            Spacer(modifier = Modifier.height(HealthSpacing.extraLarge))
+                        // Target Progress
+                        targetDistance?.let { target ->
+                            Spacer(modifier = Modifier.height(8.dp))
+                            val progress = (runState.distance / target).coerceIn(0.0, 1.0)
+                            LinearProgressIndicator(
+                                progress = { progress.toFloat() },
+                                modifier = Modifier
+                                    .fillMaxWidth(0.7f)
+                                    .height(6.dp)
+                                    .clip(RoundedCornerShape(3.dp)),
+                                color = HealthColors.NeonGreen,
+                                trackColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                            Text(
+                                text = "Target: %.2f km".format(target),
+                                style = HealthTypography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                    }
 
-            // Secondary Stats Grid
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatItem(
-                    label = "Pace",
-                    value = viewModel.formatPace(runState.averagePace),
-                    modifier = Modifier.weight(1f)
-                )
-                StatItem(
-                    label = "Waktu",
-                    value = viewModel.formatDuration(runState.duration),
-                    modifier = Modifier.weight(1f)
-                )
-                StatItem(
-                    label = "Kalori",
-                    value = "${runState.calories}",
-                    modifier = Modifier.weight(1f)
-                )
-            }
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(HealthSpacing.medium))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-            // Additional Stats
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatItem(
-                    label = "Kecepatan",
-                    value = viewModel.formatSpeed(runState.averageSpeed),
-                    modifier = Modifier.weight(1f)
-                )
-                if (runState.elevationGain > 0) {
-                    StatItem(
-                        label = "Elevasi",
-                        value = "${runState.elevationGain.toInt()}m",
-                        modifier = Modifier.weight(1f)
-                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Secondary Stats Grid
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        FloatingStatItem(
+                            label = "Waktu",
+                            value = viewModel.formatDuration(runState.duration),
+                            icon = Icons.Default.Timer
+                        )
+                        FloatingStatItem(
+                            label = "Pace",
+                            value = viewModel.formatPace(runState.averagePace),
+                            icon = Icons.Default.Speed
+                        )
+                        FloatingStatItem(
+                            label = "Kalori",
+                            value = "${runState.calories}",
+                            icon = Icons.Default.LocalFireDepartment
+                        )
+                    }
                 }
             }
-        }
 
-        // Control Buttons
-        Surface(
-            color = MaterialTheme.colorScheme.surface,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Control Buttons
             Row(
-                modifier = Modifier
-                    .padding(HealthSpacing.large)
-                    .navigationBarsPadding(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -181,31 +330,29 @@ fun LiveRunScreen(
                             viewModel.pauseTracking()
                         }
                     },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    containerColor = if (runState.isPaused) HealthColors.NeonGreen else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (runState.isPaused) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(72.dp)
                 ) {
                     Icon(
                         imageVector = if (runState.isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
                         contentDescription = if (runState.isPaused) "Resume" else "Pause",
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(36.dp)
                     )
                 }
 
                 // Finish Button
-                Button(
+                FloatingActionButton(
                     onClick = onFinishRun,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = HealthColors.Activity
-                    ),
-                    shape = CircleShape,
-                    modifier = Modifier.size(64.dp),
-                    enabled = runState.distance > 0
+                    containerColor = HealthColors.NeonGreen,
+                    contentColor = Color.White,
+                    modifier = Modifier.size(72.dp),
+                    elevation = FloatingActionButtonDefaults.elevation(8.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Stop,
                         contentDescription = "Finish",
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(36.dp)
                     )
                 }
             }
@@ -242,26 +389,33 @@ fun LiveRunScreen(
 }
 
 @Composable
-private fun StatItem(
+private fun FloatingStatItem(
     label: String,
     value: String,
-    modifier: Modifier = Modifier
+    icon: androidx.compose.ui.graphics.vector.ImageVector
 ) {
     Column(
-        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = HealthColors.NeonGreen,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = value,
-            style = HealthTypography.headlineMedium.copy(
+            style = HealthTypography.titleMedium.copy(
                 fontWeight = FontWeight.Bold
             ),
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = label,
             style = HealthTypography.bodySmall,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
     }
 }
+

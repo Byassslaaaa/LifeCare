@@ -37,15 +37,23 @@ class MainActivity : ComponentActivity() {
             val authViewModel = remember { AuthViewModel(this) }
             val pinSessionManager = remember { PINSessionManager(this) }
 
-            // THEME STATE - reactive dark mode state
+            // THEME STATE - reactive dark mode state with real-time switching
             val isSystemInDarkMode = isSystemInDarkTheme()
-            val isDarkMode = remember(isSystemInDarkMode) {
-                derivedStateOf {
-                    themeManager.isDarkModeEnabled(isSystemInDarkMode)
-                }
-            }.value
-
+            // Use mutableStateOf with key to force recomposition when SharedPreferences changes
             var themeMode by remember { mutableStateOf(themeManager.getThemeMode()) }
+
+            // Key for force recomposition
+            var themeUpdateTrigger by remember { mutableIntStateOf(0) }
+
+            // Calculate isDarkMode based on current themeMode (real-time)
+            // FIX: Correct logic - light means NOT dark, dark means dark
+            val isDarkMode = remember(themeMode, themeUpdateTrigger) {
+                when (themeManager.getThemeMode()) {  // Always read from SharedPreferences
+                    "light" -> false  // Light theme = not dark
+                    "dark" -> true    // Dark theme = dark
+                    else -> isSystemInDarkMode // System default
+                }
+            }
 
             LifeCareTheme(darkTheme = isDarkMode) {
 
@@ -98,7 +106,9 @@ class MainActivity : ComponentActivity() {
                                 currentScreen = AppScreen.LOGIN
                             },
                             onThemeToggle = {
-                                themeMode = themeManager.cycleThemeMode()
+                                // FIX: Force update theme from SharedPreferences
+                                themeMode = themeManager.getThemeMode()
+                                themeUpdateTrigger++  // Trigger recomposition
                             }
                         )
                     }

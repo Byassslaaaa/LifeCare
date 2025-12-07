@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.GpsFixed
@@ -55,13 +55,23 @@ fun PhysicalActivityScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
+            ExtendedFloatingActionButton(
                 onClick = { showDialog = true },
                 containerColor = HealthColors.NeonGreen,
-                contentColor = HealthColors.TextOnPrimary
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
+                contentColor = HealthColors.TextOnPrimary,
+                icon = {
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = "Tambah Aktivitas"
+                    )
+                },
+                text = {
+                    Text(
+                        "Catat Aktivitas",
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            )
         }
     ) { paddingValues ->
         Column(

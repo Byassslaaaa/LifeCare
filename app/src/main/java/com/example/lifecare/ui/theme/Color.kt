@@ -31,7 +31,7 @@ object HealthColors {
 
     // Light Mode Colors
     val BackgroundLight = Color(0xFFFFFFFF)      // Pure white background
-    val CardLight = Color(0xFFF4F4F4)            // Card background light #F4F4F4-#FAFAFA
+    val CardLight = Color(0xFFF8F8F8)            // Card background light #F8F8F8
     val CardLightAlt = Color(0xFFFAFAFA)         // Alternative card background
     val BorderLight = Color(0xFFE5E5E5)          // Border light
     val TextPrimaryLight = Color(0xFF000000)     // Black text
